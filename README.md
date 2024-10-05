@@ -5,3 +5,6 @@ A Retail Management System developed for my SDA course using Spring. It supports
 
 [USECASES](https://docs.google.com/document/d/1iEGZ_M8FCJL7CDgoZM3_mKZwYF-gxmzrXRYIzuYwb_8/edit?usp=sharing)
 
+[USECASE-DIAGRAM](https://drive.google.com/file/d/10-PDATXtgbPqcOy0TYtoF2K0IClebA4c/view?usp=sharing)
+
+
