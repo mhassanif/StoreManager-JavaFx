@@ -7,7 +7,7 @@ A Retail Management System developed for my SDA course using Spring. It supports
 
 [USECASE-DIAGRAM](https://drive.google.com/file/d/10-PDATXtgbPqcOy0TYtoF2K0IClebA4c/view?usp=sharing)
 
-[Domain Model](https://drive.google.com/file/d/1frQA9VhNlRuulaa5_T5N_DYxtFGY5akK/view?usp=sharing)
+[DOMAIN MODEL](https://drive.google.com/file/d/1frQA9VhNlRuulaa5_T5N_DYxtFGY5akK/view?usp=sharing)
 
 [Deliverable#4](https://docs.google.com/document/d/1kzpN3BP0F8CVbfs9zNb2Qpx1mfaCuAQz-NGVePSGB8U/edit?usp=sharing)
 
