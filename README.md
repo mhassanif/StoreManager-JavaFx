@@ -11,7 +11,7 @@ A Retail Management System developed for my SDA course using Spring. It supports
 
 [UML DIAGRAM](https://drive.google.com/file/d/1cutA6XR3TN4LJs8WPEX8XZfPz3Sf98UZ/view?usp=sharing)
 
-[System Sequence](https://drive.google.com/file/d/1NBoYfohJ-6oq0dzyxQrNiLSROiO4Tz64/view?usp=sharing).
+[System Sequence](https://drive.google.com/file/d/1NBoYfohJ-6oq0dzyxQrNiLSROiO4Tz64/view?usp=sharing)
 
 [Deliverable#4](https://docs.google.com/document/d/1kzpN3BP0F8CVbfs9zNb2Qpx1mfaCuAQz-NGVePSGB8U/edit?usp=sharing)
 
