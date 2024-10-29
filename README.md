@@ -15,7 +15,7 @@ A Retail Management System developed for my SDA course using Spring. It supports
 
 [ACTION SEQUENCES](https://drive.google.com/file/d/1zPvXNP-vhaDg80woSlj1yO6YsRoxPh7U/view?usp=sharing)
 
-[Deliverable#4](https://docs.google.com/document/d/1kzpN3BP0F8CVbfs9zNb2Qpx1mfaCuAQz-NGVePSGB8U/edit?usp=sharing)
+[DELIVERABLE#4](https://docs.google.com/document/d/1kzpN3BP0F8CVbfs9zNb2Qpx1mfaCuAQz-NGVePSGB8U/edit?usp=sharing)
 
 
 
