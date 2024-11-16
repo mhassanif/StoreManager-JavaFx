@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class HelloApplication extends Application {
+public class LoginApplication extends Application {
     @Override
 
 
@@ -16,8 +16,11 @@ public class HelloApplication extends Application {
         // Test the database connection
         DBconnector.testConnection();
 
+        // test reading from db
+        DBconnector.printAllUsernames();
+
         // Load the FXML for the main application UI
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(LoginApplication.class.getResource("Login.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 320, 240);
         stage.setTitle("Hello!");
         stage.setScene(scene);

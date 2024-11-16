@@ -1,8 +1,5 @@
 package com.storemanager.db;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class DBconnector {
 
@@ -38,4 +35,23 @@ public class DBconnector {
             System.out.println("Error: Unable to establish a connection to the database.");
         }
     }
+
+    public static void printAllUsernames() {
+        String query = "SELECT username FROM Users";  // SQL query to fetch all usernames
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet resultSet = stmt.executeQuery(query)) {
+
+            // Loop through the result set and print each username
+            while (resultSet.next()) {
+                String username = resultSet.getString("username");
+                System.out.println("Username: " + username);  // Output the username
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
+
+
