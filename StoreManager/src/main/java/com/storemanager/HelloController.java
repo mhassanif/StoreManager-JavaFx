@@ -1,4 +1,4 @@
-package com.mhassanif.storemanager;
+package com.storemanager;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;

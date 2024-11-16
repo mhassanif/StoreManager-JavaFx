@@ -8,7 +8,9 @@ module com.mhassanif.storemanager {
     requires net.synedra.validatorfx;
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
+    requires java.sql;
+    requires com.microsoft.sqlserver.jdbc;
 
-    opens com.mhassanif.storemanager to javafx.fxml;
-    exports com.mhassanif.storemanager;
+    opens com.storemanager to javafx.fxml;
+    exports com.storemanager;
 }
