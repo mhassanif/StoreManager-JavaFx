@@ -1,9 +1,14 @@
 package com.storemanager.model.users;
 
+import com.storemanager.model.cart.CartItem;
+import com.storemanager.model.cart.ShoppingCart;
+import com.storemanager.model.order.Order;
+import com.storemanager.model.order.OrderItem;
 import com.storemanager.db.DBconnector;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Represents a customer in the system.
@@ -11,15 +16,18 @@ import java.sql.SQLException;
  */
 public class Customer extends User {
 
-    // Customer-specific fields can be added here
+    // Customer-specific fields
     private String address;
     private String phoneNumber;
+    private ShoppingCart shoppingCart; // Customer's shopping cart
+    private List<Order> orders; // List of customer's past orders
 
     // Constructor
     public Customer(String username, String email, String password, String address, String phoneNumber) {
         super(username, email, password, "Customer"); // Assigning the role as "Customer"
         this.address = address;
         this.phoneNumber = phoneNumber;
+        this.shoppingCart = new ShoppingCart(); // Initialize the shopping cart
     }
 
     // Getters and Setters for customer-specific fields
@@ -37,6 +45,22 @@ public class Customer extends User {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public ShoppingCart getShoppingCart() {
+        return shoppingCart;
+    }
+
+    public void setShoppingCart(ShoppingCart shoppingCart) {
+        this.shoppingCart = shoppingCart;
+    }
+
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
     }
 
     /**
@@ -84,6 +108,44 @@ public class Customer extends User {
         System.out.println("Phone Number: " + this.phoneNumber);
     }
 
+    /**
+     * Method to add an item to the shopping cart.
+     * @param cartItem The item to be added to the cart.
+     */
+    public void addToCart(CartItem cartItem) {
+        shoppingCart.addItem(cartItem); // Adds item to the shopping cart
+    }
+
+    /**
+     * Method to remove an item from the shopping cart.
+     * @param cartItem The item to be removed from the cart.
+     */
+    public void removeFromCart(CartItem cartItem) {
+        shoppingCart.removeItem(cartItem); // Removes item from the shopping cart
+    }
+
+    /**
+     * Method to place an order using the items in the shopping cart.
+     * The checkout method of the shopping cart is used to create the order.
+     * @return The newly created order, or null if the cart is empty.
+     */
+    public Order placeOrder() {
+        if (shoppingCart.getItems().isEmpty()) {
+            System.out.println("Cannot place order. Shopping cart is empty.");
+            return null;
+        }
+
+        // Checkout the cart and create a new order
+        Order newOrder = shoppingCart.checkout(this);
+
+        if (newOrder != null) {
+            orders.add(newOrder); // Add the new order to the customer's order history
+            return newOrder;
+        }
+
+        return null;
+    }
+
     @Override
     public String toString() {
         return "Customer{" +
@@ -94,4 +156,3 @@ public class Customer extends User {
                 '}';
     }
 }
-
