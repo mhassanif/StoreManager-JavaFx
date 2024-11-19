@@ -37,14 +37,14 @@ public class DBconnector {
     }
 
     public static void printAllUsernames() {
-        String query = "SELECT username FROM Users";  // SQL query to fetch all usernames
+        String query = "SELECT name FROM Users";  // SQL query to fetch all usernames
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement();
              ResultSet resultSet = stmt.executeQuery(query)) {
 
             // Loop through the result set and print each username
             while (resultSet.next()) {
-                String username = resultSet.getString("username");
+                String username = resultSet.getString("name");
                 System.out.println("Username: " + username);  // Output the username
             }
 
