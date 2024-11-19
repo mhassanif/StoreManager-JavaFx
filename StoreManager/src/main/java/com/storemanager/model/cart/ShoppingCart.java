@@ -10,11 +10,22 @@ import java.util.List;
 
 public class ShoppingCart {
 
-    private List<CartItem> items;  // List to hold CartItem objects
+    private int cartId;           // Unique identifier for the shopping cart from the database
+    private List<CartItem> items; // List to hold CartItem objects
 
-    // Constructor to initialize an empty shopping cart
-    public ShoppingCart() {
+    // Constructor to initialize a shopping cart with a cartId and an empty list of items
+    public ShoppingCart(int cartId) {
+        this.cartId = cartId;
         this.items = new ArrayList<>();
+    }
+
+    // Getters and Setters for cartId
+    public int getCartId() {
+        return cartId;
+    }
+
+    public void setCartId(int cartId) {
+        this.cartId = cartId;
     }
 
     // Method to add a CartItem to the shopping cart
@@ -82,7 +93,7 @@ public class ShoppingCart {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Shopping Cart: \n");
+        sb.append("Shopping Cart (ID: ").append(cartId).append("):\n");
         for (CartItem item : items) {
             sb.append(item.toString()).append("\n");
         }

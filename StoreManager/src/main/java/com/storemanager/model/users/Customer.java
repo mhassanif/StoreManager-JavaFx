@@ -5,8 +5,10 @@ import com.storemanager.model.cart.ShoppingCart;
 import com.storemanager.model.order.Order;
 import com.storemanager.model.order.OrderItem;
 import com.storemanager.db.DBconnector;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -16,37 +18,16 @@ import java.util.List;
  */
 public class Customer extends User {
 
-    // Customer-specific fields
-    private String address;
-    private String phoneNumber;
     private ShoppingCart shoppingCart; // Customer's shopping cart
-    private List<Order> orders; // List of customer's past orders
+    private List<Order> orders;        // List of customer's past orders
 
     // Constructor
-    public Customer(String username, String email, String password, String address, String phoneNumber) {
-        super(username, email, password, "Customer"); // Assigning the role as "Customer"
-        this.address = address;
-        this.phoneNumber = phoneNumber;
-        this.shoppingCart = new ShoppingCart(); // Initialize the shopping cart
+    public Customer(int id, String username, String email, String password, String address, String phoneNumber) {
+        super(id, username, email, password, "Customer", address, phoneNumber); // Assigning the role as "Customer"
+        this.shoppingCart = initializeShoppingCart(id); // Initialize the shopping cart with cartId
     }
 
-    // Getters and Setters for customer-specific fields
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
+    // Getters and Setters
     public ShoppingCart getShoppingCart() {
         return shoppingCart;
     }
@@ -63,83 +44,54 @@ public class Customer extends User {
         this.orders = orders;
     }
 
-    /**
-     * Override the logout method for the customer.
-     * Currently, it could be a simple message or session handling logic.
-     */
     @Override
     public void logout() {
-        // Implement any session-related logout functionality
         System.out.println("Customer " + getUsername() + " has logged out.");
     }
 
-    /**
-     * Method to update the customer's information in the database.
-     * For example, address or phone number can be updated.
-     */
     public boolean updateCustomerInfo() {
         try (Connection connection = DBconnector.getConnection()) {
-
             String query = "UPDATE users SET address = ?, phone_number = ? WHERE username = ?";
             try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-                preparedStatement.setString(1, this.address);
-                preparedStatement.setString(2, this.phoneNumber);
+                preparedStatement.setString(1, this.getAddress());
+                preparedStatement.setString(2, this.getPhoneNumber());
                 preparedStatement.setString(3, getUsername());
 
                 int rowsAffected = preparedStatement.executeUpdate();
-                return rowsAffected > 0; // Return true if update is successful
+                return rowsAffected > 0;
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
-            return false; // Return false if an error occurs
+            return false;
         }
     }
 
-    /**
-     * Method to view the customer's profile information.
-     * This could display details like username, email, address, and phone number.
-     */
     public void viewProfile() {
         System.out.println("Customer Profile:");
         System.out.println("Username: " + getUsername());
         System.out.println("Email: " + getEmail());
-        System.out.println("Address: " + this.address);
-        System.out.println("Phone Number: " + this.phoneNumber);
+        System.out.println("Address: " + this.getAddress());
+        System.out.println("Phone Number: " + this.getPhoneNumber());
     }
 
-    /**
-     * Method to add an item to the shopping cart.
-     * @param cartItem The item to be added to the cart.
-     */
     public void addToCart(CartItem cartItem) {
-        shoppingCart.addItem(cartItem); // Adds item to the shopping cart
+        shoppingCart.addItem(cartItem);
     }
 
-    /**
-     * Method to remove an item from the shopping cart.
-     * @param cartItem The item to be removed from the cart.
-     */
     public void removeFromCart(CartItem cartItem) {
-        shoppingCart.removeItem(cartItem); // Removes item from the shopping cart
+        shoppingCart.removeItem(cartItem);
     }
 
-    /**
-     * Method to place an order using the items in the shopping cart.
-     * The checkout method of the shopping cart is used to create the order.
-     * @return The newly created order, or null if the cart is empty.
-     */
     public Order placeOrder() {
         if (shoppingCart.getItems().isEmpty()) {
             System.out.println("Cannot place order. Shopping cart is empty.");
             return null;
         }
 
-        // Checkout the cart and create a new order
         Order newOrder = shoppingCart.checkout(this);
 
         if (newOrder != null) {
-            orders.add(newOrder); // Add the new order to the customer's order history
+            orders.add(newOrder);
             return newOrder;
         }
 
@@ -151,8 +103,46 @@ public class Customer extends User {
         return "Customer{" +
                 "username='" + getUsername() + '\'' +
                 ", email='" + getEmail() + '\'' +
-                ", address='" + address + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
+                ", address='" + getAddress() + '\'' +
+                ", phoneNumber='" + getPhoneNumber() + '\'' +
                 '}';
+    }
+
+    /**
+     * Initializes the customer's shopping cart by retrieving or creating a cartId in the database.
+     *
+     * @param customerId The ID of the customer.
+     * @return A ShoppingCart object with a valid cartId.
+     */
+    private ShoppingCart initializeShoppingCart(int customerId) {
+        try (Connection connection = DBconnector.getConnection()) {
+            String query = "SELECT cart_id FROM shopping_carts WHERE customer_id = ?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setInt(1, customerId);
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        int cartId = resultSet.getInt("cart_id");
+                        return new ShoppingCart(cartId); // Return the cart with the retrieved ID
+                    } else {
+                        // If no cart exists, create one
+                        String insertQuery = "INSERT INTO shopping_carts (customer_id) VALUES (?)";
+                        try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                            insertStatement.setInt(1, customerId);
+                            insertStatement.executeUpdate();
+                            try (ResultSet generatedKeys = insertStatement.getGeneratedKeys()) {
+                                if (generatedKeys.next()) {
+                                    int newCartId = generatedKeys.getInt(1);
+                                    return new ShoppingCart(newCartId); // Return the cart with the new ID
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null; // Return null if an error occurs
     }
 }

@@ -1,23 +1,30 @@
 package com.storemanager.model.users;
 
 import com.storemanager.db.DBconnector;
+
 import java.sql.*;
 
+/**
+ * Represents a Warehouse Staff user in the system.
+ * Inherits from the User class and provides functionality specific to managing inventory.
+ */
 public class WarehouseStaff extends User {
 
-    public WarehouseStaff(String username, String email, String password, String role) {
-        super(username, email, password, role);
+    // Constructor for WarehouseStaff
+    public WarehouseStaff(int id, String username, String email, String password, String address, String phoneNumber) {
+        super(id, username, email, password, "WarehouseStaff", address, phoneNumber);
     }
 
-    // Functionality to view the list of products in the inventory
+    /**
+     * View the inventory list, including product name, quantity, and price.
+     */
     public void viewInventory() {
-        String query = "SELECT * FROM Inventory";  // Assuming the table is named Inventory
+        String query = "SELECT product_name, quantity, price FROM Inventory"; // Assuming the table is named Inventory
 
         try (Connection conn = DBconnector.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet resultSet = stmt.executeQuery(query)) {
+             PreparedStatement pstmt = conn.prepareStatement(query);
+             ResultSet resultSet = pstmt.executeQuery()) {
 
-            // Display all inventory items
             System.out.println("Inventory List:");
             while (resultSet.next()) {
                 String productName = resultSet.getString("product_name");
@@ -28,39 +35,49 @@ public class WarehouseStaff extends User {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
             System.out.println("Error while retrieving inventory.");
+            e.printStackTrace();
         }
     }
 
-    // Functionality to update inventory after an order is processed (decrease quantity)
-    public void updateInventory(int productId, int quantitySold) {
+    /**
+     * Update the inventory after an order is processed by decreasing the quantity.
+     *
+     * @param productId    The ID of the product to update.
+     * @param quantitySold The quantity sold to decrease from inventory.
+     */
+    public boolean updateInventory(int productId, int quantitySold) {
         String query = "UPDATE Inventory SET quantity = quantity - ? WHERE product_id = ?";
 
         try (Connection conn = DBconnector.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
-            // Set the parameters for the query
             pstmt.setInt(1, quantitySold);
             pstmt.setInt(2, productId);
 
-            // Execute the update query
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("Inventory updated successfully.");
+                System.out.println("Inventory updated successfully for Product ID: " + productId);
+                return true;
             } else {
-                System.out.println("Error: Could not update inventory.");
+                System.out.println("Error: Product ID " + productId + " not found or insufficient quantity.");
+                return false;
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
             System.out.println("Error while updating inventory.");
+            e.printStackTrace();
+            return false;
         }
     }
 
-    // Functionality to process an order (Update the stock when an order is processed)
+    /**
+     * Process an order by updating the inventory based on the order details.
+     *
+     * @param orderId The ID of the order to process.
+     */
     public void processOrder(int orderId) {
-        String query = "SELECT product_id, quantity FROM OrderDetails WHERE order_id = ?";
+        String query = "SELECT product_id, quantity FROM OrderDetails WHERE order_id = ?"; // Assuming OrderDetails table exists
 
         try (Connection conn = DBconnector.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -68,26 +85,39 @@ public class WarehouseStaff extends User {
             pstmt.setInt(1, orderId);
             ResultSet resultSet = pstmt.executeQuery();
 
-            // Process each item in the order
+            System.out.println("Processing Order ID: " + orderId);
             while (resultSet.next()) {
                 int productId = resultSet.getInt("product_id");
                 int quantitySold = resultSet.getInt("quantity");
 
-                // Update inventory after order is processed
-                updateInventory(productId, quantitySold);
+                // Update inventory for each product in the order
+                boolean success = updateInventory(productId, quantitySold);
+                if (success) {
+                    System.out.println("Updated inventory for Product ID: " + productId);
+                }
             }
 
         } catch (SQLException e) {
+            System.out.println("Error while processing order ID: " + orderId);
             e.printStackTrace();
-            System.out.println("Error while processing the order.");
         }
     }
 
-    // Implement logout functionality for warehouse staff (inherited from User class)
+    /**
+     * Logs the Warehouse Staff out of the system.
+     */
     @Override
     public void logout() {
         System.out.println("Warehouse staff " + getUsername() + " has logged out.");
-        // Additional logout logic can be implemented here if necessary
+    }
+
+    @Override
+    public String toString() {
+        return "WarehouseStaff{" +
+                "username='" + getUsername() + '\'' +
+                ", email='" + getEmail() + '\'' +
+                ", address='" + getAddress() + '\'' +
+                ", phoneNumber='" + getPhoneNumber() + '\'' +
+                '}';
     }
 }
-

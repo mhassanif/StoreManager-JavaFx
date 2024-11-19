@@ -1,6 +1,7 @@
 package com.storemanager.model.order;
 
 import com.storemanager.model.users.Customer;
+import com.storemanager.model.order.Payment;
 import com.storemanager.model.items.Product;
 import java.util.List;
 

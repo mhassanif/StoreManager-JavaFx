@@ -5,23 +5,25 @@ public class Product {
     private int id;              // Unique identifier for the product
     private String name;         // Name of the product
     private double price;        // Price of the product
-    private int stockLevel;      // Available quantity of the product in stock
-    private int restockLevel;    // Minimum level for restocking
     private String brand;        // Brand of the product
     private String imageUrl;     // URL for the product image
     private Category category;   // Category to which the product belongs
+    private String description;  // Nullable description of the product
 
     // Constructor
-    public Product(int id, String name, double price, int stockLevel, int restockLevel,
-                   String brand, String imageUrl, Category category) {
+    public Product(int id, String name, double price, String brand, String imageUrl, Category category, String description) {
         this.id = id;
         this.name = name;
         this.price = price;
-        this.stockLevel = stockLevel;
-        this.restockLevel = restockLevel;
         this.brand = brand;
         this.imageUrl = imageUrl;
         this.category = category;
+        this.description = description; // Description is optional
+    }
+
+    // Overloaded constructor without description (for backward compatibility)
+    public Product(int id, String name, double price, String brand, String imageUrl, Category category) {
+        this(id, name, price, brand, imageUrl, category, null); // Default description to null
     }
 
     // Getters and Setters
@@ -49,22 +51,6 @@ public class Product {
         this.price = price;
     }
 
-    public int getStockLevel() {
-        return stockLevel;
-    }
-
-    public void setStockLevel(int stockLevel) {
-        this.stockLevel = stockLevel;
-    }
-
-    public int getRestockLevel() {
-        return restockLevel;
-    }
-
-    public void setRestockLevel(int restockLevel) {
-        this.restockLevel = restockLevel;
-    }
-
     public String getBrand() {
         return brand;
     }
@@ -89,11 +75,23 @@ public class Product {
         this.category = category;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     // ToString Method for debugging and printing
     @Override
     public String toString() {
-        return "Product{id=" + id + ", name='" + name + "', price=" + price + ", stockLevel=" + stockLevel +
-                ", restockLevel=" + restockLevel + ", brand='" + brand + "', imageUrl='" + imageUrl +
-                "', category=" + category.getName() + "}";
+        return "Product{id=" + id +
+                ", name='" + name +
+                "', price=" + price +
+                ", brand='" + brand +
+                "', imageUrl='" + imageUrl +
+                "', category=" + category.getName() +
+                ", description='" + (description != null ? description : "No description") + "'}";
     }
 }

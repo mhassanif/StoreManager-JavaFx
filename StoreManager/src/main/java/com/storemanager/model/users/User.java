@@ -11,17 +11,24 @@ import java.sql.SQLException;
  * The User class serves as the base class for specific user roles such as Customer, StoreManager, and Admin.
  */
 public abstract class User {
+    private int userId;
     private String username; // User's unique username
     private String email;    // User's email address
     private String password; // User's password
     private String role;     // Role of the user (e.g., "Customer", "Manager", "Admin", "Staff")
+    private String address;
+    private String phoneNumber;
 
     // Constructor
-    public User(String username, String email, String password, String role) {
+    public User(int id, String username, String email, String password, String role,String address,
+                String Number) {
+        this.userId=id;
         this.username = username;
         this.email = email;
         this.password = password;
         this.role = role;
+        this.address=address;
+        this.phoneNumber=Number;
     }
 
     // Getters and Setters
@@ -55,6 +62,30 @@ public abstract class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public int getId() {
+        return userId;
+    }
+
+    public void setId(int id) {
+        this.userId = id;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     // Abstract Method
