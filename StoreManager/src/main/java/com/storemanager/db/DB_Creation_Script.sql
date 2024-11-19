@@ -9,18 +9,18 @@ CREATE TABLE USERS (
     phone VARCHAR(15),
 );
 
--- Create SHOPPINGCART Table
-CREATE TABLE SHOPPINGCART (
-    cart_id INT IDENTITY(1,1) PRIMARY KEY,
-);
-
--- Create CUSTOMER Table
+--Modified Customer
 CREATE TABLE CUSTOMER (
     customer_id INT IDENTITY(1,1) PRIMARY KEY,
-    user_id INT UNIQUE NOT NULL,
-    cart_id INT NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES USERS(user_id),
-    FOREIGN KEY (cart_id) REFERENCES SHOPPINGCART(cart_id)
+    user_id INT UNIQUE NOT NULL,  -- User ID should remain
+    FOREIGN KEY (user_id) REFERENCES USERS(user_id)
+);
+
+-- SHOPPINGCART table (make sure customer_id references CUSTOMER)
+CREATE TABLE SHOPPINGCART (
+    cart_id INT IDENTITY(1,1) PRIMARY KEY,
+    customer_id INT NOT NULL,  -- Foreign Key pointing to CUSTOMER
+    FOREIGN KEY (customer_id) REFERENCES CUSTOMER(customer_id)
 );
 
 -- Create STAFF Table
@@ -41,31 +41,33 @@ CREATE TABLE CATEGORY (
 CREATE TABLE PRODUCT (
     product_id INT IDENTITY(1,1) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-	brand VARCHAR(255) NOT NULL,
+    brand VARCHAR(255) NOT NULL,
     description TEXT,
     price DECIMAL(10, 2) NOT NULL,
     category_id INT,
+    url VARCHAR(500), -- Newly added field
     FOREIGN KEY (category_id) REFERENCES CATEGORY(category_id)
-);
-
--- Create PAYMENT Table
-CREATE TABLE PAYMENT (
-    payment_id INT IDENTITY(1,1) PRIMARY KEY,
-    amount DECIMAL(10, 2) NOT NULL,
-    date DATETIME DEFAULT GETDATE(),
-    status VARCHAR(10) DEFAULT 'Pending' -- "Pending", "Completed", "Failed"
 );
 
 -- Create ORDERTABLE Table
 CREATE TABLE ORDERTABLE (
     order_id INT IDENTITY(1,1) PRIMARY KEY,
-    customer_id INT NOT NULL,
-    payment_id INT, -- References Payment table
+    customer_id INT NOT NULL, -- References CUSTOMER table
     order_date DATETIME DEFAULT GETDATE(),
     total_amount DECIMAL(10, 2),
     status VARCHAR(50),
-    FOREIGN KEY (customer_id) REFERENCES CUSTOMER(customer_id),
-    FOREIGN KEY (payment_id) REFERENCES PAYMENT(payment_id)
+    FOREIGN KEY (customer_id) REFERENCES CUSTOMER(user_id) -- Adjusted to match CUSTOMER's primary key
+);
+
+
+-- Create PAYMENT Table
+CREATE TABLE PAYMENT (
+    payment_id INT IDENTITY(1,1) PRIMARY KEY,
+    order_id INT NOT NULL, -- References ORDERTABLE table
+    amount DECIMAL(10, 2) NOT NULL,
+    date DATETIME DEFAULT GETDATE(),
+    status VARCHAR(10) DEFAULT 'Pending', -- "Pending", "Completed", "Failed"
+    FOREIGN KEY (order_id) REFERENCES ORDERTABLE(order_id)
 );
 
 -- Create ORDERLINEITEM Table
@@ -125,3 +127,4 @@ CREATE TABLE NOTIFICATION_RECIPIENT (
     FOREIGN KEY (notification_id) REFERENCES NOTIFICATION(notification_id),
     FOREIGN KEY (user_id) REFERENCES USERS(user_id)
 );
+
