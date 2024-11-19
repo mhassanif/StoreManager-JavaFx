@@ -108,12 +108,20 @@ CREATE TABLE FEEDBACK (
     FOREIGN KEY (customer_id) REFERENCES CUSTOMER(customer_id)
 );
 
--- Create NOTIFICATION Table
+-- Updated NOTIFICATION Table
 CREATE TABLE NOTIFICATION (
     notification_id INT IDENTITY(1,1) PRIMARY KEY,
     message TEXT NOT NULL,
-    date DATETIME DEFAULT GETDATE(),
-    recipient_id INT NOT NULL,
+    date DATETIME DEFAULT GETDATE()
+);
+
+
+-- Junction Table for Notification Recipients
+CREATE TABLE NOTIFICATION_RECIPIENT (
+    notification_id INT NOT NULL,
+    user_id INT NOT NULL,
     status VARCHAR(10) DEFAULT 'Unread', -- "Unread" or "Read"
-    FOREIGN KEY (recipient_id) REFERENCES USERS(user_id)
+    PRIMARY KEY (notification_id, user_id),
+    FOREIGN KEY (notification_id) REFERENCES NOTIFICATION(notification_id),
+    FOREIGN KEY (user_id) REFERENCES USERS(user_id)
 );
