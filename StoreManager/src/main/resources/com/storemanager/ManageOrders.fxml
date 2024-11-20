@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+
+<HBox xmlns:fx="http://javafx.com/fxml" fx:id="mainHBox" fx:controller="com.storemanager.controlers.ManageOrdersController" alignment="TOP_CENTER" spacing="20">
+    <!-- Left Sidebar -->
+    <VBox alignment="TOP_CENTER" spacing="15" style="-fx-background-color: #2C3E50; -fx-padding: 20;">
+        <Label text="Admin Panel" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #FFFFFF;" />
+        <Separator style="-fx-background-color: white;" />
+        <Button text="Dashboard" fx:id="btnDashboard" onAction="#handleDashboard" prefWidth="200"
+                style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
+        <Button text="Manage Users" fx:id="btnManageUsers" onAction="#handleManageUsers" prefWidth="200"
+                style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
+        <Button text="Manage Orders" fx:id="btnManageOrders" onAction="#handleManageOrders" prefWidth="200"
+                style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
+        <Button text="Manage Products" fx:id="btnManageProducts" onAction="#handleManageProducts" prefWidth="200"
+                style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
+        <Button text="Manage Notifications" fx:id="btnManageNotifications" onAction="#handleManageNotifications" prefWidth="200"
+                style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
+        <Button text="Manage Feedback" fx:id="btnManageFeedback" onAction="#handleManageFeedback" prefWidth="200"
+                style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
+        <Button text="Logout" fx:id="btnLogout" onAction="#handleLogout" prefWidth="200"
+                style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #E74C3C;" />
+    </VBox>
+
+    <!-- Main Content Section -->
+    <VBox fx:id="mainVBox" alignment="TOP_CENTER" spacing="20" style="-fx-padding: 20;">
+        <Label text="Manage Orders" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;" />
+        <Separator style="-fx-background-color: #2C3E50;" />
+
+        <!-- Table displaying orders -->
+        <TableView fx:id="ordersTable" prefWidth="600" prefHeight="400">
+            <TableColumn fx:id="orderIdColumn" text="Order ID" prefWidth="200">
+                <cellValueFactory>
+                    <PropertyValueFactory property="orderId"/>
+                </cellValueFactory>
+            </TableColumn>
+
+            <TableColumn fx:id="customerUsernameColumn" text="Customer" prefWidth="200">
+                <cellValueFactory>
+                    <PropertyValueFactory property="customerUsername"/>
+                </cellValueFactory>
+            </TableColumn>
+
+            <TableColumn fx:id="orderDateColumn" text="Order Date" prefWidth="200">
+                <cellValueFactory>
+                    <PropertyValueFactory property="orderDate"/>
+                </cellValueFactory>
+            </TableColumn>
+
+            <TableColumn fx:id="orderStatusColumn" text="Status" prefWidth="200">
+                <cellValueFactory>
+                    <PropertyValueFactory property="status"/>
+                </cellValueFactory>
+            </TableColumn>
+
+            <TableColumn fx:id="totalPriceColumn" text="Total Price" prefWidth="200">
+                <cellValueFactory>
+                    <PropertyValueFactory property="totalPrice"/>
+                </cellValueFactory>
+            </TableColumn>
+        </TableView>
+
+        <!-- Buttons for managing orders -->
+        <Button text="Add Order" fx:id="btnAddOrder" onAction="#handleAddOrder" prefWidth="200" style="-fx-font-size: 14px; -fx-background-color: #34495E; -fx-text-fill: white;" />
+        <Button text="Edit Order" fx:id="btnEditOrder" onAction="#handleEditOrder" prefWidth="200" style="-fx-font-size: 14px; -fx-background-color: #34495E; -fx-text-fill: white;" />
+        <Button text="Delete Order" fx:id="btnDeleteOrder" onAction="#handleDeleteOrder" prefWidth="200" style="-fx-font-size: 14px; -fx-background-color: #E74C3C; -fx-text-fill: white;" />
+    </VBox>
+</HBox>

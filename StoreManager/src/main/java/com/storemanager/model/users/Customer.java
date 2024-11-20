@@ -116,7 +116,8 @@ public class Customer extends User {
      */
     private ShoppingCart initializeShoppingCart(int customerId) {
         try (Connection connection = DBconnector.getConnection()) {
-            String query = "SELECT cart_id FROM shopping_carts WHERE customer_id = ?";
+            // Step 1: Check if a shopping cart already exists for the customer
+            String query = "SELECT cart_id FROM SHOPPINGCART WHERE customer_id = ?";
             try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                 preparedStatement.setInt(1, customerId);
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -124,8 +125,8 @@ public class Customer extends User {
                         int cartId = resultSet.getInt("cart_id");
                         return new ShoppingCart(cartId); // Return the cart with the retrieved ID
                     } else {
-                        // If no cart exists, create one
-                        String insertQuery = "INSERT INTO shopping_carts (customer_id) VALUES (?)";
+                        // Step 2: If no cart exists, create one for the customer
+                        String insertQuery = "INSERT INTO SHOPPINGCART (customer_id) VALUES (?)";
                         try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
                             insertStatement.setInt(1, customerId);
                             insertStatement.executeUpdate();
@@ -140,7 +141,7 @@ public class Customer extends User {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            e.printStackTrace(); // Log the exception for debugging
         }
 
         return null; // Return null if an error occurs

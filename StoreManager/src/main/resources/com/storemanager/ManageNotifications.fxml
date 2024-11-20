@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.storemanager.controlers.ManageNotificationsController" prefWidth="1024" prefHeight="768">
+    <!-- Sidebar Section (Left side) -->
+    <left>
+        <VBox alignment="TOP_CENTER" spacing="15" style="-fx-background-color: #2C3E50; -fx-padding: 20;">
+            <!-- Logo -->
+            <Label text="Admin Panel" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #FFFFFF;" />
+            <Separator style="-fx-background-color: white;" />
+
+            <!-- Navigation Buttons -->
+            <Button text="Dashboard" fx:id="btnDashboard" onAction="#handleDashboard" prefWidth="200"
+                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
+            <Button text="Manage Users" fx:id="btnManageUsers" onAction="#handleManageUsers" prefWidth="200"
+                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
+            <Button text="Manage Orders" fx:id="btnManageOrders" onAction="#handleManageOrders" prefWidth="200"
+                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
+            <Button text="Manage Products" fx:id="btnManageProducts" onAction="#handleManageProducts" prefWidth="200"
+                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
+            <Button text="Manage Notifications" fx:id="btnManageNotifications" onAction="#handleManageNotifications" prefWidth="200"
+                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
+            <Button text="Manage Feedback" fx:id="btnManageFeedback" onAction="#handleManageFeedback" prefWidth="200"
+                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
+
+            <!-- Logout Button -->
+            <Button text="Logout" fx:id="btnLogout" onAction="#handleLogout" prefWidth="200"
+                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #E74C3C;" />
+        </VBox>
+    </left>
+
+    <!-- Main Content Section (Right side) -->
+    <center>
+        <VBox fx:id="mainVBox" alignment="TOP_CENTER" spacing="20" style="-fx-padding: 20;">
+            <TextField fx:id="searchField" promptText="Search notifications..." onKeyReleased="#handleSearch" prefWidth="800" />
+            <ComboBox fx:id="typeFilter" promptText="Filter by type" prefWidth="800" />
+
+            <!-- Table displaying notifications -->
+            <TableView fx:id="notificationsTable" prefWidth="800" prefHeight="400">
+                <columns>
+                    <TableColumn fx:id="notificationIdColumn" text="ID" />
+                    <TableColumn fx:id="recipientColumn" text="Recipient" />
+                    <TableColumn fx:id="messageColumn" text="Message" />
+                    <TableColumn fx:id="typeColumn" text="Type" />
+                    <TableColumn fx:id="readStatusColumn" text="Read" />
+                </columns>
+            </TableView>
+
+            <!-- Buttons for managing notifications -->
+            <Button fx:id="btnMarkAsRead" text="Mark as Read" onAction="#handleMarkAsRead" prefWidth="200" style="-fx-font-size: 14px; -fx-background-color: #34495E; -fx-text-fill: white;" />
+            <Button fx:id="btnDeleteNotification" text="Delete Notification" onAction="#handleDeleteNotification" prefWidth="200" style="-fx-font-size: 14px; -fx-background-color: #E74C3C; -fx-text-fill: white;" />
+        </VBox>
+    </center>
+</BorderPane>
