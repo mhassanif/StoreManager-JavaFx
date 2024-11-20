@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" spacing="20" prefHeight="620.0" prefWidth="989.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.storemanager.controlers.DashboardController">
+    <Label text="Welcome to Your Dashboard" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+    <Label fx:id="dummyLabel" visible="false" />
+
+    <!-- Navigation Options -->
+    <GridPane hgap="10" vgap="15" alignment="CENTER">
+        <children>
+            <!-- Categories -->
+            <Button text="Categories" onAction="#handleCategories" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-size: 16px;" />
+
+            <!-- Products -->
+            <Button text="Products" onAction="#handleProducts" GridPane.rowIndex="0" GridPane.columnIndex="1" style="-fx-font-size: 16px;" />
+
+            <!-- Cart -->
+            <Button text="Cart" onAction="#handleCart" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-font-size: 16px;" />
+
+            <!-- Orders -->
+            <Button text="Orders" onAction="#handleOrders" GridPane.rowIndex="1" GridPane.columnIndex="1" style="-fx-font-size: 16px;" />
+
+            <!-- Profile -->
+            <Button text="Profile" onAction="#handleProfile" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-font-size: 16px;" />
+
+            <!-- Logout -->
+            <Button text="Logout" onAction="#handleLogout" GridPane.rowIndex="2" GridPane.columnIndex="1" style="-fx-font-size: 16px;" />
+        </children>
+    </GridPane>
+</VBox>

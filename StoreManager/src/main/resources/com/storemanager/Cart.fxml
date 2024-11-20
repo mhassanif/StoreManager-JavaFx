@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" spacing="15" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.storemanager.controlers.CartController">
+    <!-- Title -->
+    <Label text="Your Shopping Cart" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+
+    <!-- Cart Items Table -->
+    <TableView fx:id="cartTable" prefWidth="750.0">
+        <columns>
+            <TableColumn fx:id="colProductName" text="Product Name" prefWidth="200.0" />
+            <TableColumn fx:id="colProductBrand" text="Brand" prefWidth="100.0" />
+            <TableColumn fx:id="colQuantity" text="Quantity" prefWidth="100.0" />
+            <TableColumn fx:id="colPrice" text="Price" prefWidth="100.0" />
+            <TableColumn fx:id="colTotal" text="Total" prefWidth="150.0" />
+            <TableColumn fx:id="colActions" text="Actions" prefWidth="200.0" />
+        </columns>
+    </TableView>
+
+    <!-- Total Amount -->
+    <HBox spacing="20" alignment="CENTER_RIGHT" style="-fx-padding: 10px;">
+        <Label text="Total Price:" style="-fx-font-size: 18px;" />
+        <Label fx:id="totalAmountLabel" text="0.00" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+    </HBox>
+
+    <!-- Action Buttons -->
+    <HBox spacing="20" alignment="CENTER">
+        <Button text="Clear Cart" onAction="#clearCart" style="-fx-background-color: #d9534f; -fx-text-fill: white;" />
+        <Button text="Proceed to Checkout" onAction="#proceedToCheckout" style="-fx-background-color: #5cb85c; -fx-text-fill: white;" />
+    </HBox>
+</VBox>

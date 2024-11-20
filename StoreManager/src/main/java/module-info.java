@@ -6,4 +6,6 @@ module com.mhassanif.storemanager {
 
     opens com.storemanager to javafx.fxml;
     exports com.storemanager;
+    exports com.storemanager.controlers;
+    opens com.storemanager.controlers to javafx.fxml;
 }
