@@ -8,7 +8,7 @@ import javafx.scene.layout.HBox;
 
 import java.util.List;
 
-public class ManageUsersController extends AdminBaseController {
+public class ManageUsersController {
 
     @FXML
     private TableView<Customer> userTable;

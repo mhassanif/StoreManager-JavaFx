@@ -8,9 +8,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class StaffManageFeedbackController extends AdminBaseController {
+public class StaffManageFeedbackController {
 
     @FXML
     private VBox mainVBox;
