@@ -18,7 +18,7 @@ import java.util.List;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
-public class ManageOrdersController extends AdminBaseController {
+public class ManageOrdersController {
 
     @FXML private TableView<Order> ordersTable;
     @FXML private TableColumn<Order, String> orderIdColumn;
@@ -54,7 +54,7 @@ public class ManageOrdersController extends AdminBaseController {
     private void loadOrders() {
         // Assuming you have a list of orders
 /*        List<Order> orders = orderService.getAllOrders(); // This should be your method to get orders
-        ordersTable.getItems().setAll(orders);*/
+        ordersTable.getItems().setAll(orders); */
     }
 
     // Example method to fetch orders from a data source (e.g., a database)

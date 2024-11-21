@@ -13,7 +13,7 @@ import javafx.scene.layout.VBox;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ManageProductsController extends AdminBaseController {
+public class ManageProductsController {
 
     @FXML
     private VBox contentArea;

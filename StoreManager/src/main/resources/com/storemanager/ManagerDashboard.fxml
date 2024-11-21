@@ -5,20 +5,17 @@
 <?import javafx.scene.text.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.storemanager.controlers.AdminDashboardController"
+            fx:controller="com.storemanager.controlers.ManagerDashboardController"
             prefHeight="620.0" prefWidth="989.0" style="-fx-background-color: #ECF0F1;">
-
     <!-- Left Sidebar -->
     <left>
         <VBox alignment="TOP_CENTER" spacing="15" style="-fx-background-color: #2C3E50; -fx-padding: 20;">
             <!-- Logo -->
-            <Label text="Admin Panel" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #FFFFFF;" />
+            <Label text="Manager Panel" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #FFFFFF;" />
             <Separator style="-fx-background-color: white;" />
 
             <!-- Navigation Buttons -->
             <Button text="Dashboard" fx:id="btnDashboard" onAction="#handleDashboard" prefWidth="200"
-                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
-            <Button text="Manage Users" fx:id="btnManageUsers" onAction="#handleManageUsers" prefWidth="200"
                     style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
             <Button text="Manage Orders" fx:id="btnManageOrders" onAction="#handleManageOrders" prefWidth="200"
                     style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
@@ -35,8 +32,11 @@
         </VBox>
     </left>
 
-    <!-- Main Content Area -->
+    <!-- Main Content Area (right side) -->
     <center>
-        <VBox fx:id="contentArea" style="-fx-padding: 20; -fx-background-color: #FFFFFF;" />
+        <VBox fx:id="contentArea" alignment="CENTER" style="-fx-padding: 20; -fx-background-color: #FFFFFF;">
+            <Label text="Welcome to the Manager Dashboard"
+                   style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;" />
+        </VBox>
     </center>
 </BorderPane>

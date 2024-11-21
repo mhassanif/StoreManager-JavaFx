@@ -7,29 +7,8 @@
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.storemanager.controlers.StaffManageFeedbackController"
             prefWidth="1024" prefHeight="768">
-    <!-- Sidebar Section (Left side) -->
-    <left>
-        <VBox alignment="TOP_CENTER" spacing="15" style="-fx-background-color: #2C3E50; -fx-padding: 20;">
-            <Label text="Admin Panel" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #FFFFFF;" />
-            <Separator style="-fx-background-color: white;" />
 
-            <Button text="Dashboard" fx:id="btnDashboard" onAction="#handleDashboard" prefWidth="200"
-                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
-            <Button text="Manage Orders" fx:id="btnManageOrders" onAction="#handleManageOrders" prefWidth="200"
-                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
-            <Button text="Manage Products" fx:id="btnManageProducts" onAction="#handleManageProducts" prefWidth="200"
-                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
-            <Button text="Manage Notifications" fx:id="btnManageNotifications" onAction="#handleManageNotifications" prefWidth="200"
-                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
-            <Button text="Manage Feedback" fx:id="btnManageFeedback" onAction="#handleManageFeedback" prefWidth="200"
-                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
-
-            <Button text="Logout" fx:id="btnLogout" onAction="#handleLogout" prefWidth="200"
-                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #E74C3C;" />
-        </VBox>
-    </left>
-
-    <!-- Main Content Section (Right side) -->
+    <!-- Main Content Section (now occupies full width) -->
     <center>
         <VBox fx:id="mainVBox" alignment="TOP_CENTER" spacing="20" style="-fx-padding: 20;">
             <Text text="Manage Feedback" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
