@@ -1,8 +1,8 @@
 package com.storemanager.controlers;
 
 import com.storemanager.communication.Feedback;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -13,10 +13,7 @@ import java.util.stream.Collectors;
 public class StaffManageFeedbackController extends AdminBaseController {
 
     @FXML
-    private VBox contentArea;
-
-    @FXML
-    private TextField searchField;
+    private VBox mainVBox;
 
     @FXML
     private TableView<Feedback> feedbackTable;
@@ -36,46 +33,36 @@ public class StaffManageFeedbackController extends AdminBaseController {
     @FXML
     private Button btnRejectFeedback;
 
-    private List<Feedback> allFeedback;  // To store all feedback for search and filter
+    private List<Feedback> allFeedback; // To store all feedback for searching and filtering
 
     @FXML
     public void initialize() {
-        // Initialize table columns with getter methods for Feedback
-        feedbackIdColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getId()).asObject());
-        customerIdColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getCustomerId()).asObject());
-        commentsColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getComments()));
+        // Initialize table columns
+        feedbackIdColumn.setCellValueFactory(cellData ->
+                new SimpleIntegerProperty(cellData.getValue().getId()).asObject());
+        customerIdColumn.setCellValueFactory(cellData ->
+                new SimpleIntegerProperty(cellData.getValue().getCustomerId()).asObject());
+        commentsColumn.setCellValueFactory(cellData ->
+                new SimpleStringProperty(cellData.getValue().getComments()));
 
-        // Load feedback from the database or mock data
+        // Load feedback into the table
         loadFeedback();
-
-        // Set the table data
         feedbackTable.getItems().setAll(allFeedback);
     }
 
     private void loadFeedback() {
-        // In a real application, fetch the feedback data from the database.
-        // For now, we use a mock data generation method.
+        // Replace with actual database logic. Mock data used here for testing.
         allFeedback = fetchFeedbackFromDatabase();
-    }
-
-    @FXML
-    public void handleSearch() {
-        String searchTerm = searchField.getText().toLowerCase();
-        List<Feedback> filteredFeedback = allFeedback.stream()
-                .filter(feedback -> feedback.getComments().toLowerCase().contains(searchTerm))
-                .collect(Collectors.toList());
-        feedbackTable.getItems().setAll(filteredFeedback);
     }
 
     @FXML
     public void handleApproveFeedback() {
         Feedback selectedFeedback = feedbackTable.getSelectionModel().getSelectedItem();
         if (selectedFeedback != null) {
-            // Code to approve the feedback in the database
-            System.out.println("Approve Feedback: " + selectedFeedback.getComments());
-            // Implement database update here (e.g., change status to 'approved')
+            System.out.println("Approving feedback: " + selectedFeedback.getComments());
+            // Database logic to mark feedback as approved
         } else {
-            System.out.println("No feedback selected to approve.");
+            showAlert("No Feedback Selected", "Please select a feedback to approve.");
         }
     }
 
@@ -83,32 +70,27 @@ public class StaffManageFeedbackController extends AdminBaseController {
     public void handleRejectFeedback() {
         Feedback selectedFeedback = feedbackTable.getSelectionModel().getSelectedItem();
         if (selectedFeedback != null) {
-            // Code to reject the feedback in the database
-            System.out.println("Reject Feedback: " + selectedFeedback.getComments());
-            // Implement database update here (e.g., change status to 'rejected')
+            System.out.println("Rejecting feedback: " + selectedFeedback.getComments());
+            // Database logic to mark feedback as rejected
         } else {
-            System.out.println("No feedback selected to reject.");
-        }
-    }
-
-    @FXML
-    public void handleDeleteFeedback() {
-        Feedback selectedFeedback = feedbackTable.getSelectionModel().getSelectedItem();
-        if (selectedFeedback != null) {
-            // Code to delete the selected feedback from the database
-            System.out.println("Delete Feedback: " + selectedFeedback.getComments());
-            // Implement database deletion here
-        } else {
-            System.out.println("No feedback selected to delete.");
+            showAlert("No Feedback Selected", "Please select a feedback to reject.");
         }
     }
 
     private List<Feedback> fetchFeedbackFromDatabase() {
-        // Mock data: Replace this with actual database call
+        // Replace with actual database query logic
         return List.of(
                 new Feedback(1, 101, "Great service, will come again!"),
                 new Feedback(2, 102, "Product quality could be better."),
                 new Feedback(3, 103, "Fast delivery, happy with the product.")
         );
+    }
+
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

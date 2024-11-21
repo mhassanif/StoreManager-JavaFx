@@ -2,7 +2,6 @@
 
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.text.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.storemanager.controlers.ManageProductsController"
@@ -11,7 +10,6 @@
     <!-- Left Sidebar -->
     <left>
         <VBox alignment="TOP_CENTER" spacing="15" style="-fx-background-color: #2C3E50; -fx-padding: 20;">
-            <!-- Logo or Title (you can modify as needed) -->
             <Label text="Admin Panel" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #FFFFFF;" />
             <Separator style="-fx-background-color: white;" />
 
@@ -35,19 +33,15 @@
         </VBox>
     </left>
 
-    <!-- Main Content Area (Right Side) -->
+    <!-- Main Content Area -->
     <center>
         <VBox fx:id="contentArea" alignment="CENTER" spacing="20" style="-fx-padding: 20; -fx-background-color: #FFFFFF;">
             <Label text="Manage Products" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;" />
 
             <!-- Search and Filter Section -->
-            <HBox spacing="10">
+            <HBox spacing="10" alignment="CENTER">
                 <TextField fx:id="searchField" promptText="Search by product name" onKeyReleased="#handleSearch" />
-                <ComboBox fx:id="brandFilter" promptText="Filter by brand" onAction="#handleFilterBrand">
-                    <items>
-                        <!-- Add available brand names here -->
-                    </items>
-                </ComboBox>
+                <ComboBox fx:id="brandFilter" promptText="Filter by brand" onAction="#handleFilterBrand" />
                 <Button text="Add Product" onAction="#handleAddProduct" />
             </HBox>
 
@@ -60,6 +54,7 @@
                     <TableColumn fx:id="priceColumn" text="Price" prefWidth="100" />
                     <TableColumn fx:id="stockLevelColumn" text="Stock Level" prefWidth="100" />
                     <TableColumn fx:id="restockLevelColumn" text="Restock Level" prefWidth="100" />
+                    <TableColumn fx:id="restockDateColumn" text="Restock Date" prefWidth="150" />
                 </columns>
             </TableView>
 

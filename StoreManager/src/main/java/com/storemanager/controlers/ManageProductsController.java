@@ -51,51 +51,41 @@ public class ManageProductsController extends AdminBaseController {
     @FXML
     private Button btnAddProduct, btnDeleteProduct, btnSetRestockLevel;
 
-    private List<InventoryProduct> allInventoryProducts;  // To store all inventory products for search and filter
+    private List<InventoryProduct> allInventoryProducts;
 
     @FXML
     public void initialize() {
-        // Initialize table columns with getter methods for InventoryProduct
-
-        // For Integer columns (productId, stockLevel, restockLevel)
+        // Initialize table columns
         productIdColumn.setCellValueFactory(cellData ->
                 new SimpleIntegerProperty(cellData.getValue().getProduct().getId()).asObject());
-
-        // For String columns (productName, brand)
         productNameColumn.setCellValueFactory(cellData ->
                 new SimpleStringProperty(cellData.getValue().getProduct().getName()));
-
         brandColumn.setCellValueFactory(cellData ->
                 new SimpleStringProperty(cellData.getValue().getProduct().getBrand()));
-
-        // For Double columns (price)
         priceColumn.setCellValueFactory(cellData ->
                 new SimpleDoubleProperty(cellData.getValue().getProduct().getPrice()).asObject());
-
-        // For Integer columns (stockLevel, restockLevel)
         stockLevelColumn.setCellValueFactory(cellData ->
                 new SimpleIntegerProperty(cellData.getValue().getStockLevel()).asObject());
-
         restockLevelColumn.setCellValueFactory(cellData ->
                 new SimpleIntegerProperty(cellData.getValue().getRestockLevel()).asObject());
-
-        // For String column (restockDate)
         restockDateColumn.setCellValueFactory(cellData ->
                 new SimpleStringProperty(cellData.getValue().getRestockDate()));
 
-        // Load the products from the database or mock data
+        // Load mock data
         loadProducts();
 
-        // Set the table data
+        // Populate table
         productsTable.getItems().setAll(allInventoryProducts);
 
-        // Populate the brand filter combobox (example brands here)
-        brandFilter.getItems().addAll("Brand A", "Brand B", "Brand C");
+        // Populate brand filter dropdown
+        brandFilter.getItems().addAll(allInventoryProducts.stream()
+                .map(inventoryProduct -> inventoryProduct.getProduct().getBrand())
+                .distinct()
+                .collect(Collectors.toList()));
     }
 
     private void loadProducts() {
-        // In a real application, fetch the product data from the database.
-        // For now, we use a mock data generation method.
+        // Mock data for testing
         allInventoryProducts = fetchInventoryProductsFromDatabase();
     }
 
@@ -103,7 +93,7 @@ public class ManageProductsController extends AdminBaseController {
     public void handleSearch() {
         String searchTerm = searchField.getText().toLowerCase();
         List<InventoryProduct> filteredProducts = allInventoryProducts.stream()
-                .filter(inventoryProduct -> inventoryProduct.getProduct().getName().toLowerCase().contains(searchTerm))
+                .filter(product -> product.getProduct().getName().toLowerCase().contains(searchTerm))
                 .collect(Collectors.toList());
         productsTable.getItems().setAll(filteredProducts);
     }
@@ -113,7 +103,7 @@ public class ManageProductsController extends AdminBaseController {
         String selectedBrand = brandFilter.getValue();
         if (selectedBrand != null) {
             List<InventoryProduct> filteredByBrand = allInventoryProducts.stream()
-                    .filter(inventoryProduct -> inventoryProduct.getProduct().getBrand().equals(selectedBrand))
+                    .filter(product -> product.getProduct().getBrand().equals(selectedBrand))
                     .collect(Collectors.toList());
             productsTable.getItems().setAll(filteredByBrand);
         } else {
@@ -123,45 +113,47 @@ public class ManageProductsController extends AdminBaseController {
 
     @FXML
     public void handleAddProduct() {
-        // Code to add a new product (open a new form to add product details)
-        System.out.println("Add Product button clicked.");
+        System.out.println("Add Product clicked");
+        // Open a new form for adding a product
     }
 
     @FXML
     public void handleDeleteProduct() {
-        InventoryProduct selectedInventoryProduct = productsTable.getSelectionModel().getSelectedItem();
-        if (selectedInventoryProduct != null) {
-            // Code to delete the selected product from the database
-            System.out.println("Delete Product: " + selectedInventoryProduct.getProduct().getName());
+        InventoryProduct selectedProduct = productsTable.getSelectionModel().getSelectedItem();
+        if (selectedProduct != null) {
+            System.out.println("Delete Product: " + selectedProduct.getProduct().getName());
+            // Remove from database and refresh table
+            allInventoryProducts.remove(selectedProduct);
+            productsTable.getItems().setAll(allInventoryProducts);
         } else {
-            System.out.println("No product selected to delete.");
+            System.out.println("No product selected for deletion");
         }
     }
 
     @FXML
     public void handleSetRestockLevel() {
-        InventoryProduct selectedInventoryProduct = productsTable.getSelectionModel().getSelectedItem();
-        if (selectedInventoryProduct != null) {
-            // Code to set the restock level of the selected product
-            System.out.println("Set Restock Level for Product: " + selectedInventoryProduct.getProduct().getName());
+        InventoryProduct selectedProduct = productsTable.getSelectionModel().getSelectedItem();
+        if (selectedProduct != null) {
+            System.out.println("Set Restock Level for Product: " + selectedProduct.getProduct().getName());
+            // Open dialog to set restock level
         } else {
-            System.out.println("No product selected to set restock level.");
+            System.out.println("No product selected to set restock level");
         }
     }
 
-    private List<InventoryProduct> fetchInventoryProductsFromDatabase() {     //testing
-        // Mock data: Replace this with actual database call
-        Category category1 = new Category(1, "Category A");
-        Category category2 = new Category(2, "Category B");
+    private List<InventoryProduct> fetchInventoryProductsFromDatabase() {
+        // Mock data for testing
+        Category categoryA = new Category(1, "Category A");
+        Category categoryB = new Category(2, "Category B");
 
-        Product product1 = new Product(1, "Product 1", 100.0, "Brand A", "image1.jpg", category1, "Description of Product 1");
-        Product product2 = new Product(2, "Product 2", 150.0, "Brand B", "image2.jpg", category2, "Description of Product 2");
-        Product product3 = new Product(3, "Product 3", 200.0, "Brand A", "image3.jpg", category1, "Description of Product 3");
+        Product product1 = new Product(1, "Product A", 100.0, "Brand A", null, categoryA, "Description A");
+        Product product2 = new Product(2, "Product B", 150.0, "Brand B", null, categoryB, "Description B");
+        Product product3 = new Product(3, "Product C", 200.0, "Brand A", null, categoryA, "Description C");
 
         return List.of(
-                new InventoryProduct(product1, 100, 50, "2024-12-01"),
-                new InventoryProduct(product2, 200, 75, "2024-12-05"),
-                new InventoryProduct(product3, 50, 30, "2024-12-10")
+                new InventoryProduct(product1, 50, 20, "2024-11-30"),
+                new InventoryProduct(product2, 100, 50, "2024-12-15"),
+                new InventoryProduct(product3, 30, 10, "2024-12-20")
         );
     }
 }
