@@ -1,6 +1,7 @@
 package com.storemanager.model.users;
 
 import com.storemanager.db.DBconnector; // Import DBconnector for getting connection
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,15 +21,15 @@ public abstract class User {
     private String phoneNumber;
 
     // Constructor
-    public User(int id, String username, String email, String password, String role,String address,
+    public User(int id, String username, String email, String password, String role, String address,
                 String Number) {
-        this.userId=id;
+        this.userId = id;
         this.username = username;
         this.email = email;
         this.password = password;
         this.role = role;
-        this.address=address;
-        this.phoneNumber=Number;
+        this.address = address;
+        this.phoneNumber = Number;
     }
 
     // Getters and Setters
@@ -89,6 +90,7 @@ public abstract class User {
     }
 
     // Abstract Method
+
     /**
      * Abstract method to be implemented by subclasses to define role-specific logout behavior.
      */
