@@ -13,7 +13,6 @@ target/
 *.ipr
 # Ignore IntelliJ IDEA project files
 .idea/
-*.iml
 
 ### Eclipse ###
 .apt_generated
