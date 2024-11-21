@@ -83,7 +83,7 @@ public class AdminDashboardController {
         System.out.println("Logging out...");
         try {
             // Redirect to login screen by loading the Login FXML as the new root
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/storemanager/view/Login.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/storemanager/Login.fxml"));
             Parent loginRoot = loader.load();  // Parent is used here instead of Node
 
             // Replace the entire scene's root with the Login view
