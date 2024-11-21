@@ -61,7 +61,7 @@ public class ShoppingCart {
         return items;
     }
 
-    // Method to clear all items from the cart
+    // **Method to clear all items from the cart**
     public void clearCart() {
         items.clear();
     }

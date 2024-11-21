@@ -1,109 +1,66 @@
 package com.storemanager.controlers;
 
-import javafx.event.ActionEvent;
+import com.storemanager.model.cart.ShoppingCart;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.stage.Stage;
+import javafx.scene.Node;
+import javafx.scene.layout.StackPane;
 
 import java.io.IOException;
 
 public class DashboardController {
 
     @FXML
-    private Label dummyLabel;
+    private StackPane contentArea;
 
-
-    /**
-     * Handle navigation to Categories.
-     */
     @FXML
-    public void handleCategories(ActionEvent event) {
+    private void showProducts() {
+        loadContent("/com/storemanager/CustomerProducts.fxml");
+    }
+
+    @FXML
+    private void showCart() {
+        loadContent("/com/storemanager/Cart.fxml");
+    }
+
+    @FXML
+    private void showOrders() {
+        loadContent("/com/storemanager/CustomerOrder.fxml");
+    }
+
+    @FXML
+    private void showNotifications() {
+        loadContent("/com/storemanager/CustomerNotification.fxml");
+    }
+
+    @FXML
+    private void showProfile() {
+        loadContent("/com/storemanager/CustomerProfile.fxml");
+    }
+
+    private static ShoppingCart activeCart = new ShoppingCart(1); // Shared cart (replace with DB ID if needed)
+
+    public static ShoppingCart getActiveCart() {
+        return activeCart;
+    }
+    /**
+     * Helper method to load and display content in the `contentArea`.
+     *
+     * @param fxmlFile The FXML file to load (relative path).
+     */
+    private void loadContent(String fxmlFile) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/storemanager/Categories.fxml"));
-            Parent root = loader.load();
+            // Load the FXML file
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
+            Node content = loader.load();
 
-            // Get the Stage dynamically from the event
-            Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+            // Clear existing content and add the new one
+            contentArea.getChildren().clear();
+            contentArea.getChildren().add(content);
 
-            stage.setScene(new Scene(root));
-            stage.setTitle("Categories");
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
-
-    /**
-     * Handle navigation to Products.
-     */
-    @FXML
-    private void handleProducts() {
-        System.out.println("Navigating to Products...");
-        // Load Products view here
-    }
-
-    /**
-     * Handle navigation to Cart.
-     */
-
-
-    /**
-     * Handle navigation to Orders.
-     */
-    @FXML
-    private void handleOrders() {
-        System.out.println("Navigating to Orders...");
-        // Load Orders view here
-    }
-
-    /**
-     * Handle navigation to Profile.
-     */
-    @FXML
-    private void handleProfile() {
-        System.out.println("Navigating to Profile...");
-        // Load Profile view here
-    }
-
-    /**
-     * Handle Logout.
-     */
-    @FXML
-    private void handleLogout() {
-        System.out.println("Logging out...");
-        // Add logic to return to Login page
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Logout");
-        alert.setHeaderText(null);
-        alert.setContentText("You have been logged out.");
-        alert.showAndWait();
-        // Load Login view
-    }
-    @FXML
-    public void handleCart() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/storemanager/Cart.fxml"));
-            Parent root = loader.load();
-
-            // Get the current stage
-            Stage stage = (Stage) dummyLabel.getScene().getWindow();
-
-            Scene cartScene = new Scene(root);
-            stage.setScene(cartScene);
-            stage.setTitle("Shopping Cart");
-
-            stage.show();
         } catch (IOException e) {
             e.printStackTrace();
+            System.err.println("Failed to load FXML file: " + fxmlFile);
         }
     }
-
-
 }
