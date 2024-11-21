@@ -34,9 +34,14 @@
 
     <!-- Main Content Area (right side) -->
     <center>
-        <VBox fx:id="contentArea" alignment="CENTER" style="-fx-padding: 20; -fx-background-color: #FFFFFF;">
+        <VBox fx:id="contentArea" alignment="TOP_CENTER" style="-fx-padding: 20; -fx-background-color: #FFFFFF;">
+            <!-- Manager Dashboard Welcome Text -->
             <Label text="Welcome to the Manager Dashboard"
                    style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;" />
+
+            <!-- Example of a Content Section (can be replaced with actual content later) -->
+            <Label text="Manage your store with ease!"
+                   style="-fx-font-size: 18px; -fx-font-weight: normal; -fx-text-fill: #7F8C8D;" />
         </VBox>
     </center>
 </BorderPane>

@@ -38,15 +38,17 @@ public class AdminDashboardController {
 
     @FXML
     public void handleDashboard() {
-        if (!"AdminDashboardContent.fxml".equals(currentView)) {
+/*        if (!"AdminDashboardContent.fxml".equals(currentView)) {
             loadContent("AdminDashboardContent.fxml"); // Example: Separate content file for Dashboard
-        }
+            currentView = "ManagerDashboard";
+        }*/
     }
 
     @FXML
     public void handleManageUsers() {
         if (!"ManageUsers.fxml".equals(currentView)) {
             loadContent("ManageUsers.fxml");
+            currentView = "ManageUsers";
         }
     }
 
@@ -54,6 +56,7 @@ public class AdminDashboardController {
     public void handleManageOrders() {
         if (!"ManageOrders.fxml".equals(currentView)) {
             loadContent("ManageOrders.fxml");
+            currentView = "ManageOrders";
         }
     }
 
@@ -61,6 +64,7 @@ public class AdminDashboardController {
     public void handleManageProducts() {
         if (!"ManageProducts.fxml".equals(currentView)) {
             loadContent("ManageProducts.fxml");
+            currentView = "ManageProducts";
         }
     }
 
@@ -68,6 +72,7 @@ public class AdminDashboardController {
     public void handleManageNotifications() {
         if (!"ManageNotifications.fxml".equals(currentView)) {
             loadContent("ManageNotifications.fxml");
+            currentView = "ManageNotifications";
         }
     }
 
@@ -75,6 +80,7 @@ public class AdminDashboardController {
     public void handleManageFeedback() {
         if (!"StaffManageFeedback.fxml".equals(currentView)) {
             loadContent("StaffManageFeedback.fxml");
+            currentView = "StaffManageFeedback";
         }
     }
 
@@ -83,7 +89,7 @@ public class AdminDashboardController {
         System.out.println("Logging out...");
         try {
             // Redirect to login screen by loading the Login FXML as the new root
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/storemanager/view/Login.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/storemanager/Login.fxml"));
             Parent loginRoot = loader.load();  // Parent is used here instead of Node
 
             // Replace the entire scene's root with the Login view
