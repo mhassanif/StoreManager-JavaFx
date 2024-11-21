@@ -9,7 +9,7 @@
     <children>
         <VBox alignment="CENTER" spacing="15.0" prefWidth="400.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="100.0" AnchorPane.topAnchor="50.0" AnchorPane.bottomAnchor="50.0">
             <!-- Title -->
-            <Label text="Login to Store Manager" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
+            <Label text="Login to TradeTrack" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
 
             <!-- Username Field -->
             <TextField fx:id="usernameField" promptText="Username" style="-fx-font-size: 14px; -fx-background-color: #ffffff; -fx-border-color: #cccccc; -fx-border-radius: 5px; -fx-background-radius: 5px; -fx-padding: 10px;" />
