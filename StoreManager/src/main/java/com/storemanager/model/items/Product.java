@@ -1,5 +1,7 @@
 package com.storemanager.model.items;
 
+import com.storemanager.model.cart.CartItem;
+
 public class Product {
 
     private int id;              // Unique identifier for the product
@@ -27,9 +29,7 @@ public class Product {
     }
 
     // Getters and Setters
-    public int getId() {
-        return id;
-    }
+
 
     public void setId(int id) {
         this.id = id;
@@ -93,5 +93,9 @@ public class Product {
                 "', imageUrl='" + imageUrl +
                 "', category=" + category.getName() +
                 ", description='" + (description != null ? description : "No description") + "'}";
+    }
+
+    public int getId() {
+        return id;
     }
 }

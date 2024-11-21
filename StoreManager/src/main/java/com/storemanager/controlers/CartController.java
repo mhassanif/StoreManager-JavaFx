@@ -1,7 +1,9 @@
 package com.storemanager.controlers;
 
+import com.storemanager.db.DBconnector;
 import com.storemanager.model.cart.CartItem;
 import com.storemanager.model.cart.ShoppingCart;
+import com.storemanager.model.items.Product;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -10,6 +12,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class CartController {
 
@@ -26,8 +33,8 @@ public class CartController {
 
     @FXML
     public void initialize() {
-        // Initialize ShoppingCart with a cart ID (this can be dynamic or fetched from the database)
-        shoppingCart = new ShoppingCart(1);
+        // Initialize ShoppingCart
+        shoppingCart = new ShoppingCart(1); // Dynamic cart ID (fetch from session)
 
         // Set up table columns
         colProductName.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getProduct().getName()));
@@ -44,16 +51,46 @@ public class CartController {
     }
 
     /**
-     * Load cart items into the TableView from the ShoppingCart.
+     * Load cart items from the database into the TableView.
      */
     private void loadCartItems() {
+        shoppingCart.getItems().clear();
+
+        try (Connection connection = DBconnector.getConnection();
+             PreparedStatement ps = connection.prepareStatement(
+                     "SELECT ci.quantity, ci.price, p.product_id, p.name, p.brand, p.description, p.url " +
+                             "FROM CARTITEM ci " +
+                             "JOIN PRODUCT p ON ci.product_id = p.product_id " +
+                             "WHERE ci.cart_id = ?")) {
+
+            ps.setInt(1, shoppingCart.getCartId());
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Product product = new Product(
+                        rs.getInt("product_id"),
+                        rs.getString("name"),
+                        rs.getDouble("price"),
+                        rs.getString("brand"),
+                        rs.getString("url"),
+                        null,
+                        rs.getString("description")
+                );
+                CartItem cartItem = new CartItem(product, rs.getInt("quantity"));
+                shoppingCart.addItem(cartItem);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         ObservableList<CartItem> cartItems = FXCollections.observableArrayList(shoppingCart.getItems());
         cartTable.setItems(cartItems);
         updateTotalAmount();
     }
 
     /**
-     * Add action buttons (+ and -) to the table for quantity adjustment.
+     * Add action buttons (+ and -) for quantity adjustment.
      */
     private void addActionButtons() {
         colActions.setCellFactory(param -> new TableCell<>() {
@@ -64,18 +101,19 @@ public class CartController {
                 btnAdd.setOnAction(event -> {
                     CartItem item = getTableView().getItems().get(getIndex());
                     item.setQuantity(item.getQuantity() + 1);
-                    shoppingCart.addItem(item); // Update the shopping cart
-                    loadCartItems();           // Reload the table
+                    updateCartItemInDB(item);
+                    loadCartItems();
                 });
 
                 btnSubtract.setOnAction(event -> {
                     CartItem item = getTableView().getItems().get(getIndex());
                     if (item.getQuantity() > 1) {
                         item.setQuantity(item.getQuantity() - 1);
-                        loadCartItems();       // Reload the table
+                        updateCartItemInDB(item);
+                        loadCartItems();
                     } else {
-                        shoppingCart.removeItem(item); // Remove item if quantity reaches 0
-                        loadCartItems();               // Reload the table
+                        removeCartItemFromDB(item);
+                        loadCartItems();
                     }
                 });
             }
@@ -94,25 +132,71 @@ public class CartController {
     }
 
     /**
-     * Clear all items from the shopping cart.
+     * Update cart item quantity in the database.
+     */
+    private void updateCartItemInDB(CartItem item) {
+        try (Connection connection = DBconnector.getConnection();
+             PreparedStatement ps = connection.prepareStatement(
+                     "UPDATE CARTITEM SET quantity = ? WHERE cart_id = ? AND product_id = ?")) {
+
+            ps.setInt(1, item.getQuantity());
+            ps.setInt(2, shoppingCart.getCartId());
+            ps.setInt(3, item.getProduct().getId());
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Remove cart item from the database.
+     */
+    private void removeCartItemFromDB(CartItem item) {
+        try (Connection connection = DBconnector.getConnection();
+             PreparedStatement ps = connection.prepareStatement(
+                     "DELETE FROM CARTITEM WHERE cart_id = ? AND product_id = ?")) {
+
+            ps.setInt(1, shoppingCart.getCartId());
+            ps.setInt(2, item.getProduct().getId());
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Clear all items from the cart.
      */
     public void clearCart() {
+        try (Connection connection = DBconnector.getConnection();
+             PreparedStatement ps = connection.prepareStatement(
+                     "DELETE FROM CARTITEM WHERE cart_id = ?")) {
+
+            ps.setInt(1, shoppingCart.getCartId());
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         shoppingCart.clearCart();
         loadCartItems();
     }
 
     /**
-     * Update the total price displayed in the label.
+     * Update the total price label.
      */
     private void updateTotalAmount() {
         totalAmountLabel.setText("$" + String.format("%.2f", shoppingCart.getTotalPrice()));
     }
 
     /**
-     * Placeholder for the checkout process.
+     * Proceed to checkout (placeholder for checkout functionality).
      */
     public void proceedToCheckout() {
         System.out.println("Proceeding to checkout...");
-        // Implement checkout logic, such as converting cart items to an order
+        // Navigate to Checkout.fxml
     }
 }
