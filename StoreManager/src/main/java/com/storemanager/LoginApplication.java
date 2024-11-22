@@ -1,9 +1,6 @@
 package com.storemanager;
 
-import com.storemanager.dao.CustomerDAO;
-import com.storemanager.dao.StaffDAO;
 import com.storemanager.db.DBconnector;
-import com.storemanager.model.users.*;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -35,36 +32,37 @@ public class LoginApplication extends Application {
 //    }
 
     public static void main(String[] args) {
-        // generic staff read
-        StaffDAO staffDAO = new StaffDAO();
-        int staffId = 1;
-        User user = staffDAO.read(staffId);
-        if (user != null) {
-            System.out.println("User fetched successfully!");
-            System.out.println("Name: " + user.getUsername());
-            System.out.println("Email: " + user.getEmail());
-            System.out.println("Position: " + user.getClass().getSimpleName());
-        } else {
-            System.out.println("No user found with the provided staffId.");
-        }
+//        // generic staff read
+//        StaffDAO staffDAO = new StaffDAO();
+//        int staffId = 1;
+//        User user = staffDAO.read(staffId);
+//        if (user != null) {
+//            System.out.println("User fetched successfully!");
+//            System.out.println("Name: " + user.getUsername());
+//            System.out.println("Email: " + user.getEmail());
+//            System.out.println("Position: " + user.getClass().getSimpleName());
+//        } else {
+//            System.out.println("No user found with the provided staffId.");
+//        }
+//
+//
+//        // customer  read
+//        CustomerDAO customerDAO = new CustomerDAO();
+//        int customerID = 2;
+//        Customer customer = customerDAO.read(customerID);
+//        if (customer != null) {
+//            System.out.println("Customer fetched successfully!");
+//            System.out.println("Username: " + customer.getUsername());
+//            System.out.println("Email: " + customer.getEmail());
+//            System.out.println("Address: " + customer.getAddress());
+//            System.out.println("Phone Number: " + customer.getPhoneNumber());
+//            System.out.println("Cart ID: " + customer.getShoppingCart().getCartId());
+//        } else {
+//            System.out.println("No customer found with the provided customerID.");
+//        }
+//    }
 
 
-        // customer  read
-        CustomerDAO customerDAO = new CustomerDAO();
-        int customerID = 2;
-        Customer customer = customerDAO.read(customerID);
-        if (customer != null) {
-            System.out.println("Customer fetched successfully!");
-            System.out.println("Username: " + customer.getUsername());
-            System.out.println("Email: " + customer.getEmail());
-            System.out.println("Address: " + customer.getAddress());
-            System.out.println("Phone Number: " + customer.getPhoneNumber());
-            System.out.println("Cart ID: " + customer.getShoppingCart().getCartId());
-        } else {
-            System.out.println("No customer found with the provided customerID.");
-        }
-    }
 
-
-
+}
 }

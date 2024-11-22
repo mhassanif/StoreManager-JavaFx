@@ -1,52 +1,158 @@
 package com.storemanager.dao;
 
 import com.storemanager.db.DBconnector;
-import com.storemanager.model.order.Order;
 import com.storemanager.model.users.Customer;
-import com.storemanager.model.cart.ShoppingCart;
+import com.storemanager.model.users.User;
 
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class CustomerDAO {
+    private final UserDAO userDAO;
 
-    public Customer read(int customerID) {
-        Customer customer = null;
+    public CustomerDAO() {
+        this.userDAO = new UserDAO();
+    }
 
-        // SQL query to join USERS table and fetch customer details
-        String customerQuery = "SELECT u.user_id, u.name, u.email, u.password, u.address, u.phone " +
-                "FROM USERS u " +
-                "INNER JOIN CUSTOMER c ON u.user_id = c.user_id " +
+    /**
+     * Fetches a Customer by their customer ID.
+     *
+     * @param customerId The customer ID.
+     * @return Customer object or null if not found.
+     */
+    public Customer getCustomerById(int customerId) {
+        String query = "SELECT c.customer_id, u.user_id, u.name, u.email, u.password, u.role, u.address, u.phone " +
+                "FROM CUSTOMER c " +
+                "INNER JOIN USERS u ON c.user_id = u.user_id " +
                 "WHERE c.customer_id = ?";
 
-        try (Connection conn = DBconnector.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(customerQuery)) {
-            stmt.setInt(1, customerID);
-            ResultSet rs = stmt.executeQuery();
+        try (Connection connection = DBconnector.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
-            // If the result set contains a record, process it
-            if (rs.next()) {
-                int userId = rs.getInt("user_id");
-                String username = rs.getString("name");
-                String email = rs.getString("email");
-                String password = rs.getString("password");
-                String address = rs.getString("address");
-                String phoneNumber = rs.getString("phone");
-
-//                // Instantiate the Customer object
-                customer = new Customer(userId, username, email, password, address, phoneNumber);
-//
-//                // Initialize the shopping cart with the cartId from the database
-//                customer.setShoppingCart(new ShoppingCart(cartId));
-//
-//                // You could also load the customer's past orders if needed
-                // customer.setOrders(loadOrders(customerID)); // Implement the order loading logic as needed
+            preparedStatement.setInt(1, customerId);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return new Customer(
+                            resultSet.getInt("customer_id"),
+                            resultSet.getString("name"),
+                            resultSet.getString("email"),
+                            resultSet.getString("password"),
+                            resultSet.getString("address"),
+                            resultSet.getString("phone")
+                    );
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return null;
+    }
 
-        return customer;  // Return the Customer object (if found), otherwise null
+    /**
+     * Fetches a Customer by their user ID.
+     *
+     * @param userId The user ID.
+     * @return Customer object or null if not found.
+     */
+    public Customer getCustomerByUserId(int userId) {
+        String query = "SELECT c.customer_id, u.user_id, u.name, u.email, u.password, u.role, u.address, u.phone " +
+                "FROM CUSTOMER c " +
+                "INNER JOIN USERS u ON c.user_id = u.user_id " +
+                "WHERE u.user_id = ?";
+
+        try (Connection connection = DBconnector.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, userId);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return new Customer(
+                            resultSet.getInt("customer_id"),
+                            resultSet.getString("name"),
+                            resultSet.getString("email"),
+                            resultSet.getString("password"),
+                            resultSet.getString("address"),
+                            resultSet.getString("phone")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Creates a new Customer in the database.
+     *
+     * @param customer The Customer object to be created.
+     * @return true if successful, false otherwise.
+     */
+    public boolean createCustomer(Customer customer) {
+        // First, create a user using the UserDAO
+        boolean userCreated = userDAO.createUser(customer);
+        if (!userCreated) {
+            return false;
+        }
+
+        // Then, create the customer-specific record
+        String query = "INSERT INTO CUSTOMER (user_id) VALUES (?)";
+
+        try (Connection connection = DBconnector.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, customer.getId());
+            int rowsInserted = preparedStatement.executeUpdate();
+            return rowsInserted > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * Updates a Customer's information in the database.
+     *
+     * @param customer The Customer object with updated information.
+     * @return true if successful, false otherwise.
+     */
+    public boolean updateCustomer(Customer customer) {
+        // Update the user using UserDAO
+        boolean userUpdated = userDAO.updateUser(customer);
+        if (!userUpdated) {
+            return false;
+        }
+
+        // Customer-specific updates (if any) can go here
+        // Currently, there are no customer-specific fields in the CUSTOMER table to update
+        return true;
+    }
+
+    /**
+     * Deletes a Customer from the database.
+     *
+     * @param customerId The ID of the Customer to delete.
+     * @return true if successful, false otherwise.
+     */
+    public boolean deleteCustomer(int customerId) {
+        // Delete the customer-specific record
+        String query = "DELETE FROM CUSTOMER WHERE customer_id = ?";
+
+        try (Connection connection = DBconnector.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, customerId);
+            int rowsDeleted = preparedStatement.executeUpdate();
+
+            if (rowsDeleted > 0) {
+                // Optionally, delete the user using UserDAO
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
