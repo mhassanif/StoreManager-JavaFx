@@ -74,8 +74,8 @@ public class ManageOrdersController {
         OrderItem orderItem3 = new OrderItem(product3, 3, 30.0); // Order 3 Item
 
         // Creating mock Customers
-        Customer customer1 = new Customer(1, "John Doe", "john.doe@example.com", "123", "456", "789");
-        Customer customer2 = new Customer(2, "Jane Smith", "jane.smith@example.com", "123", "456", "789");
+        Customer customer1 = new Customer(1,2, "John Doe", "john.doe@example.com", "123", "456", "789");
+        Customer customer2 = new Customer(3,4, "Jane Smith", "jane.smith@example.com", "123", "456", "789");
 
         // Creating Orders with Customer and OrderItem
         Order order1 = new Order(customer1, List.of(orderItem1)); // Order 1
