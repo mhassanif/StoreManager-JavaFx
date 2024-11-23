@@ -13,48 +13,72 @@ import java.util.logging.Logger;
 public class ProductDAO {
     private static final Logger LOGGER = Logger.getLogger(ProductDAO.class.getName());
 
-    // Method to find a product by its ID
-    public Product findById(int id) {
+    // Method to get a product by its ID
+    public Product getProductById(int productId) {
         String query = "SELECT p.*, c.name AS category_name FROM PRODUCT p " +
                 "JOIN CATEGORY c ON p.category_id = c.category_id WHERE p.product_id = ?";
         try (Connection conn = DBconnector.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
-            pstmt.setInt(1, id);
+            pstmt.setInt(1, productId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     return mapRowToProduct(rs);
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error finding product by ID: {0}", e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error getting product by ID: {0}", e.getMessage());
         }
         return null;
     }
 
-    // Method to retrieve all products
-    public List<Product> findAll() {
+    // Method to get products by category ID
+    public List<Product> getProductsByCategoryId(int categoryId) {
         List<Product> products = new ArrayList<>();
         String query = "SELECT p.*, c.name AS category_name FROM PRODUCT p " +
-                "JOIN CATEGORY c ON p.category_id = c.category_id";
-
+                "JOIN CATEGORY c ON p.category_id = c.category_id WHERE c.category_id = ?";
         try (Connection conn = DBconnector.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
 
-            while (rs.next()) {
-                products.add(mapRowToProduct(rs));
+            pstmt.setInt(1, categoryId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    products.add(mapRowToProduct(rs));
+                }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error retrieving all products: {0}", e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error getting products by category ID: {0}", e.getMessage());
         }
         return products;
     }
 
-    // Method to save a new product
-    public void save(Product product) {
-        String query = "INSERT INTO PRODUCT (name, brand, description, price, category_id) VALUES (?, ?, ?, ?, ?)";
+    // Method to search products by a keyword
+    public List<Product> searchProducts(String keyword) {
+        List<Product> products = new ArrayList<>();
+        String query = "SELECT p.*, c.name AS category_name FROM PRODUCT p " +
+                "JOIN CATEGORY c ON p.category_id = c.category_id " +
+                "WHERE p.name LIKE ? OR p.description LIKE ?";
 
+        try (Connection conn = DBconnector.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            String searchKeyword = "%" + keyword + "%";
+            pstmt.setString(1, searchKeyword);
+            pstmt.setString(2, searchKeyword);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    products.add(mapRowToProduct(rs));
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error searching products: {0}", e.getMessage());
+        }
+        return products;
+    }
+
+    // Method to create a new product
+    public boolean createProduct(Product product) {
+        String query = "INSERT INTO PRODUCT (name, brand, description, price, category_id) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DBconnector.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
@@ -63,18 +87,18 @@ public class ProductDAO {
             pstmt.setString(3, product.getDescription());
             pstmt.setDouble(4, product.getPrice());
             pstmt.setInt(5, product.getCategory().getId());
-            pstmt.executeUpdate();
-            LOGGER.log(Level.INFO, "Product saved successfully: {0}", product.getName());
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
 
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error saving product: {0}", e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error creating product: {0}", e.getMessage());
         }
+        return false;
     }
 
     // Method to update an existing product
-    public void update(Product product) {
+    public boolean updateProduct(Product product) {
         String query = "UPDATE PRODUCT SET name = ?, brand = ?, description = ?, price = ?, category_id = ? WHERE product_id = ?";
-
         try (Connection conn = DBconnector.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
@@ -84,35 +108,32 @@ public class ProductDAO {
             pstmt.setDouble(4, product.getPrice());
             pstmt.setInt(5, product.getCategory().getId());
             pstmt.setInt(6, product.getId());
-            pstmt.executeUpdate();
-            LOGGER.log(Level.INFO, "Product updated successfully: {0}", product.getName());
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error updating product: {0}", e.getMessage());
         }
+        return false;
     }
 
     // Method to delete a product by its ID
-    public void delete(int id) {
+    public boolean deleteProduct(int productId) {
         String query = "DELETE FROM PRODUCT WHERE product_id = ?";
-
         try (Connection conn = DBconnector.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
 
-            pstmt.setInt(1, id);
+            pstmt.setInt(1, productId);
             int rowsAffected = pstmt.executeUpdate();
-            if (rowsAffected > 0) {
-                LOGGER.log(Level.INFO, "Product deleted successfully with ID: {0}", id);
-            } else {
-                LOGGER.log(Level.WARNING, "No product found with ID: {0}", id);
-            }
+            return rowsAffected > 0;
 
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error deleting product: {0}", e.getMessage());
         }
+        return false;
     }
 
-    // Utility function retrived row to object
+    // Utility function to map a result set row to a Product object
     private Product mapRowToProduct(ResultSet rs) throws SQLException {
         int categoryId = rs.getInt("category_id");
         String categoryName = rs.getString("category_name");
