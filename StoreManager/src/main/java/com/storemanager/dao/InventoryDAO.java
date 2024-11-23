@@ -13,6 +13,39 @@ import java.util.logging.Logger;
 public class InventoryDAO {
     private static final Logger LOGGER = Logger.getLogger(InventoryDAO.class.getName());
 
+    // Method to get all inventory products
+    public List<InventoryProduct> getAllInventory() {
+        String sql = "SELECT * FROM INVENTORY";
+        List<InventoryProduct> inventoryList = new ArrayList<>();
+
+        try (Connection connection = DBconnector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                int productId = resultSet.getInt("product_id");
+                Product product = ProductDAO.getProductById(productId); // Get product details using ProductDAO
+                if (product != null) {
+                    int stockQuantity = resultSet.getInt("stock_quantity");
+                    int restockQuantity = resultSet.getInt("restock_quantity");
+                    String restockDate = resultSet.getString("restock_date");
+
+                    // Create InventoryProduct object and add it to the list
+                    InventoryProduct inventoryProduct = new InventoryProduct(product, stockQuantity, restockQuantity, restockDate);
+                    inventoryList.add(inventoryProduct);
+                } else {
+                    LOGGER.log(Level.WARNING, "Product with ID {0} not found in inventory", productId);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error retrieving all inventory products: {0}", e.getMessage());
+        }
+
+        return inventoryList;
+    }
+
+
+
     // Method to get inventory details by product ID
     public InventoryProduct getInventoryByProductId(int productId) {
         String sql = "SELECT * FROM INVENTORY WHERE product_id = ?";

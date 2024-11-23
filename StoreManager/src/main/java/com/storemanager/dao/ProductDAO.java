@@ -13,6 +13,26 @@ import java.util.logging.Logger;
 public class ProductDAO {
     private static final Logger LOGGER = Logger.getLogger(ProductDAO.class.getName());
 
+    // Method to get all products
+    public static List<Product> getAllProducts() {
+        List<Product> products = new ArrayList<>();
+        String query = "SELECT p.*, c.name AS category_name FROM PRODUCT p " +
+                "JOIN CATEGORY c ON p.category_id = c.category_id";
+
+        try (Connection conn = DBconnector.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                products.add(mapRowToProduct(rs));
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error getting all products: {0}", e.getMessage());
+        }
+        return products;
+    }
+
+
     // Method to get a product by its ID
     public static Product getProductById(int productId) {
         String query = "SELECT p.*, c.name AS category_name FROM PRODUCT p " +

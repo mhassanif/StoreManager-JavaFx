@@ -7,8 +7,29 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserDAO {
+
+    public static List<User> getAllUsers() {
+        List<User> users = new ArrayList<>();
+        String query = "SELECT * FROM USERS";
+
+        try (Connection connection = DBconnector.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                users.add(mapToUser(resultSet)); // Map each row to a User object and add to the list
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return users; // Return the list of users
+    }
 
     // Fetch user by ID
     public static User getUserById(int userId) {

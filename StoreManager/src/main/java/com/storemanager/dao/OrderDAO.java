@@ -11,7 +11,42 @@ import java.util.List;
 
 public class OrderDAO {
 
-    // Retrieve an order by its ID
+    public List<Order> getAllOrders() throws SQLException {
+        String sql = "SELECT * FROM ORDERTABLE";
+        List<Order> orders = new ArrayList<>();
+
+        try (Connection connection = DBconnector.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                // Fetch order details
+                int orderId = rs.getInt("order_id");
+                int customerId = rs.getInt("customer_id");
+                Customer customer = CustomerDAO.getCustomerById(customerId); // Fetch Customer using CustomerDAO
+
+                // Initialize order object
+                Order order = new Order(customer, new ArrayList<>());
+                order.setOrderId(orderId);
+                order.setOrderDate(rs.getTimestamp("order_date").toLocalDateTime().toString());
+                order.setTotalPrice(rs.getDouble("total_amount"));
+                order.setStatus(rs.getString("status"));
+
+                // Fetch and set order items
+                List<OrderItem> orderItems = OrderItemDAO.getOrderItemsByOrderId(orderId); // Fetch items using OrderItemDAO
+                order.setOrderItems(orderItems);
+
+                // Recalculate total price if needed
+                order.setTotalPrice(OrderItemDAO.calculateTotalPrice(orderItems));
+
+                orders.add(order); // Add the order to the list
+            }
+        }
+        return orders;
+    }
+
+
+
     public Order getOrderById(int orderId) throws SQLException {
         String orderSql = "SELECT * FROM ORDERTABLE WHERE order_id = ?";
         Order order = null;
