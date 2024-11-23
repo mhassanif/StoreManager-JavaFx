@@ -1,6 +1,7 @@
 package com.storemanager.model.users;
 
 import com.storemanager.db.DBconnector; // Import DBconnector for getting connection
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,7 +11,7 @@ import java.sql.SQLException;
  * Represents a generalized user in the system.
  * The User class serves as the base class for specific user roles such as Customer, StoreManager, and Admin.
  */
-public abstract class User {
+public class User {
     private int userId;
     private String username; // User's unique username
     private String email;    // User's email address
@@ -20,15 +21,15 @@ public abstract class User {
     private String phoneNumber;
 
     // Constructor
-    public User(int id, String username, String email, String password, String role,String address,
+    public User(int id, String username, String email, String password, String role, String address,
                 String Number) {
-        this.userId=id;
+        this.userId = id;
         this.username = username;
         this.email = email;
         this.password = password;
         this.role = role;
-        this.address=address;
-        this.phoneNumber=Number;
+        this.address = address;
+        this.phoneNumber = Number;
     }
 
     // Getters and Setters
@@ -88,11 +89,11 @@ public abstract class User {
         this.phoneNumber = phoneNumber;
     }
 
-    // Abstract Method
-    /**
-     * Abstract method to be implemented by subclasses to define role-specific logout behavior.
-     */
-    public abstract void logout();
+
+    // abstraction removed , child classes can still override
+    public void logout(){
+        System.out.println( "User has logged out.");
+    }
 
     /**
      * Login method that is common to all user types.
