@@ -8,6 +8,10 @@ import com.storemanager.model.users.WarehouseStaff;
 
 import java.sql.*;
 
+/**
+ * Data Access Object (DAO) for the Staff entity.
+ * Handles operations related to the STAFF table, utilizing the UserDAO for user-related operations.
+ */
 public class StaffDAO {
 
     private final UserDAO userDAO;
@@ -16,7 +20,13 @@ public class StaffDAO {
         this.userDAO = new UserDAO(); // Initialize the UserDAO for user-related operations
     }
 
-    public User getStaffById(int staffId) {
+    /**
+     * Retrieves a Staff object by staffId.
+     *
+     * @param staffId The ID of the staff to fetch.
+     * @return The User object (could be Admin, Manager, or WarehouseStaff), or null if not found.
+     */
+    public User read(int staffId) {
         User user = null;
 
         String staffQuery = "SELECT s.staff_id, s.user_id, s.position "
@@ -57,6 +67,12 @@ public class StaffDAO {
         return user;  // Return the User object (could be Admin, Manager, or WarehouseStaff)
     }
 
+    /**
+     * Creates a new Staff record.
+     *
+     * @param staff The Staff object to be created.
+     * @return true if the staff was successfully created, false otherwise.
+     */
     public boolean createStaff(User user, String position) {
         try {
             // Step 1: Use UserDAO to create the user
@@ -81,6 +97,13 @@ public class StaffDAO {
         return false;  // Return false if an error occurs
     }
 
+    /**
+     * Updates an existing Staff record.
+     *
+     * @param user The User object with updated data.
+     * @param position The position of the staff.
+     * @return true if the staff was successfully updated, false otherwise.
+     */
     public boolean updateStaff(User user, String position) {
         try {
             // Step 1: Use UserDAO to update the user
@@ -105,6 +128,12 @@ public class StaffDAO {
         return false;  // Return false if an error occurs
     }
 
+    /**
+     * Deletes a Staff record from the database.
+     *
+     * @param staffId The ID of the staff to be deleted.
+     * @return true if the staff was successfully deleted, false otherwise.
+     */
     public boolean deleteStaff(int staffId) {
         try {
             // Step 1: Use UserDAO to delete the user
