@@ -46,8 +46,8 @@
               style="-fx-font-size: 14px; -fx-background-color: #ffffff; -fx-border-color: #cccccc; -fx-border-radius: 5px; -fx-background-radius: 5px; -fx-padding: 5px;">
         <items>
             <FXCollections fx:factory="observableArrayList">
-                <String fx:value="customer"/>
-                <String fx:value="warehousestaff"/>
+                <String fx:value="Customer"/>
+                <String fx:value="Staff"/>
             </FXCollections>
         </items>
     </ComboBox>

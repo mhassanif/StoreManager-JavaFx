@@ -82,9 +82,9 @@ public class CreateAccountController {
                 if (rs.next()) {
                     int userId = rs.getInt(1);  // user_id is the first column
                     // Create user-specific data for either Customer or WarehouseStaff
-                    if (role.equalsIgnoreCase("customer")) {
+                    if (role.equalsIgnoreCase("Customer")) {
                         createCustomer(userId);
-                    } else if (role.equalsIgnoreCase("warehousestaff")) {
+                    } else if (role.equalsIgnoreCase("staff")) {
                         createWarehouseStaff(userId);
                     }
                     messageLabel.setText("Account created successfully.");
@@ -117,11 +117,12 @@ public class CreateAccountController {
      * Create a warehouse staff entry in the STAFF table after creating a user.
      */
     private void createWarehouseStaff(int userId) {
-        String insertStaffQuery = "INSERT INTO STAFF (user_id) VALUES (?)";
+        String insertStaffQuery = "INSERT INTO STAFF (user_id, position) VALUES (?,?)";
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(insertStaffQuery)) {
 
             preparedStatement.setInt(1, userId);
+            preparedStatement.setString(2, "WarehouseStaff");
             preparedStatement.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();

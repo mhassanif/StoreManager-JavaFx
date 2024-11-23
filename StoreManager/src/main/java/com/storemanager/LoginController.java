@@ -164,7 +164,7 @@ public class LoginController {
                     loader = new FXMLLoader(getClass().getResource("/com/storemanager/ManagerDashboard.fxml"));
                     break;
                 case "customer":
-                    loader = new FXMLLoader(getClass().getResource("/com/storemanager/CustomerDashboard.fxml"));
+                    loader = new FXMLLoader(getClass().getResource("/com/storemanager/Dashboard.fxml"));
                     break;
                 case "warehousestaff":
                     loader = new FXMLLoader(getClass().getResource("/com/storemanager/WarehouseStaffDashboard.fxml"));
