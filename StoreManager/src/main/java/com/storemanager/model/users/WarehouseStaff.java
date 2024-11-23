@@ -11,11 +11,12 @@ import java.sql.*;
 public class WarehouseStaff extends User {
 
     private int staffId; // Unique ID for the Warehouse Staff in the STAFF table
-
+    String position;
     // Constructor for WarehouseStaff
     public WarehouseStaff(int staffId, int userId, String username, String email, String password, String address, String phoneNumber) {
-        super(userId, username, email, password, "WarehouseStaff", address, phoneNumber);
+        super(userId, username, email, password, "Staff", address, phoneNumber);
         this.staffId = staffId;
+        position="Manager";
     }
 
     // Getter for staffId

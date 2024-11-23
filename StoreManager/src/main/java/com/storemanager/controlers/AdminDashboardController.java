@@ -19,6 +19,7 @@ public class AdminDashboardController {
 
     private String currentView = "";
 
+
     /**
      * Helper method to load the relevant content into the content area.
      *
@@ -35,6 +36,10 @@ public class AdminDashboardController {
             e.printStackTrace();
         }
     }
+    public void loadContentToDashboard(String fxmlFile) {
+        loadContent(fxmlFile); // This calls the private loadContent method
+    }
+
 
     @FXML
     public void handleDashboard() {

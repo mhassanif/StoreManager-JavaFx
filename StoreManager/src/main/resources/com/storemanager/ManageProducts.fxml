@@ -16,7 +16,7 @@
             <HBox spacing="10" alignment="CENTER">
                 <TextField fx:id="searchField" promptText="Search by product name" onKeyReleased="#handleSearch" />
                 <ComboBox fx:id="brandFilter" promptText="Filter by brand" onAction="#handleFilterBrand" />
-                <Button text="Add Product" onAction="#handleAddProduct" />
+                <Button fx:id="btnAddProduct" text="Add Product" onAction="#handleAddProduct" />
             </HBox>
 
             <!-- Table for Displaying Products -->

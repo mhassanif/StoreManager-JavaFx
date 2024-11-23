@@ -47,10 +47,8 @@
             </TableColumn>
         </TableView>
 
-        <!-- Buttons for managing orders -->
+        <!-- Button for deleting orders -->
         <HBox spacing="20" alignment="CENTER">
-            <Button text="Add Order" fx:id="btnAddOrder" onAction="#handleAddOrder" prefWidth="200" style="-fx-font-size: 14px; -fx-background-color: #34495E; -fx-text-fill: white;" />
-            <Button text="Edit Order" fx:id="btnEditOrder" onAction="#handleEditOrder" prefWidth="200" style="-fx-font-size: 14px; -fx-background-color: #34495E; -fx-text-fill: white;" />
             <Button text="Delete Order" fx:id="btnDeleteOrder" onAction="#handleDeleteOrder" prefWidth="200" style="-fx-font-size: 14px; -fx-background-color: #E74C3C; -fx-text-fill: white;" />
         </HBox>
     </VBox>

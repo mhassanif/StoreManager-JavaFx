@@ -24,7 +24,7 @@ public class OrderItemDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     int productId = rs.getInt("product_id");
-                    Product product = productDAO.getProductById(productId); // Fetch product details
+                    Product product = ProductDAO.getProductById(productId); // Fetch product details
                     int quantity = rs.getInt("quantity");
                     double priceAtPurchase = rs.getDouble("price");
                     OrderItem orderItem = new OrderItem(product, quantity, priceAtPurchase);

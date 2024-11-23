@@ -6,17 +6,15 @@ import com.storemanager.model.order.Order;
 import com.storemanager.model.order.OrderItem;
 import com.storemanager.model.users.Customer;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.event.ActionEvent;
 
-import java.io.IOException;
-import java.util.List;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+
+import java.util.List;
 
 public class ManageOrdersController {
 
@@ -31,7 +29,7 @@ public class ManageOrdersController {
     private void initialize() {
         // Set up the cell value factories for each column
         orderIdColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(String.valueOf(cellData.getValue().getOrderId())) // Corrected to handle int as String
+                new SimpleStringProperty(String.valueOf(cellData.getValue().getOrderId())) // Handle int as String
         );
         customerUsernameColumn.setCellValueFactory(cellData ->
                 new SimpleStringProperty(cellData.getValue().getCustomer().getUsername())
@@ -43,22 +41,22 @@ public class ManageOrdersController {
                 new SimpleStringProperty(cellData.getValue().getStatus())
         );
         totalPriceColumn.setCellValueFactory(cellData ->
-                new SimpleDoubleProperty(cellData.getValue().getTotalPrice()).asObject() // Properly bind the Double property
+                new SimpleDoubleProperty(cellData.getValue().getTotalPrice()).asObject() // Bind the Double property
         );
 
-        // Load data into the table (this should be done dynamically)
+        // Load data into the table
         loadOrders();
     }
 
     // Load orders into the TableView
     private void loadOrders() {
         // Assuming you have a list of orders
-/*        List<Order> orders = orderService.getAllOrders(); // This should be your method to get orders
-        ordersTable.getItems().setAll(orders); */
+        List<Order> orders = fetchOrdersFromDatabase(); // Fetch orders dynamically
+        ordersTable.getItems().setAll(orders);
     }
 
     // Example method to fetch orders from a data source (e.g., a database)
-    private List<Order> fetchOrdersFromDatabase() {     //testing
+    private List<Order> fetchOrdersFromDatabase() {     // Testing with mock data
         // Creating mock data for Category
         Category category1 = new Category(1, "Electronics");
         Category category2 = new Category(2, "Furniture");
@@ -74,8 +72,8 @@ public class ManageOrdersController {
         OrderItem orderItem3 = new OrderItem(product3, 3, 30.0); // Order 3 Item
 
         // Creating mock Customers
-        Customer customer1 = new Customer(1,2, "John Doe", "john.doe@example.com", "123", "456", "789");
-        Customer customer2 = new Customer(3,4, "Jane Smith", "jane.smith@example.com", "123", "456", "789");
+        Customer customer1 = new Customer(1, 2, "John Doe", "john.doe@example.com", "123", "456", "789");
+        Customer customer2 = new Customer(3, 4, "Jane Smith", "jane.smith@example.com", "123", "456", "789");
 
         // Creating Orders with Customer and OrderItem
         Order order1 = new Order(customer1, List.of(orderItem1)); // Order 1
@@ -87,23 +85,15 @@ public class ManageOrdersController {
     }
 
     @FXML
-    public void handleAddOrder(ActionEvent event) throws IOException {
-        // Logic to add a new order
-        System.out.println("Add Order clicked");
-        // You can load a new FXML for adding orders or open a dialog here
-    }
-
-    @FXML
-    public void handleEditOrder(ActionEvent event) throws IOException {
-        // Logic to edit an existing order
-        System.out.println("Edit Order clicked");
-        // You can implement functionality to edit the selected order
-    }
-
-    @FXML
-    public void handleDeleteOrder(ActionEvent event) throws IOException {
+    public void handleDeleteOrder(ActionEvent event) {
         // Logic to delete an existing order
-        System.out.println("Delete Order clicked");
-        // You can implement functionality to delete the selected order
+        Order selectedOrder = ordersTable.getSelectionModel().getSelectedItem();
+        if (selectedOrder != null) {
+            System.out.println("Deleting Order: " + selectedOrder.getOrderId());
+            ordersTable.getItems().remove(selectedOrder); // Remove from table
+            // Add logic to remove the order from the database if necessary
+        } else {
+            System.out.println("No order selected for deletion.");
+        }
     }
 }

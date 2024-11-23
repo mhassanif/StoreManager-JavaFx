@@ -70,15 +70,17 @@ public class LoginController {
                 String role = resultSet.getString("role");
                 String address = resultSet.getString("address");
                 String phone = resultSet.getString("phone");
+                String position="";
 
                 // Check and set the user object based on role
                 if (role.equalsIgnoreCase("customer")) {
                     setCurrentCustomer(userId, email, username, password, address, phone);
                 } else {
-                    setCurrentStaff(userId, email, username, password, address, phone, role);
+                    position=setCurrentStaff(userId, email, username, password, address, phone, role);
+
                 }
 
-                loadDashboard(role);  // Load the appropriate dashboard
+                loadDashboard(role,position);  // Load the appropriate dashboard
                 return true;
             }
         } catch (Exception e) {
@@ -113,8 +115,9 @@ public class LoginController {
     /**
      * Set the current user as a Staff member.
      */
-    private void setCurrentStaff(int userId, String email, String username, String password, String address, String phone, String role) {
+    private String setCurrentStaff(int userId, String email, String username, String password, String address, String phone, String role) {
         String query = "SELECT * FROM STAFF WHERE user_id = ?";
+        String position="";
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
@@ -123,17 +126,17 @@ public class LoginController {
 
             if (resultSet.next()) {
                 int staffId = resultSet.getInt("staff_id");
-
-                switch (role.toLowerCase()) {
-                    case "admin":
+                position=resultSet.getString("position");
+                switch (position) {
+                    case "Admin":
                         CurrentUser.getInstance().setUser(new Admin(staffId, userId, username, email, password, address, phone));
                         System.out.println("Logged in as Admin");
                         break;
-                    case "manager":
+                    case "Manager":
                         CurrentUser.getInstance().setUser(new Manager(staffId, userId, username, email, password, address, phone));
                         System.out.println("Logged in as Manager");
                         break;
-                    case "warehousestaff":
+                    case "Warehouse Staff":
                         CurrentUser.getInstance().setUser(new WarehouseStaff(staffId, userId, username, email, password, address, phone));
                         System.out.println("Logged in as Warehouse Staff");
                         break;
@@ -145,32 +148,35 @@ public class LoginController {
             e.printStackTrace();
             messageLabel.setText("Error retrieving staff data.");
         }
+        return position;
     }
 
     /**
      * Load the appropriate dashboard based on the user role.
      */
-    private void loadDashboard(String role) {
+    private void loadDashboard(String role, String position) {
         try {
             FXMLLoader loader;
             Parent root;
 
             // Load the correct dashboard based on the role
-            switch (role.toLowerCase()) {
-                case "admin":
-                    loader = new FXMLLoader(getClass().getResource("/com/storemanager/AdminDashboard.fxml"));
-                    break;
-                case "manager":
-                    loader = new FXMLLoader(getClass().getResource("/com/storemanager/ManagerDashboard.fxml"));
-                    break;
-                case "customer":
-                    loader = new FXMLLoader(getClass().getResource("/com/storemanager/Dashboard.fxml"));
-                    break;
-                case "warehousestaff":
-                    loader = new FXMLLoader(getClass().getResource("/com/storemanager/WarehouseStaffDashboard.fxml"));
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unknown role: " + role);
+            if(role.toLowerCase().equals("customer")){
+                loader = new FXMLLoader(getClass().getResource("/com/storemanager/Dashboard.fxml"));
+            }
+            else {
+                switch (position.toLowerCase()) {
+                    case "admin":
+                        loader = new FXMLLoader(getClass().getResource("/com/storemanager/AdminDashboard.fxml"));
+                        break;
+                    case "manager":
+                        loader = new FXMLLoader(getClass().getResource("/com/storemanager/ManagerDashboard.fxml"));
+                        break;
+                    case "warehouse staff":
+                        loader = new FXMLLoader(getClass().getResource("/com/storemanager/WarehouseStaffDashboard.fxml"));
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Unknown role: " + role);
+                }
             }
 
             root = loader.load();

@@ -32,23 +32,4 @@ public class LoginApplication extends Application {
     public static void main(String[] args) {
         launch(); // Launch the JavaFX application
     }
-
-//    public static void main(String[] args) {
-//
-//
-////        // customer  read
-//        CustomerDAO customerDAO = new CustomerDAO();
-//        int customerID = 2;
-//        Customer customer = customerDAO.getCustomerById(customerID);
-//        if (customer != null) {
-//            System.out.println("Customer fetched successfully!");
-//            System.out.println("Username: " + customer.getUsername());
-//            System.out.println("Email: " + customer.getEmail());
-//            System.out.println("Address: " + customer.getAddress());
-//            System.out.println("Phone Number: " + customer.getPhoneNumber());
-//            System.out.println("Cart ID: " + customer.getShoppingCart().getCartId());
-//        } else {
-//            System.out.println("No customer found with the provided customerID.");
-//        }
-//    }
 }

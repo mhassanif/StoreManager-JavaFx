@@ -37,9 +37,8 @@ public class ManageUsersController {
         emailColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getEmail()));
         roleColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getRole()));
 
-        // Add buttons to the action column
+        // Add "Delete" button to the action column
         actionColumn.setCellFactory(param -> new TableCell<>() {
-            private final Button editButton = new Button("Edit");
             private final Button deleteButton = new Button("Delete");
 
             @Override
@@ -48,8 +47,7 @@ public class ManageUsersController {
                 if (empty) {
                     setGraphic(null);
                 } else {
-                    setGraphic(new HBox(10, editButton, deleteButton));
-                    editButton.setOnAction(event -> handleEditCustomer());
+                    setGraphic(new HBox(10, deleteButton));
                     deleteButton.setOnAction(event -> handleDeleteCustomer());
                 }
             }
@@ -62,8 +60,8 @@ public class ManageUsersController {
     private void loadCustomers() {
         // Mock some customers (replace with actual data retrieval later)
         List<Customer> customers = List.of(
-                new Customer(1,2, "John Doe", "john.doe@example.com", "password123", "123 Main St", "555-1234"),
-                new Customer(3,4, "Jane Smith", "jane.smith@example.com", "password123", "456 Elm St", "555-5678")
+                new Customer(1, 2, "John Doe", "john.doe@example.com", "password123", "123 Main St", "555-1234"),
+                new Customer(3, 4, "Jane Smith", "jane.smith@example.com", "password123", "456 Elm St", "555-5678")
         );
         userTable.getItems().setAll(customers);
     }
@@ -74,17 +72,6 @@ public class ManageUsersController {
         // Search functionality (mocked for now)
         List<Customer> searchResults = List.of(); // Replace with actual search logic
         userTable.getItems().setAll(searchResults);
-    }
-
-    @FXML
-    private void handleEditCustomer() {
-        selectedCustomer = userTable.getSelectionModel().getSelectedItem();
-        if (selectedCustomer != null) {
-            System.out.println("Edit Customer: " + selectedCustomer.getUsername());
-            // Open Edit Customer form logic here
-        } else {
-            showAlert("No Customer Selected", "Please select a customer to edit.");
-        }
     }
 
     @FXML

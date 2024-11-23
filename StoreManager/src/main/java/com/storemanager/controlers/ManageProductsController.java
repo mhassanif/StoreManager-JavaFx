@@ -7,9 +7,14 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -113,9 +118,30 @@ public class ManageProductsController {
 
     @FXML
     public void handleAddProduct() {
-        System.out.println("Add Product clicked");
-        // Open a new form for adding a product
+        try {
+            // Load the FXML for the CreateProduct page
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/storemanager/CreateProduct.fxml"));
+            Parent createProductRoot = loader.load();
+
+            // Pass the current stage as a reference to allow navigation back
+            CreateProductController createProductController = loader.getController();
+            createProductController.setPreviousStage((Stage) btnAddProduct.getScene().getWindow());
+
+            // Set up a new stage for the CreateProduct page
+            Stage stage = new Stage();
+            stage.setTitle("Create New Product");
+            stage.setScene(new Scene(createProductRoot));
+            stage.show();
+
+            // Close the current ManageProducts stage (optional if you want only one window open at a time)
+            btnAddProduct.getScene().getWindow().hide();
+
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to load CreateProduct page.", e.getMessage());
+        }
     }
+
+
 
     @FXML
     public void handleDeleteProduct() {
@@ -156,4 +182,13 @@ public class ManageProductsController {
                 new InventoryProduct(product3, 30, 10, "2024-12-20")
         );
     }
+
+    private void showAlert(Alert.AlertType alertType, String title, String header, String content) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
 }

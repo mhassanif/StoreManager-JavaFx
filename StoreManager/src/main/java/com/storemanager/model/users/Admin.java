@@ -16,12 +16,14 @@ import java.util.List;
 public class Admin extends User {
 
     private int staffId; // Unique ID for the admin in the STAFF table
+    String position;
     private List<String> managedUsers;
 
     // Constructor
     public Admin(int staffId, int userId, String username, String email, String password, String address, String phoneNumber) {
-        super(userId, username, email, password, "Admin", address, phoneNumber); // Assigning the role as "Admin"
+        super(userId, username, email, password, "Staff", address, phoneNumber); // Assigning the role as "Admin"
         this.staffId = staffId;
+        position="Admin";
         this.managedUsers = new ArrayList<>();
     }
 

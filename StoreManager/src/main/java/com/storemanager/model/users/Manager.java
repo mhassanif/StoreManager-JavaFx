@@ -13,11 +13,13 @@ import java.util.List;
 public class Manager extends User {
 
     private int staffId; // Unique ID for the Manager in the STAFF table
+    String position;
 
     // Constructor for Manager
     public Manager(int staffId, int userId, String username, String email, String password, String address, String phoneNumber) {
-        super(userId, username, email, password, "Manager", address, phoneNumber);
+        super(userId, username, email, password, "Staff", address, phoneNumber);
         this.staffId = staffId;
+        position="Manager";
     }
 
     // Getters and Setters
