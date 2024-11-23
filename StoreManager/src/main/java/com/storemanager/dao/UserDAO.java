@@ -1,7 +1,9 @@
 package com.storemanager.dao;
 
 import com.storemanager.db.DBconnector;
+import com.storemanager.model.users.Customer;
 import com.storemanager.model.users.User;
+import com.storemanager.model.users.WarehouseStaff;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -66,6 +68,64 @@ public class UserDAO {
         }
         return null; // Return null if user not found or an exception occurs
     }
+
+    public static List<User> searchUsers(String query) {
+        List<User> users = new ArrayList<>();
+        // Search for users based on partial username
+        String sql = "SELECT * FROM USERS WHERE username LIKE ?";
+
+        try (Connection conn = DBconnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, "%" + query + "%");  // Use the partial username in the query
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                String role = rs.getString("role");
+                int userId = rs.getInt("user_id");
+                String username = rs.getString("username");
+                String email = rs.getString("email");
+                String password = rs.getString("password");
+                String address = rs.getString("address");
+                String phone = rs.getString("phone");
+
+                if ("Customer".equals(role)) {
+                    // Query the CUSTOMER table to fetch customer_id based on the user_id
+                    String customerQuery = "SELECT * FROM CUSTOMER WHERE user_id = ?";
+                    try (PreparedStatement customerStmt = conn.prepareStatement(customerQuery)) {
+                        customerStmt.setInt(1, userId);
+                        try (ResultSet customerRs = customerStmt.executeQuery()) {
+                            if (customerRs.next()) {
+                                int customerId = customerRs.getInt("customer_id");
+                                // Create a Customer object with the relevant information
+                                users.add(new Customer(customerId, userId, username, email, password, address, phone));
+                            }
+                        }
+                    }
+
+                } else if ("WarehouseStaff".equals(role)) {
+                    // Query the STAFF table to fetch staff_id based on the user_id
+                    String staffQuery = "SELECT * FROM STAFF WHERE user_id = ?";
+                    try (PreparedStatement staffStmt = conn.prepareStatement(staffQuery)) {
+                        staffStmt.setInt(1, userId);
+                        try (ResultSet staffRs = staffStmt.executeQuery()) {
+                            if (staffRs.next()) {
+                                int staffId = staffRs.getInt("staff_id");
+                                // Create a WarehouseStaff object with the relevant information
+                                users.add(new WarehouseStaff(staffId, userId, username, email, password, address, phone));
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return users;
+    }
+
+
 
     // Create a new user
     public static boolean createUser(User user) {

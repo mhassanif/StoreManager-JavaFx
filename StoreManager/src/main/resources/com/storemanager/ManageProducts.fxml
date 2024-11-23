@@ -34,8 +34,8 @@
 
             <!-- Buttons for Product Management -->
             <HBox spacing="10" alignment="CENTER">
-                <Button text="Delete Product" onAction="#handleDeleteProduct" />
-                <Button text="Set Restock Level" onAction="#handleSetRestockLevel" />
+                <Button fx:id="btnDeleteProduct" text="Delete Product" onAction="#handleDeleteProduct" />
+                <Button fx:id="btnSetRestockLevel" text="Set Restock Level" onAction="#handleSetRestockLevel" />
             </HBox>
         </VBox>
     </center>

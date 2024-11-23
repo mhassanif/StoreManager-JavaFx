@@ -105,4 +105,17 @@ public class NotificationDAO {
         }
         return false;
     }
+
+    // Delete notifications for a user from NOTIFICATION_RECIPIENT table
+    public static boolean deleteNotificationsByUserId(int userId) {
+        String query = "DELETE FROM NOTIFICATION_RECIPIENT WHERE user_id = ?";
+        try (PreparedStatement stmt = DBconnector.getConnection().prepareStatement(query)) {
+            stmt.setInt(1, userId);
+            int result = stmt.executeUpdate();
+            return result > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

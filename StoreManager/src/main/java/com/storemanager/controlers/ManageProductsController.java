@@ -2,8 +2,10 @@ package com.storemanager.controlers;
 
 import com.storemanager.dao.InventoryDAO;
 import com.storemanager.dao.ProductDAO;
+import com.storemanager.dao.InventoryProductDAO;
 import com.storemanager.model.items.InventoryProduct;
 import com.storemanager.model.items.Product;
+import com.storemanager.model.items.Category;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -54,8 +56,16 @@ public class ManageProductsController {
 
     private List<InventoryProduct> allInventoryProducts;
 
+    // DAOs
+    private ProductDAO productDAO;
+    private InventoryProductDAO inventoryProductDAO;
+
     @FXML
     public void initialize() {
+        // Initialize DAO instances
+        productDAO = new ProductDAO();
+        inventoryProductDAO = new InventoryProductDAO();
+
         // Initialize table columns
         productIdColumn.setCellValueFactory(cellData ->
                 new SimpleIntegerProperty(cellData.getValue().getProduct().getId()).asObject());
@@ -72,11 +82,8 @@ public class ManageProductsController {
         restockDateColumn.setCellValueFactory(cellData ->
                 new SimpleStringProperty(cellData.getValue().getRestockDate()));
 
-        // Load products from the database
+        // Load products from database
         loadProducts();
-
-        // Populate table
-        productsTable.getItems().setAll(allInventoryProducts);
 
         // Populate brand filter dropdown
         brandFilter.getItems().addAll(allInventoryProducts.stream()
@@ -86,11 +93,9 @@ public class ManageProductsController {
     }
 
     private void loadProducts() {
-        // Fetch products and their inventory from the database
-        List<Product> products = ProductDAO.searchProducts(""); // Fetch all products
-        allInventoryProducts = products.stream()
-                .map(product -> new InventoryDAO().getInventoryByProductId(product.getId()))
-                .collect(Collectors.toList());
+        // Fetch inventory products from the database using the DAO
+        allInventoryProducts = InventoryDAO.getAllInventory();
+        productsTable.getItems().setAll(allInventoryProducts);
     }
 
     @FXML
@@ -117,24 +122,19 @@ public class ManageProductsController {
 
     @FXML
     public void handleAddProduct() {
+        // Logic for adding a product (could open a new form or modal)
         System.out.println("Add Product clicked");
-        // Open a new form for adding a product
     }
 
     @FXML
     public void handleDeleteProduct() {
         InventoryProduct selectedProduct = productsTable.getSelectionModel().getSelectedItem();
         if (selectedProduct != null) {
-            System.out.println("Delete Product: " + selectedProduct.getProduct().getName());
-            // Delete product from the database
-            boolean success = ProductDAO.deleteProduct(selectedProduct.getProduct().getId());
-            if (success) {
-                // Remove from table and refresh
-                allInventoryProducts.remove(selectedProduct);
-                productsTable.getItems().setAll(allInventoryProducts);
-            } else {
-                System.out.println("Failed to delete the product.");
-            }
+            // Delete from database using the DAO
+            ProductDAO.deleteProduct(selectedProduct.getProduct().getId());
+            allInventoryProducts.remove(selectedProduct);
+            productsTable.getItems().setAll(allInventoryProducts);
+            System.out.println("Deleted Product: " + selectedProduct.getProduct().getName());
         } else {
             System.out.println("No product selected for deletion");
         }
@@ -144,35 +144,14 @@ public class ManageProductsController {
     public void handleSetRestockLevel() {
         InventoryProduct selectedProduct = productsTable.getSelectionModel().getSelectedItem();
         if (selectedProduct != null) {
+            // Open dialog to set restock level or update via DAO
             System.out.println("Set Restock Level for Product: " + selectedProduct.getProduct().getName());
-
-            // Create a dialog to input the restock level
-            TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle("Set Restock Level");
-            dialog.setHeaderText("Enter the new restock level for " + selectedProduct.getProduct().getName());
-            dialog.setContentText("Restock Level:");
-
-            // Show dialog and wait for input
-            dialog.showAndWait().ifPresent(restockLevelInput -> {
-                try {
-                    int restockLevel = Integer.parseInt(restockLevelInput);  // Parse the input to an integer
-                    // Update restock level in the database using InventoryDAO
-                    boolean success = InventoryDAO.setRestockLevel(selectedProduct.getProduct().getId(), restockLevel);
-                    if (success) {
-                        // Refresh the inventory product list if the update was successful
-                        selectedProduct.setRestockLevel(restockLevel);  // Update in the table view
-                        productsTable.refresh();  // Refresh the table to reflect the changes
-                        System.out.println("Restock level updated successfully.");
-                    } else {
-                        System.out.println("Failed to update restock level.");
-                    }
-                } catch (NumberFormatException e) {
-                    System.out.println("Invalid input. Please enter a valid integer.");
-                }
-            });
+            // Example logic: update restock level in database
+            selectedProduct.setRestockLevel(50);  // Update restock level
+            InventoryDAO.setRestockLevel(selectedProduct.getProduct().getId(),selectedProduct.getRestockLevel());
+            productsTable.refresh();  // Refresh table to reflect changes
         } else {
             System.out.println("No product selected to set restock level");
         }
     }
-
 }

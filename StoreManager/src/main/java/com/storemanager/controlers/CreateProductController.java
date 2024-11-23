@@ -26,7 +26,9 @@ public class CreateProductController {
     @FXML private TextField imageUrlField;
     @FXML private Button btnSave;
     @FXML private Button btnCancel;
-    private Stage previousStage;
+
+    private Runnable cancelCallback; // Callback for cancel action
+
     @FXML
     private void initialize() {
         // Load categories into ComboBox
@@ -92,20 +94,17 @@ public class CreateProductController {
         }
     }
 
-    public void setPreviousStage(Stage stage) {
-        this.previousStage = stage;
+    public void setCancelCallback(Runnable cancelCallback) {
+        this.cancelCallback = cancelCallback;
     }
 
     @FXML
     public void handleCancel() {
-        if (previousStage != null) {
-            previousStage.show(); // Show the ManageProducts window
-            // Close the current Create Product window
-            Stage createProductStage = (Stage) btnCancel.getScene().getWindow();
-            createProductStage.close();
+        if (cancelCallback != null) {
+            cancelCallback.run();
         }
+        closeWindow();
     }
-
 
     private void closeWindow() {
         Stage stage = (Stage) btnCancel.getScene().getWindow();

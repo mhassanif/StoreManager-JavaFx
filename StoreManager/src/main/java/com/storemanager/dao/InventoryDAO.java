@@ -14,7 +14,7 @@ public class InventoryDAO {
     private static final Logger LOGGER = Logger.getLogger(InventoryDAO.class.getName());
 
     // Method to get inventory details by product ID
-    public InventoryProduct getInventoryByProductId(int productId) {
+    public static InventoryProduct getInventoryByProductId(int productId) {
         String sql = "SELECT * FROM INVENTORY WHERE product_id = ?";
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -35,8 +35,37 @@ public class InventoryDAO {
         return null; // Return null if no inventory found for the given product ID
     }
 
+    public static List<InventoryProduct> getAllInventory() {
+        List<InventoryProduct> inventoryList = new ArrayList<>();
+
+        // SQL query to get all inventory products
+        String query = "SELECT * FROM INVENTORY";
+
+        try (Connection connection = DBconnector.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            // Process the results
+            while (resultSet.next()) {
+                int inventoryId = resultSet.getInt("inventory_id");
+                int productId = resultSet.getInt("product_id");
+                int stockQuantity = resultSet.getInt("stock_quantity");
+                int restockQuantity = resultSet.getInt("restock_quantity");
+                Date restockDate = resultSet.getDate("restock_date");
+
+                // Create an Inventory object
+                InventoryProduct inventory = new InventoryProduct(inventoryId, productId, stockQuantity, restockQuantity, restockDate);
+                inventoryList.add(inventory);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return inventoryList;
+    }
+
     // Method to update stock quantity for a product
-    public boolean updateStockQuantity(int productId, int quantity) {
+    public static boolean updateStockQuantity(int productId, int quantity) {
         String sql = "UPDATE INVENTORY SET stock_quantity = ? WHERE product_id = ?";
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -52,7 +81,7 @@ public class InventoryDAO {
     }
 
     // Method to restock a product by adding to the existing stock quantity
-    public boolean restockProduct(int productId, int quantity) {
+    public static boolean restockProduct(int productId, int quantity) {
         String sql = "UPDATE INVENTORY SET stock_quantity = stock_quantity + ?, restock_date = GETDATE() WHERE product_id = ?";
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -68,7 +97,7 @@ public class InventoryDAO {
     }
 
     // Method to get products with low stock based on a threshold
-    public List<InventoryProduct> getLowStockProducts(int threshold) {
+    public static List<InventoryProduct> getLowStockProducts(int threshold) {
         String sql = "SELECT * FROM INVENTORY WHERE stock_quantity <= ?";
         List<InventoryProduct> lowStockProducts = new ArrayList<>();
 

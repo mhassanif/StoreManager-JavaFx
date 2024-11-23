@@ -32,7 +32,6 @@ public class OrderItemDAO {
         return orderItems;
     }
 
-
     // Retrieve OrderItems by Order ID
     public static List<OrderItem> getOrderItemsByOrderId(int orderId) throws SQLException {
         String sql = "SELECT * FROM ORDERITEM WHERE order_id = ?";
@@ -63,5 +62,16 @@ public class OrderItemDAO {
             total += item.calculateTotalPrice(); // Calculate price per item and sum them up
         }
         return total;
+    }
+
+    // Static method to delete order items by orderId
+    public static boolean deleteByOrderId(int orderId) throws SQLException {
+        String sql = "DELETE FROM ORDERITEM WHERE order_id = ?";
+
+        try (Connection connection = DBconnector.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, orderId);
+            return stmt.executeUpdate() > 0; // Return true if rows are deleted
+        }
     }
 }

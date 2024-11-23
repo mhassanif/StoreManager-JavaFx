@@ -25,7 +25,7 @@ public class CustomerDAO {
              ResultSet resultSet = preparedStatement.executeQuery()) {
 
             while (resultSet.next()) {
-                Customer customer = new Customer(
+                customers.add(new Customer(
                         resultSet.getInt("customer_id"),
                         resultSet.getInt("user_id"),
                         resultSet.getString("name"),
@@ -33,8 +33,7 @@ public class CustomerDAO {
                         resultSet.getString("password"),
                         resultSet.getString("address"),
                         resultSet.getString("phone")
-                );
-                customers.add(customer);
+                ));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -42,7 +41,6 @@ public class CustomerDAO {
 
         return customers;
     }
-
 
     public static Customer getCustomerById(int customerId) {
         String query = "SELECT c.customer_id, u.user_id, u.name, u.email, u.password, u.role, u.address, u.phone " +
@@ -73,110 +71,91 @@ public class CustomerDAO {
         return null;
     }
 
-    /**
-     * Fetches a Customer by their user ID.
-     *
-     * @param userId The user ID.
-     * @return Customer object or null if not found.
-     */
     public static Customer getCustomerByUserId(int userId) {
-        String query = "SELECT c.customer_id, u.user_id, u.name, u.email, u.password, u.role, u.address, u.phone " +
-                "FROM CUSTOMER c " +
-                "INNER JOIN USERS u ON c.user_id = u.user_id " +
-                "WHERE u.user_id = ?";
-
+        String query = "SELECT * FROM CUSTOMER WHERE user_id = ?";
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
             preparedStatement.setInt(1, userId);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return new Customer(
-                            resultSet.getInt("customer_id"),
-                            resultSet.getInt("user_id"),
-                            resultSet.getString("name"),
-                            resultSet.getString("email"),
-                            resultSet.getString("password"),
-                            resultSet.getString("address"),
-                            resultSet.getString("phone")
-                    );
-                }
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                int customerId = resultSet.getInt("customer_id");
+                // Fetch user details
+                User user = UserDAO.getUserById(userId);
+                return new Customer(customerId, user.getId(), user.getUsername(), user.getEmail(),
+                        user.getPassword(), user.getAddress(), user.getPhoneNumber());
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return null; // Return null if no customer found
     }
 
-    /**
-     * Creates a new Customer in the database.
-     *
-     * @param customer The Customer object to be created.
-     * @return true if successful, false otherwise.
-     */
     public static boolean createCustomer(Customer customer) {
-        // First, create a user using the UserDAO
-        boolean userCreated = UserDAO.createUser(customer);
-        if (!userCreated) {
+        if (!UserDAO.createUser(customer)) {
             return false;
         }
 
-        // Then, create the customer-specific record
         String query = "INSERT INTO CUSTOMER (user_id) VALUES (?)";
 
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
             preparedStatement.setInt(1, customer.getId());
-            int rowsInserted = preparedStatement.executeUpdate();
-            return rowsInserted > 0;
+            return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return false;
     }
 
-    /**
-     * Updates a Customer's information in the database.
-     *
-     * @param customer The Customer object with updated information.
-     * @return true if successful, false otherwise.
-     */
     public static boolean updateCustomer(Customer customer) {
-        // Update the user using UserDAO
-        boolean userUpdated = UserDAO.updateUser(customer);
-        if (!userUpdated) {
-            return false;
-        }
-
-        // Customer-specific updates (if any) can go here
-        // Currently, there are no customer-specific fields in the CUSTOMER table to update
-        return true;
+        return UserDAO.updateUser(customer);
     }
 
-    /**
-     * Deletes a Customer from the database.
-     *
-     * @param customerId The ID of the Customer to delete.
-     * @return true if successful, false otherwise.
-     */
+    // Delete customer by user_id
+    public static boolean deleteCustomerByUserId(int userId) {
+        // First, get the customer_id using the user_id
+        Customer customer = CustomerDAO.getCustomerByUserId(userId);
+        if (customer == null) return false;
+
+        int customerId = customer.getId();
+
+        // Call the deleteCustomer method to handle the deletion
+        return deleteCustomer(customerId);
+    }
+
+    // Delete customer by customer_id
     public static boolean deleteCustomer(int customerId) {
-        // Delete the customer-specific record
-        String query = "DELETE FROM CUSTOMER WHERE customer_id = ?";
+        Customer customer = getCustomerById(customerId);
+        if (customer == null) return false;
 
-        try (Connection connection = DBconnector.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        int userId = customer.getId();
 
-            preparedStatement.setInt(1, customerId);
-            int rowsDeleted = preparedStatement.executeUpdate();
+        try {
+            // Delete related records using appropriate DAOs
+            NotificationDAO.deleteNotificationsByUserId(userId);
+            FeedbackDAO.deleteFeedbackByCustomer(customerId);
+            ShoppingCartDAO.deleteShoppingCartByCustomer(customerId);
+            OrderDAO.deleteOrderByCustomer(customerId);
 
-            if (rowsDeleted > 0) {
-                // Optionally, delete the user using UserDAO
-                return true;
+            // Delete customer record
+            String query = "DELETE FROM CUSTOMER WHERE customer_id = ?";
+            try (Connection connection = DBconnector.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+                preparedStatement.setInt(1, customerId);
+                if (preparedStatement.executeUpdate() > 0) {
+                    // Delete user record as well
+                    return UserDAO.deleteUser(userId);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return false;
     }
+
 }
