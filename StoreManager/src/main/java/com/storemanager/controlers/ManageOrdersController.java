@@ -1,7 +1,6 @@
 package com.storemanager.controlers;
 
-import com.storemanager.model.items.Category;
-import com.storemanager.model.items.Product;
+import com.storemanager.dao.OrderDAO;
 import com.storemanager.model.order.Order;
 import com.storemanager.model.order.OrderItem;
 import com.storemanager.model.users.Customer;
@@ -10,10 +9,10 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.event.ActionEvent;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class ManageOrdersController {
@@ -50,48 +49,31 @@ public class ManageOrdersController {
 
     // Load orders into the TableView
     private void loadOrders() {
-        // Assuming you have a list of orders
-        List<Order> orders = fetchOrdersFromDatabase(); // Fetch orders dynamically
-        ordersTable.getItems().setAll(orders);
-    }
-
-    // Example method to fetch orders from a data source (e.g., a database)
-    private List<Order> fetchOrdersFromDatabase() {     // Testing with mock data
-        // Creating mock data for Category
-        Category category1 = new Category(1, "Electronics");
-        Category category2 = new Category(2, "Furniture");
-
-        // Creating mock data for Product, linking to Category
-        Product product1 = new Product(1, "Product A", 20.0, "Brand A", "imageA.jpg", category1, "Description of Product A");
-        Product product2 = new Product(2, "Product B", 50.0, "Brand B", "imageB.jpg", category2, "Description of Product B");
-        Product product3 = new Product(3, "Product C", 30.0, "Brand C", "imageC.jpg", category1, "Description of Product C");
-
-        // Creating mock data for OrderItem, linking to Product
-        OrderItem orderItem1 = new OrderItem(product1, 2, 20.0); // Order 1 Item
-        OrderItem orderItem2 = new OrderItem(product2, 1, 50.0); // Order 2 Item
-        OrderItem orderItem3 = new OrderItem(product3, 3, 30.0); // Order 3 Item
-
-        // Creating mock Customers
-        Customer customer1 = new Customer(1, 2, "John Doe", "john.doe@example.com", "123", "456", "789");
-        Customer customer2 = new Customer(3, 4, "Jane Smith", "jane.smith@example.com", "123", "456", "789");
-
-        // Creating Orders with Customer and OrderItem
-        Order order1 = new Order(customer1, List.of(orderItem1)); // Order 1
-        Order order2 = new Order(customer2, List.of(orderItem2)); // Order 2
-        Order order3 = new Order(customer1, List.of(orderItem3)); // Order 3
-
-        // Return the list of orders
-        return List.of(order1, order2, order3);
+        try {
+            List<Order> orders = OrderDAO.getAllOrders(); // Fetch orders from the database using OrderDAO
+            ordersTable.getItems().setAll(orders);  // Populate the TableView
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle the exception appropriately (you may show an error message to the user)
+        }
     }
 
     @FXML
     public void handleDeleteOrder(ActionEvent event) {
-        // Logic to delete an existing order
         Order selectedOrder = ordersTable.getSelectionModel().getSelectedItem();
         if (selectedOrder != null) {
             System.out.println("Deleting Order: " + selectedOrder.getOrderId());
-            ordersTable.getItems().remove(selectedOrder); // Remove from table
-            // Add logic to remove the order from the database if necessary
+            try {
+                // Remove from the database
+                boolean success = OrderDAO.deleteOrder(selectedOrder.getOrderId());
+                if (success) {
+                    ordersTable.getItems().remove(selectedOrder); // Remove from table
+                    System.out.println("Order deleted successfully.");
+                } else {
+                    System.out.println("Failed to delete order.");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace(); // Handle SQL exception, maybe show an error message
+            }
         } else {
             System.out.println("No order selected for deletion.");
         }

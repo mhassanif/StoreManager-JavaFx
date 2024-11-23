@@ -11,7 +11,8 @@ import java.util.List;
 
 public class OrderDAO {
 
-    public List<Order> getAllOrders() throws SQLException {
+    // Static method to retrieve all orders
+    public static List<Order> getAllOrders() throws SQLException {
         String sql = "SELECT * FROM ORDERTABLE";
         List<Order> orders = new ArrayList<>();
 
@@ -45,9 +46,8 @@ public class OrderDAO {
         return orders;
     }
 
-
-
-    public Order getOrderById(int orderId) throws SQLException {
+    // Static method to retrieve a specific order by its ID
+    public static Order getOrderById(int orderId) throws SQLException {
         String orderSql = "SELECT * FROM ORDERTABLE WHERE order_id = ?";
         Order order = null;
 
@@ -78,8 +78,8 @@ public class OrderDAO {
         return order;
     }
 
-    // Retrieve all orders for a specific customer
-    public List<Order> getOrdersByCustomerId(int customerId) throws SQLException {
+    // Static method to retrieve all orders for a specific customer
+    public static List<Order> getOrdersByCustomerId(int customerId) throws SQLException {
         String sql = "SELECT * FROM ORDERTABLE WHERE customer_id = ?";
         List<Order> orders = new ArrayList<>();
 
@@ -104,8 +104,8 @@ public class OrderDAO {
         return orders;
     }
 
-    // Create a new order with its items
-    public boolean createOrder(Order order) throws SQLException {
+    // Static method to create a new order with its items
+    public static boolean createOrder(Order order) throws SQLException {
         String orderSql = "INSERT INTO ORDERTABLE (customer_id, order_date, total_amount, status) VALUES (?, GETDATE(), ?, ?)";
         String itemsSql = "INSERT INTO ORDERITEM (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)";
 
@@ -154,8 +154,8 @@ public class OrderDAO {
         }
     }
 
-    // Update the status of an order
-    public boolean updateOrderStatus(int orderId, String status) throws SQLException {
+    // Static method to update the status of an order
+    public static boolean updateOrderStatus(int orderId, String status) throws SQLException {
         String sql = "UPDATE ORDERTABLE SET status = ? WHERE order_id = ?";
 
         try (Connection connection = DBconnector.getConnection();
@@ -167,8 +167,8 @@ public class OrderDAO {
         }
     }
 
-    // Delete an order and its items
-    public boolean deleteOrder(int orderId) throws SQLException {
+    // Static method to delete an order and its items
+    public static boolean deleteOrder(int orderId) throws SQLException {
         String itemsSql = "DELETE FROM ORDERITEM WHERE order_id = ?";
         String orderSql = "DELETE FROM ORDERTABLE WHERE order_id = ?";
 
