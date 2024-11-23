@@ -14,7 +14,7 @@ public class ProductDAO {
     private static final Logger LOGGER = Logger.getLogger(ProductDAO.class.getName());
 
     // Method to get a product by its ID
-    public Product getProductById(int productId) {
+    public static Product getProductById(int productId) {
         String query = "SELECT p.*, c.name AS category_name FROM PRODUCT p " +
                 "JOIN CATEGORY c ON p.category_id = c.category_id WHERE p.product_id = ?";
         try (Connection conn = DBconnector.getConnection();
@@ -33,7 +33,7 @@ public class ProductDAO {
     }
 
     // Method to get products by category ID
-    public List<Product> getProductsByCategoryId(int categoryId) {
+    public  static List<Product> getProductsByCategoryId(int categoryId) {
         List<Product> products = new ArrayList<>();
         String query = "SELECT p.*, c.name AS category_name FROM PRODUCT p " +
                 "JOIN CATEGORY c ON p.category_id = c.category_id WHERE c.category_id = ?";
@@ -53,7 +53,7 @@ public class ProductDAO {
     }
 
     // Method to search products by a keyword
-    public List<Product> searchProducts(String keyword) {
+    public  static  List<Product> searchProducts(String keyword) {
         List<Product> products = new ArrayList<>();
         String query = "SELECT p.*, c.name AS category_name FROM PRODUCT p " +
                 "JOIN CATEGORY c ON p.category_id = c.category_id " +
@@ -77,7 +77,7 @@ public class ProductDAO {
     }
 
     // Method to create a new product
-    public boolean createProduct(Product product) {
+    public  static boolean createProduct(Product product) {
         String query = "INSERT INTO PRODUCT (name, brand, description, price, category_id) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DBconnector.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -97,7 +97,7 @@ public class ProductDAO {
     }
 
     // Method to update an existing product
-    public boolean updateProduct(Product product) {
+    public  static boolean updateProduct(Product product) {
         String query = "UPDATE PRODUCT SET name = ?, brand = ?, description = ?, price = ?, category_id = ? WHERE product_id = ?";
         try (Connection conn = DBconnector.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -118,7 +118,7 @@ public class ProductDAO {
     }
 
     // Method to delete a product by its ID
-    public boolean deleteProduct(int productId) {
+    public  static boolean deleteProduct(int productId) {
         String query = "DELETE FROM PRODUCT WHERE product_id = ?";
         try (Connection conn = DBconnector.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -134,7 +134,7 @@ public class ProductDAO {
     }
 
     // Utility function to map a result set row to a Product object
-    private Product mapRowToProduct(ResultSet rs) throws SQLException {
+    private  static  Product mapRowToProduct(ResultSet rs) throws SQLException {
         int categoryId = rs.getInt("category_id");
         String categoryName = rs.getString("category_name");
 

@@ -14,19 +14,7 @@ import java.sql.*;
  */
 public class StaffDAO {
 
-    private final UserDAO userDAO;
-
-    public StaffDAO() {
-        this.userDAO = new UserDAO(); // Initialize the UserDAO for user-related operations
-    }
-
-    /**
-     * Retrieves a Staff object by staffId.
-     *
-     * @param staffId The ID of the staff to fetch.
-     * @return The User object (could be Admin, Manager, or WarehouseStaff), or null if not found.
-     */
-    public User read(int staffId) {
+    public static User read(int staffId) {
         User user = null;
 
         String staffQuery = "SELECT s.staff_id, s.user_id, s.position "
@@ -44,7 +32,7 @@ public class StaffDAO {
                 String position = rs.getString("position");
 
                 // Use UserDAO to retrieve user details
-                user = userDAO.getUserById(userId);
+                user = UserDAO.getUserById(userId);
 
                 // If the user exists, create an instance of the appropriate staff type based on position
                 if (user != null) {
@@ -68,10 +56,10 @@ public class StaffDAO {
     }
 
 
-    public boolean createStaff(User user, String position) {
+    public  static boolean createStaff(User user, String position) {
         try {
             // Step 1: Use UserDAO to create the user
-            boolean userCreated = userDAO.createUser(user);
+            boolean userCreated = UserDAO.createUser(user);
             if (!userCreated) {
                 return false; // Return false if user creation fails
             }
@@ -99,10 +87,10 @@ public class StaffDAO {
      * @param position The position of the staff.
      * @return true if the staff was successfully updated, false otherwise.
      */
-    public boolean updateStaff(User user, String position) {
+    public  static boolean updateStaff(User user, String position) {
         try {
             // Step 1: Use UserDAO to update the user
-            boolean userUpdated = userDAO.updateUser(user);
+            boolean userUpdated = UserDAO.updateUser(user);
             if (!userUpdated) {
                 return false; // Return false if user update fails
             }
@@ -129,10 +117,10 @@ public class StaffDAO {
      * @param staffId The ID of the staff to be deleted.
      * @return true if the staff was successfully deleted, false otherwise.
      */
-    public boolean deleteStaff(int staffId) {
+    public static boolean deleteStaff(int staffId) {
         try {
             // Step 1: Use UserDAO to delete the user
-            boolean userDeleted = userDAO.deleteUser(staffId);
+            boolean userDeleted = UserDAO.deleteUser(staffId);
             if (!userDeleted) {
                 return false;  // Return false if user deletion fails
             }

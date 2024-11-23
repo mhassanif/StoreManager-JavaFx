@@ -11,7 +11,7 @@ import java.sql.SQLException;
 public class UserDAO {
 
     // Fetch user by ID
-    public User getUserById(int userId) {
+    public static User getUserById(int userId) {
         String query = "SELECT * FROM USERS WHERE user_id = ?";
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -29,7 +29,7 @@ public class UserDAO {
     }
 
     // Fetch user by email
-    public User getUserByEmail(String email) {
+    public static User getUserByEmail(String email) {
         String query = "SELECT * FROM USERS WHERE email = ?";
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -47,7 +47,7 @@ public class UserDAO {
     }
 
     // Create a new user
-    public boolean createUser(User user) {
+    public static boolean createUser(User user) {
         String query = "INSERT INTO USERS (name, email, password, role, address, phone) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -67,7 +67,7 @@ public class UserDAO {
     }
 
     // Update an existing user
-    public boolean updateUser(User user) {
+    public static boolean updateUser(User user) {
         String query = "UPDATE USERS SET name = ?, email = ?, password = ?, role = ?, address = ?, phone = ? WHERE user_id = ?";
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -88,7 +88,7 @@ public class UserDAO {
     }
 
     // Delete a user by ID
-    public boolean deleteUser(int userId) {
+    public static boolean deleteUser(int userId) {
         String query = "DELETE FROM USERS WHERE user_id = ?";
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -102,7 +102,7 @@ public class UserDAO {
     }
 
     // Map ResultSet to User object
-    private User mapToUser(ResultSet resultSet) throws SQLException {
+    private static User mapToUser(ResultSet resultSet) throws SQLException {
         int id = resultSet.getInt("user_id");
         String name = resultSet.getString("name");
         String email = resultSet.getString("email");

@@ -9,17 +9,11 @@ import com.storemanager.db.DBconnector;
 
 public class FeedbackDAO {
 
-    private final Connection connection;
-
-    public FeedbackDAO() throws SQLException {
-        connection = DBconnector.getConnection();
-    }
-
     // Fetch feedback by customer ID
-    public List<Feedback> getFeedbackByCustomerId(int customerId) {
+    public static List<Feedback> getFeedbackByCustomerId(int customerId) {
         List<Feedback> feedbackList = new ArrayList<>();
         String query = "SELECT feedback_id, customer_id, comments FROM FEEDBACK WHERE customer_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        try (Connection connection = DBconnector.getConnection();PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, customerId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -34,9 +28,9 @@ public class FeedbackDAO {
     }
 
     // Create a new feedback entry
-    public boolean createFeedback(Feedback feedback) {
+    public static boolean createFeedback(Feedback feedback) {
         String query = "INSERT INTO FEEDBACK (customer_id, comments) VALUES (?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        try (Connection connection = DBconnector.getConnection();PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, feedback.getCustomerId());
             stmt.setString(2, feedback.getComments());
             int result = stmt.executeUpdate();
@@ -48,9 +42,9 @@ public class FeedbackDAO {
     }
 
     // Delete a feedback entry by feedback ID
-    public boolean deleteFeedback(int feedbackId) {
+    public static boolean deleteFeedback(int feedbackId) {
         String query = "DELETE FROM FEEDBACK WHERE feedback_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        try (Connection connection = DBconnector.getConnection();PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, feedbackId);
             int result = stmt.executeUpdate();
             return result > 0;

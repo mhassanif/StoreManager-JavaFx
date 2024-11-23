@@ -13,11 +13,6 @@ import java.util.logging.Logger;
 
 public class ShoppingCartDAO {
     private static final Logger LOGGER = Logger.getLogger(ShoppingCartDAO.class.getName());
-    private final ProductDAO productDAO;
-
-    public ShoppingCartDAO() {
-        this.productDAO = new ProductDAO(); // Initialize ProductDAO
-    }
 
     // Method to create a new shopping cart for a customer
     public int createShoppingCart(int customerId) {
@@ -54,7 +49,7 @@ public class ShoppingCartDAO {
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     // Fetch product details using ProductDAO
-                    Product product = productDAO.getProductById(resultSet.getInt("product_id"));
+                    Product product = ProductDAO.getProductById(resultSet.getInt("product_id"));
 
                     if (product != null) {
                         // Create CartItem and add it to the shopping cart

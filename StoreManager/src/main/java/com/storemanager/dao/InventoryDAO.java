@@ -12,7 +12,6 @@ import java.util.logging.Logger;
 
 public class InventoryDAO {
     private static final Logger LOGGER = Logger.getLogger(InventoryDAO.class.getName());
-    private ProductDAO productDAO = new ProductDAO(); // ProductDAO is used to fetch product details
 
     // Method to get inventory details by product ID
     public InventoryProduct getInventoryByProductId(int productId) {
@@ -23,7 +22,7 @@ public class InventoryDAO {
             statement.setInt(1, productId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    Product product = productDAO.getProductById(productId); // Get product details
+                    Product product = ProductDAO.getProductById(productId); // Get product details
                     int stockQuantity = resultSet.getInt("stock_quantity");
                     int restockQuantity = resultSet.getInt("restock_quantity");
                     String restockDate = resultSet.getString("restock_date");
@@ -80,7 +79,7 @@ public class InventoryDAO {
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     int productId = resultSet.getInt("product_id");
-                    Product product = productDAO.getProductById(productId); // Get product details
+                    Product product = ProductDAO.getProductById(productId); // Get product details
                     int stockQuantity = resultSet.getInt("stock_quantity");
                     int restockQuantity = resultSet.getInt("restock_quantity");
                     String restockDate = resultSet.getString("restock_date");

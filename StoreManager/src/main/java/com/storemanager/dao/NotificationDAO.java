@@ -9,16 +9,10 @@ import java.util.List;
 
 public class NotificationDAO {
 
-    private final Connection connection;
-
-    public NotificationDAO() throws SQLException {
-        connection = DBconnector.getConnection();  // Assuming DBconnection handles the connection setup
-    }
-
     // Fetch notification by notification ID
-    public Notification getNotificationById(int notificationId) {
+    public static Notification getNotificationById(int notificationId) {
         String query = "SELECT notification_id, message, date, status FROM NOTIFICATION WHERE notification_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        try (PreparedStatement stmt = DBconnector.getConnection().prepareStatement(query)) {
             stmt.setInt(1, notificationId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -34,11 +28,11 @@ public class NotificationDAO {
     }
 
     // Fetch all notifications for a specific user
-    public List<Notification> getNotificationsForUser(int userId) {
+    public static List<Notification> getNotificationsForUser(int userId) {
         List<Notification> notifications = new ArrayList<>();
         String query = "SELECT notification_id, message, date, status FROM NOTIFICATION " +
                 "WHERE notification_id IN (SELECT notification_id FROM NOTIFICATION_RECIPIENT WHERE user_id = ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        try (PreparedStatement stmt = DBconnector.getConnection().prepareStatement(query)) {
             stmt.setInt(1, userId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -55,9 +49,9 @@ public class NotificationDAO {
     }
 
     // Mark a notification as read for a user
-    public boolean markNotificationAsRead(int notificationId, int userId) {
+    public static boolean markNotificationAsRead(int notificationId, int userId) {
         String query = "UPDATE NOTIFICATION_RECIPIENT SET status = 'Read' WHERE notification_id = ? AND user_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        try (PreparedStatement stmt = DBconnector.getConnection().prepareStatement(query)) {
             stmt.setInt(1, notificationId);
             stmt.setInt(2, userId);
             int result = stmt.executeUpdate();
@@ -69,9 +63,9 @@ public class NotificationDAO {
     }
 
     // Create a new notification and associate it with a list of user IDs
-    public boolean createNotification(Notification notification, List<Integer> userIds) {
+    public static boolean createNotification(Notification notification, List<Integer> userIds) {
         String notificationQuery = "INSERT INTO NOTIFICATION (message, date) VALUES (?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(notificationQuery, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = DBconnector.getConnection().prepareStatement(notificationQuery, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, notification.getMessage());
             stmt.setTimestamp(2, Timestamp.valueOf(notification.getDate()));
             int result = stmt.executeUpdate();
@@ -82,7 +76,7 @@ public class NotificationDAO {
 
                     // Insert into NOTIFICATION_RECIPIENT table
                     String recipientQuery = "INSERT INTO NOTIFICATION_RECIPIENT (notification_id, user_id) VALUES (?, ?)";
-                    try (PreparedStatement recipientStmt = connection.prepareStatement(recipientQuery)) {
+                    try (PreparedStatement recipientStmt = DBconnector.getConnection().prepareStatement(recipientQuery)) {
                         for (int userId : userIds) {
                             recipientStmt.setInt(1, notificationId);
                             recipientStmt.setInt(2, userId);
@@ -100,9 +94,9 @@ public class NotificationDAO {
     }
 
     // Delete a notification by ID
-    public boolean deleteNotification(int notificationId) {
+    public static boolean deleteNotification(int notificationId) {
         String query = "DELETE FROM NOTIFICATION WHERE notification_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        try (PreparedStatement stmt = DBconnector.getConnection().prepareStatement(query)) {
             stmt.setInt(1, notificationId);
             int result = stmt.executeUpdate();
             return result > 0;

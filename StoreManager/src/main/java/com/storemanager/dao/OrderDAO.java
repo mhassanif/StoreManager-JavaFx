@@ -11,10 +11,6 @@ import java.util.List;
 
 public class OrderDAO {
 
-    private final ProductDAO productDAO = new ProductDAO();
-    private final CustomerDAO customerDAO = new CustomerDAO();
-    private final OrderItemDAO orderItemDAO = new OrderItemDAO();
-
     // Retrieve an order by its ID
     public Order getOrderById(int orderId) throws SQLException {
         String orderSql = "SELECT * FROM ORDERTABLE WHERE order_id = ?";
@@ -27,7 +23,7 @@ public class OrderDAO {
                 try (ResultSet orderRs = orderStmt.executeQuery()) {
                     if (orderRs.next()) {
                         int customerId = orderRs.getInt("customer_id");
-                        Customer customer = customerDAO.getCustomerById(customerId);
+                        Customer customer = CustomerDAO.getCustomerById(customerId);
                         order = new Order(customer, new ArrayList<>());
                         order.setOrderId(orderRs.getInt("order_id"));
                         order.setOrderDate(orderRs.getTimestamp("order_date").toLocalDateTime().toString());
@@ -39,9 +35,9 @@ public class OrderDAO {
 
             // Fetch order items
             if (order != null) {
-                List<OrderItem> orderItems = orderItemDAO.getOrderItemsByOrderId(orderId);
+                List<OrderItem> orderItems = OrderItemDAO.getOrderItemsByOrderId(orderId);
                 order.setOrderItems(orderItems);
-                order.setTotalPrice(orderItemDAO.calculateTotalPrice(orderItems)); // Recalculate total price if needed
+                order.setTotalPrice(OrderItemDAO.calculateTotalPrice(orderItems)); // Recalculate total price if needed
             }
         }
         return order;
@@ -59,7 +55,7 @@ public class OrderDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Order order = new Order(
-                            customerDAO.getCustomerById(rs.getInt("customer_id")), // Fetch Customer using CustomerDAO
+                            CustomerDAO.getCustomerById(rs.getInt("customer_id")), // Fetch Customer using CustomerDAO
                             new ArrayList<>() // Initialize empty list for items
                     );
                     order.setOrderId(rs.getInt("order_id"));
@@ -101,7 +97,7 @@ public class OrderDAO {
 
             // Insert into ORDERITEM
             for (OrderItem item : order.getOrderItems()) {
-                productDAO.getProductById(item.getProduct().getId()); // Ensure product exists
+                ProductDAO.getProductById(item.getProduct().getId()); // Ensure product exists
             }
 
             try (PreparedStatement itemsStmt = connection.prepareStatement(itemsSql)) {

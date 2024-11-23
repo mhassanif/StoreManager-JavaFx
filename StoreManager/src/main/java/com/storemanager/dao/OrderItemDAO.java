@@ -13,7 +13,7 @@ public class OrderItemDAO {
     private final ProductDAO productDAO = new ProductDAO();
 
     // Retrieve OrderItems by Order ID
-    public List<OrderItem> getOrderItemsByOrderId(int orderId) throws SQLException {
+    public static List<OrderItem> getOrderItemsByOrderId(int orderId) throws SQLException {
         String sql = "SELECT * FROM ORDERITEM WHERE order_id = ?";
         List<OrderItem> orderItems = new ArrayList<>();
 
@@ -36,7 +36,7 @@ public class OrderItemDAO {
     }
 
     // Calculate total price for a list of OrderItems
-    public double calculateTotalPrice(List<OrderItem> orderItems) {
+    public static double calculateTotalPrice(List<OrderItem> orderItems) {
         double total = 0;
         for (OrderItem item : orderItems) {
             total += item.calculateTotalPrice(); // Calculate price per item and sum them up

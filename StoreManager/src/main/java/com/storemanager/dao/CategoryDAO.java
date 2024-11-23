@@ -13,7 +13,7 @@ public class CategoryDAO {
     private static final Logger LOGGER = Logger.getLogger(CategoryDAO.class.getName());
 
     // Method to create a new category
-    public int createCategory(Category category) {
+    public static int createCategory(Category category) {
         String sql = "INSERT INTO CATEGORY (name) VALUES (?)";
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -36,7 +36,7 @@ public class CategoryDAO {
     }
 
     // Method to retrieve a category by its ID
-    public Category getCategoryById(int categoryId) {
+    public static Category getCategoryById(int categoryId) {
         String sql = "SELECT * FROM CATEGORY WHERE category_id = ?";
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -57,7 +57,7 @@ public class CategoryDAO {
     }
 
     // Method to retrieve all categories
-    public List<Category> getAllCategories() {
+    public static List<Category> getAllCategories() {
         String sql = "SELECT * FROM CATEGORY";
         List<Category> categories = new ArrayList<>();
 
@@ -79,7 +79,7 @@ public class CategoryDAO {
     }
 
     // Method to update a category
-    public boolean updateCategory(Category category) {
+    public static boolean updateCategory(Category category) {
         String sql = "UPDATE CATEGORY SET name = ? WHERE category_id = ?";
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -96,7 +96,7 @@ public class CategoryDAO {
     }
 
     // Method to delete a category by its ID
-    public boolean deleteCategory(int categoryId) {
+    public  static boolean deleteCategory(int categoryId) {
         String sql = "DELETE FROM CATEGORY WHERE category_id = ?";
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {

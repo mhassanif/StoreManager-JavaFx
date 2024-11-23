@@ -10,11 +10,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class CustomerDAO {
-    private final UserDAO userDAO;
-
-    public CustomerDAO() {
-        this.userDAO = new UserDAO();
-    }
 
     /**
      * Fetches a Customer by their customer ID.
@@ -22,7 +17,7 @@ public class CustomerDAO {
      * @param customerId The customer ID.
      * @return Customer object or null if not found.
      */
-    public Customer getCustomerById(int customerId) {
+    public static Customer getCustomerById(int customerId) {
         String query = "SELECT c.customer_id, u.user_id, u.name, u.email, u.password, u.role, u.address, u.phone " +
                 "FROM CUSTOMER c " +
                 "INNER JOIN USERS u ON c.user_id = u.user_id " +
@@ -57,7 +52,7 @@ public class CustomerDAO {
      * @param userId The user ID.
      * @return Customer object or null if not found.
      */
-    public Customer getCustomerByUserId(int userId) {
+    public static Customer getCustomerByUserId(int userId) {
         String query = "SELECT c.customer_id, u.user_id, u.name, u.email, u.password, u.role, u.address, u.phone " +
                 "FROM CUSTOMER c " +
                 "INNER JOIN USERS u ON c.user_id = u.user_id " +
@@ -92,9 +87,9 @@ public class CustomerDAO {
      * @param customer The Customer object to be created.
      * @return true if successful, false otherwise.
      */
-    public boolean createCustomer(Customer customer) {
+    public static boolean createCustomer(Customer customer) {
         // First, create a user using the UserDAO
-        boolean userCreated = userDAO.createUser(customer);
+        boolean userCreated = UserDAO.createUser(customer);
         if (!userCreated) {
             return false;
         }
@@ -120,9 +115,9 @@ public class CustomerDAO {
      * @param customer The Customer object with updated information.
      * @return true if successful, false otherwise.
      */
-    public boolean updateCustomer(Customer customer) {
+    public static boolean updateCustomer(Customer customer) {
         // Update the user using UserDAO
-        boolean userUpdated = userDAO.updateUser(customer);
+        boolean userUpdated = UserDAO.updateUser(customer);
         if (!userUpdated) {
             return false;
         }
@@ -138,7 +133,7 @@ public class CustomerDAO {
      * @param customerId The ID of the Customer to delete.
      * @return true if successful, false otherwise.
      */
-    public boolean deleteCustomer(int customerId) {
+    public static boolean deleteCustomer(int customerId) {
         // Delete the customer-specific record
         String query = "DELETE FROM CUSTOMER WHERE customer_id = ?";
 
