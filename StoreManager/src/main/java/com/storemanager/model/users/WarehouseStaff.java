@@ -10,16 +10,24 @@ import java.sql.*;
  */
 public class WarehouseStaff extends User {
 
+    private int staffId; // Unique ID for the Warehouse Staff in the STAFF table
+
     // Constructor for WarehouseStaff
-    public WarehouseStaff(int id, String username, String email, String password, String address, String phoneNumber) {
-        super(id, username, email, password, "WarehouseStaff", address, phoneNumber);
+    public WarehouseStaff(int staffId, int userId, String username, String email, String password, String address, String phoneNumber) {
+        super(userId, username, email, password, "WarehouseStaff", address, phoneNumber);
+        this.staffId = staffId;
+    }
+
+    // Getter for staffId
+    public int getStaffId() {
+        return staffId;
     }
 
     /**
      * View the inventory list, including product name, quantity, and price.
      */
     public void viewInventory() {
-        String query = "SELECT product_name, quantity, price FROM Inventory"; // Assuming the table is named Inventory
+        String query = "SELECT product_name, quantity, price FROM INVENTORY"; // Assuming the table is named INVENTORY
 
         try (Connection conn = DBconnector.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query);
@@ -47,7 +55,7 @@ public class WarehouseStaff extends User {
      * @param quantitySold The quantity sold to decrease from inventory.
      */
     public boolean updateInventory(int productId, int quantitySold) {
-        String query = "UPDATE Inventory SET quantity = quantity - ? WHERE product_id = ?";
+        String query = "UPDATE INVENTORY SET quantity = quantity - ? WHERE product_id = ?";
 
         try (Connection conn = DBconnector.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -77,7 +85,7 @@ public class WarehouseStaff extends User {
      * @param orderId The ID of the order to process.
      */
     public void processOrder(int orderId) {
-        String query = "SELECT product_id, quantity FROM OrderDetails WHERE order_id = ?"; // Assuming OrderDetails table exists
+        String query = "SELECT product_id, quantity FROM ORDERITEM WHERE order_id = ?"; // Assuming ORDERITEM table exists
 
         try (Connection conn = DBconnector.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -114,7 +122,8 @@ public class WarehouseStaff extends User {
     @Override
     public String toString() {
         return "WarehouseStaff{" +
-                "username='" + getUsername() + '\'' +
+                "staffId=" + staffId +
+                ", username='" + getUsername() + '\'' +
                 ", email='" + getEmail() + '\'' +
                 ", address='" + getAddress() + '\'' +
                 ", phoneNumber='" + getPhoneNumber() + '\'' +

@@ -3,7 +3,6 @@ package com.storemanager.model.users;
 import com.storemanager.model.cart.CartItem;
 import com.storemanager.model.cart.ShoppingCart;
 import com.storemanager.model.order.Order;
-import com.storemanager.model.order.OrderItem;
 import com.storemanager.db.DBconnector;
 
 import java.sql.Connection;
@@ -18,16 +17,22 @@ import java.util.List;
  */
 public class Customer extends User {
 
+    private int customerId; // Unique ID for the customer in the database
     private ShoppingCart shoppingCart; // Customer's shopping cart
     private List<Order> orders;        // List of customer's past orders
 
     // Constructor
-    public Customer(int id, String username, String email, String password, String address, String phoneNumber) {
-        super(id, username, email, password, "Customer", address, phoneNumber); // Assigning the role as "Customer"
-        this.shoppingCart = initializeShoppingCart(id); // Initialize the shopping cart with cartId
+    public Customer(int customerId, int userId, String username, String email, String password, String address, String phoneNumber) {
+        super(userId, username, email, password, "Customer", address, phoneNumber); // Assigning the role as "Customer"
+        this.customerId = customerId;
+        this.shoppingCart = initializeShoppingCart(customerId); // Initialize the shopping cart with cartId
     }
 
     // Getters and Setters
+    public int getCustomerId() {
+        return customerId;
+    }
+
     public ShoppingCart getShoppingCart() {
         return shoppingCart;
     }
@@ -51,11 +56,11 @@ public class Customer extends User {
 
     public boolean updateCustomerInfo() {
         try (Connection connection = DBconnector.getConnection()) {
-            String query = "UPDATE users SET address = ?, phone_number = ? WHERE username = ?";
+            String query = "UPDATE USERS SET address = ?, phone_number = ? WHERE id = ?";
             try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                 preparedStatement.setString(1, this.getAddress());
                 preparedStatement.setString(2, this.getPhoneNumber());
-                preparedStatement.setString(3, getUsername());
+                preparedStatement.setInt(3, getId()); // Use user ID here
 
                 int rowsAffected = preparedStatement.executeUpdate();
                 return rowsAffected > 0;
@@ -68,6 +73,7 @@ public class Customer extends User {
 
     public void viewProfile() {
         System.out.println("Customer Profile:");
+        System.out.println("Customer ID: " + customerId);
         System.out.println("Username: " + getUsername());
         System.out.println("Email: " + getEmail());
         System.out.println("Address: " + this.getAddress());
@@ -101,7 +107,8 @@ public class Customer extends User {
     @Override
     public String toString() {
         return "Customer{" +
-                "username='" + getUsername() + '\'' +
+                "customerId=" + customerId +
+                ", username='" + getUsername() + '\'' +
                 ", email='" + getEmail() + '\'' +
                 ", address='" + getAddress() + '\'' +
                 ", phoneNumber='" + getPhoneNumber() + '\'' +

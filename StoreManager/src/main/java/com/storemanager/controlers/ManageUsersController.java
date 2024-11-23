@@ -62,8 +62,8 @@ public class ManageUsersController {
     private void loadCustomers() {
         // Mock some customers (replace with actual data retrieval later)
         List<Customer> customers = List.of(
-                new Customer(1, "John Doe", "john.doe@example.com", "password123", "123 Main St", "555-1234"),
-                new Customer(2, "Jane Smith", "jane.smith@example.com", "password123", "456 Elm St", "555-5678")
+                new Customer(1,2, "John Doe", "john.doe@example.com", "password123", "123 Main St", "555-1234"),
+                new Customer(3,4, "Jane Smith", "jane.smith@example.com", "password123", "456 Elm St", "555-5678")
         );
         userTable.getItems().setAll(customers);
     }

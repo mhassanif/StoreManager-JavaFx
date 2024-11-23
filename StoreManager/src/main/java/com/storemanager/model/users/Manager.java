@@ -12,9 +12,17 @@ import java.util.List;
  */
 public class Manager extends User {
 
+    private int staffId; // Unique ID for the Manager in the STAFF table
+
     // Constructor for Manager
-    public Manager(int id, String username, String email, String password, String address, String phoneNumber) {
-        super(id, username, email, password, "Manager", address, phoneNumber);
+    public Manager(int staffId, int userId, String username, String email, String password, String address, String phoneNumber) {
+        super(userId, username, email, password, "Manager", address, phoneNumber);
+        this.staffId = staffId;
+    }
+
+    // Getters and Setters
+    public int getStaffId() {
+        return staffId;
     }
 
     /**
@@ -23,7 +31,7 @@ public class Manager extends User {
      */
     public List<String> viewAllOrders() {
         List<String> orders = new ArrayList<>();
-        String query = "SELECT order_id, order_date FROM Orders"; // Assuming an Orders table exists
+        String query = "SELECT order_id, order_date FROM ORDERTABLE"; // Assuming an ORDERTABLE exists
 
         try (Connection conn = DBconnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query);
@@ -50,9 +58,9 @@ public class Manager extends User {
      */
     public boolean manageProducts(String action, String productName, double price) {
         String query = switch (action.toLowerCase()) {
-            case "add" -> "INSERT INTO Products (product_name, price) VALUES (?, ?)";
-            case "update" -> "UPDATE Products SET price = ? WHERE product_name = ?";
-            case "delete" -> "DELETE FROM Products WHERE product_name = ?";
+            case "add" -> "INSERT INTO PRODUCT (product_name, price) VALUES (?, ?)";
+            case "update" -> "UPDATE PRODUCT SET price = ? WHERE product_name = ?";
+            case "delete" -> "DELETE FROM PRODUCT WHERE product_name = ?";
             default -> null;
         };
 
@@ -92,7 +100,7 @@ public class Manager extends User {
      */
     public List<String> viewAllCustomers() {
         List<String> customers = new ArrayList<>();
-        String query = "SELECT username, email FROM Users WHERE role = 'Customer'";
+        String query = "SELECT username, email FROM USERS WHERE role = 'Customer'";
 
         try (Connection conn = DBconnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query);
@@ -117,7 +125,7 @@ public class Manager extends User {
      * @param role     The new role to assign (e.g., "Staff", "Customer").
      */
     public boolean assignRole(String username, String role) {
-        String query = "UPDATE Users SET role = ? WHERE username = ?";
+        String query = "UPDATE USERS SET role = ? WHERE username = ?";
 
         try (Connection conn = DBconnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -151,7 +159,8 @@ public class Manager extends User {
     @Override
     public String toString() {
         return "Manager{" +
-                "username='" + getUsername() + '\'' +
+                "staffId=" + staffId +
+                ", username='" + getUsername() + '\'' +
                 ", email='" + getEmail() + '\'' +
                 ", address='" + getAddress() + '\'' +
                 ", phoneNumber='" + getPhoneNumber() + '\'' +

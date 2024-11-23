@@ -1,6 +1,8 @@
 package com.storemanager;
 
 import com.storemanager.db.DBconnector;
+import com.storemanager.auth.CurrentUser;
+import com.storemanager.model.users.*;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -8,6 +10,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.fxml.FXMLLoader;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -61,9 +64,21 @@ public class LoginController {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                // Check the user's role
+                // Extract user information
+                int userId = resultSet.getInt("user_id");
+                String email = resultSet.getString("email");
                 String role = resultSet.getString("role");
-                loadDashboard(role);  // Pass the role to determine the dashboard
+                String address = resultSet.getString("address");
+                String phone = resultSet.getString("phone");
+
+                // Check and set the user object based on role
+                if (role.equalsIgnoreCase("customer")) {
+                    setCurrentCustomer(userId, email, username, password, address, phone);
+                } else {
+                    setCurrentStaff(userId, email, username, password, address, phone, role);
+                }
+
+                loadDashboard(role);  // Load the appropriate dashboard
                 return true;
             }
         } catch (Exception e) {
@@ -74,21 +89,62 @@ public class LoginController {
     }
 
     /**
-     * Handle the "Database Setup" hyperlink click event.
+     * Set the current user as a Customer.
      */
-    public void hlDbOnAction() {
-        System.out.println("Database Setup clicked.");
-        messageLabel.setText("Redirecting to Database Setup...");
-        // Implement your database setup navigation or logic here
+    private void setCurrentCustomer(int userId, String email, String username, String password, String address, String phone) {
+        String query = "SELECT * FROM CUSTOMER WHERE user_id = ?";
+        try (Connection connection = DBconnector.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                int customerId = resultSet.getInt("customer_id");
+                CurrentUser.getInstance().setUser(new Customer(customerId, userId, username, email, password, address, phone));
+                System.out.println("Logged in as Customer");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            messageLabel.setText("Error retrieving customer data.");
+        }
     }
 
     /**
-     * Handle the "Create an Account" hyperlink click event.
+     * Set the current user as a Staff member.
      */
-    public void hlCreateAnAccount() {
-        System.out.println("Create an Account clicked.");
-        messageLabel.setText("Redirecting to Account Creation...");
-        // Implement your account creation navigation or logic here
+    private void setCurrentStaff(int userId, String email, String username, String password, String address, String phone, String role) {
+        String query = "SELECT * FROM STAFF WHERE user_id = ?";
+        try (Connection connection = DBconnector.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                int staffId = resultSet.getInt("staff_id");
+
+                switch (role.toLowerCase()) {
+                    case "admin":
+                        CurrentUser.getInstance().setUser(new Admin(staffId, userId, username, email, password, address, phone));
+                        System.out.println("Logged in as Admin");
+                        break;
+                    case "manager":
+                        CurrentUser.getInstance().setUser(new Manager(staffId, userId, username, email, password, address, phone));
+                        System.out.println("Logged in as Manager");
+                        break;
+                    case "warehousestaff":
+                        CurrentUser.getInstance().setUser(new WarehouseStaff(staffId, userId, username, email, password, address, phone));
+                        System.out.println("Logged in as Warehouse Staff");
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Unknown role: " + role);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            messageLabel.setText("Error retrieving staff data.");
+        }
     }
 
     /**
@@ -102,13 +158,16 @@ public class LoginController {
             // Load the correct dashboard based on the role
             switch (role.toLowerCase()) {
                 case "admin":
-                    loader = new FXMLLoader(getClass().getResource("AdminDashboard.fxml"));
+                    loader = new FXMLLoader(getClass().getResource("/com/storemanager/AdminDashboard.fxml"));
                     break;
                 case "manager":
-                    loader = new FXMLLoader(getClass().getResource("ManagerDashboard.fxml"));
+                    loader = new FXMLLoader(getClass().getResource("/com/storemanager/ManagerDashboard.fxml"));
                     break;
                 case "customer":
-                    loader = new FXMLLoader(getClass().getResource("Dashboard.fxml"));
+                    loader = new FXMLLoader(getClass().getResource("/com/storemanager/Dashboard.fxml"));
+                    break;
+                case "warehousestaff":
+                    loader = new FXMLLoader(getClass().getResource("/com/storemanager/WarehouseStaffDashboard.fxml"));
                     break;
                 default:
                     throw new IllegalArgumentException("Unknown role: " + role);
@@ -125,5 +184,45 @@ public class LoginController {
             e.printStackTrace();
             messageLabel.setText("Failed to load dashboard.");
         }
+    }
+
+    /**
+     * Handle the action for creating a new account.
+     */
+    @FXML
+    private void hlCreateAnAccount() {
+        System.out.println("Create an Account clicked");
+        // You can load the account creation scene or logic here
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/storemanager/CreateAccount.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) usernameField.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Create Account");
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            messageLabel.setText("Failed to load account creation page.");
+        }
+    }
+
+    /**
+     * Handle the database setup action.
+     */
+    @FXML
+    private void hlDbOnAction() {
+        System.out.println("Database Setup clicked");
+/*        // Logic to set up or reset the database (or navigate to a setup page)
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/storemanager/DatabaseSetup.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) usernameField.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Database Setup");
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            messageLabel.setText("Failed to load database setup page.");
+        }*/
     }
 }

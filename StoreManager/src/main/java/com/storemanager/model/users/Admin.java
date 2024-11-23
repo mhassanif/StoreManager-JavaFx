@@ -1,6 +1,7 @@
 package com.storemanager.model.users;
 
 import com.storemanager.db.DBconnector;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,15 +15,21 @@ import java.util.List;
  */
 public class Admin extends User {
 
+    private int staffId; // Unique ID for the admin in the STAFF table
     private List<String> managedUsers;
 
     // Constructor
-    public Admin(int id, String username, String email, String password, String address, String phoneNumber) {
-        super(id, username, email, password, "Admin", address, phoneNumber); // Assigning the role as "Admin"
+    public Admin(int staffId, int userId, String username, String email, String password, String address, String phoneNumber) {
+        super(userId, username, email, password, "Admin", address, phoneNumber); // Assigning the role as "Admin"
+        this.staffId = staffId;
         this.managedUsers = new ArrayList<>();
     }
 
-    // Getter for managedUsers
+    // Getters and Setters
+    public int getStaffId() {
+        return staffId;
+    }
+
     public List<String> getManagedUsers() {
         return managedUsers;
     }
@@ -37,7 +44,7 @@ public class Admin extends User {
     }
 
     public boolean addUser(String username, String email, String password, String role, String address, String phoneNumber) {
-        String query = "INSERT INTO Users (username, email, password, role, address, phone_number) VALUES (?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO USERS (username, email, password, role, address, phone_number) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -57,7 +64,7 @@ public class Admin extends User {
     }
 
     public boolean deleteUser(String username) {
-        String query = "DELETE FROM Users WHERE username = ?";
+        String query = "DELETE FROM USERS WHERE username = ?";
 
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -73,7 +80,7 @@ public class Admin extends User {
 
     public List<String> viewAllUsers() {
         List<String> users = new ArrayList<>();
-        String query = "SELECT username FROM Users";
+        String query = "SELECT username FROM USERS";
 
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query);
@@ -90,7 +97,7 @@ public class Admin extends User {
     }
 
     public boolean updateUserRole(String username, String newRole) {
-        String query = "UPDATE Users SET role = ? WHERE username = ?";
+        String query = "UPDATE USERS SET role = ? WHERE username = ?";
 
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -106,7 +113,7 @@ public class Admin extends User {
     }
 
     public static Customer searchUserByUsername(String username) {
-        String query = "SELECT user_id, username, email, password, address, phone_number FROM Users WHERE username = ?";
+        String query = "SELECT user_id, username, email, password, address, phone_number FROM USERS WHERE username = ?";
         try (Connection conn = DBconnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
@@ -114,12 +121,12 @@ public class Admin extends User {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    int id = rs.getInt("user_id");
+                    int userId = rs.getInt("user_id");
                     String email = rs.getString("email");
                     String password = rs.getString("password");
                     String address = rs.getString("address");
                     String phoneNumber = rs.getString("phone_number");
-                    return new Customer(id, username, email, password, address, phoneNumber);
+                    return new Customer(0, userId, username, email, password, address, phoneNumber); // Customer ID not relevant here
                 } else {
                     System.out.println("User not found.");
                     return null;
@@ -135,7 +142,8 @@ public class Admin extends User {
     @Override
     public String toString() {
         return "Admin{" +
-                "username='" + getUsername() + '\'' +
+                "staffId=" + staffId +
+                ", username='" + getUsername() + '\'' +
                 ", email='" + getEmail() + '\'' +
                 ", address='" + getAddress() + '\'' +
                 ", phoneNumber='" + getPhoneNumber() + '\'' +
