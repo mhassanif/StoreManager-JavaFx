@@ -7,12 +7,56 @@ import com.storemanager.model.users.Manager;
 import com.storemanager.model.users.WarehouseStaff;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Data Access Object (DAO) for the Staff entity.
  * Handles operations related to the STAFF table, utilizing the UserDAO for user-related operations.
  */
 public class StaffDAO {
+
+
+    public static List<User> getAllStaff() {
+        List<User> staffList = new ArrayList<>();
+
+        String query = "SELECT s.staff_id, s.user_id, s.position FROM STAFF s";
+
+        try (Connection connection = DBconnector.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            // Iterate through each staff record
+            while (resultSet.next()) {
+                int staffId = resultSet.getInt("staff_id");
+                int userId = resultSet.getInt("user_id");
+                String position = resultSet.getString("position");
+
+                // Fetch user details using UserDAO
+                User user = UserDAO.getUserById(userId);
+
+                // If user exists, map to the appropriate staff type
+                if (user != null) {
+                    switch (position) {
+                        case "Admin" -> staffList.add(
+                                new Admin(staffId, user.getId(), user.getUsername(), user.getEmail(),
+                                        user.getPassword(), user.getAddress(), user.getPhoneNumber()));
+                        case "Manager" -> staffList.add(
+                                new Manager(staffId, user.getId(), user.getUsername(), user.getEmail(),
+                                        user.getPassword(), user.getAddress(), user.getPhoneNumber()));
+                        case "WarehouseStaff" -> staffList.add(
+                                new WarehouseStaff(staffId, user.getId(), user.getUsername(), user.getEmail(),
+                                        user.getPassword(), user.getAddress(), user.getPhoneNumber()));
+                        default -> throw new IllegalArgumentException("Unknown position: " + position);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return staffList; // Return the list of staff members
+    }
 
     public static User read(int staffId) {
         User user = null;

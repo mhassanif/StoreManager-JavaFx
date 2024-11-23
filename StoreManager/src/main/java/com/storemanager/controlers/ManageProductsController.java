@@ -1,20 +1,16 @@
 package com.storemanager.controlers;
 
+import com.storemanager.dao.InventoryDAO;
+import com.storemanager.dao.ProductDAO;
 import com.storemanager.model.items.InventoryProduct;
 import com.storemanager.model.items.Product;
-import com.storemanager.model.items.Category;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,7 +72,7 @@ public class ManageProductsController {
         restockDateColumn.setCellValueFactory(cellData ->
                 new SimpleStringProperty(cellData.getValue().getRestockDate()));
 
-        // Load mock data
+        // Load products from the database
         loadProducts();
 
         // Populate table
@@ -90,8 +86,11 @@ public class ManageProductsController {
     }
 
     private void loadProducts() {
-        // Mock data for testing
-        allInventoryProducts = fetchInventoryProductsFromDatabase();
+        // Fetch products and their inventory from the database
+        List<Product> products = ProductDAO.searchProducts(""); // Fetch all products
+        allInventoryProducts = products.stream()
+                .map(product -> new InventoryDAO().getInventoryByProductId(product.getId()))
+                .collect(Collectors.toList());
     }
 
     @FXML
@@ -118,39 +117,24 @@ public class ManageProductsController {
 
     @FXML
     public void handleAddProduct() {
-        try {
-            // Load the FXML for the CreateProduct page
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/storemanager/CreateProduct.fxml"));
-            Parent createProductRoot = loader.load();
-
-            // Pass the current stage as a reference to allow navigation back
-            CreateProductController createProductController = loader.getController();
-            createProductController.setPreviousStage((Stage) btnAddProduct.getScene().getWindow());
-
-            // Set up a new stage for the CreateProduct page
-            Stage stage = new Stage();
-            stage.setTitle("Create New Product");
-            stage.setScene(new Scene(createProductRoot));
-            stage.show();
-
-            // Close the current ManageProducts stage (optional if you want only one window open at a time)
-            btnAddProduct.getScene().getWindow().hide();
-
-        } catch (IOException e) {
-            showAlert(Alert.AlertType.ERROR, "Error", "Failed to load CreateProduct page.", e.getMessage());
-        }
+        System.out.println("Add Product clicked");
+        // Open a new form for adding a product
     }
-
-
 
     @FXML
     public void handleDeleteProduct() {
         InventoryProduct selectedProduct = productsTable.getSelectionModel().getSelectedItem();
         if (selectedProduct != null) {
             System.out.println("Delete Product: " + selectedProduct.getProduct().getName());
-            // Remove from database and refresh table
-            allInventoryProducts.remove(selectedProduct);
-            productsTable.getItems().setAll(allInventoryProducts);
+            // Delete product from the database
+            boolean success = ProductDAO.deleteProduct(selectedProduct.getProduct().getId());
+            if (success) {
+                // Remove from table and refresh
+                allInventoryProducts.remove(selectedProduct);
+                productsTable.getItems().setAll(allInventoryProducts);
+            } else {
+                System.out.println("Failed to delete the product.");
+            }
         } else {
             System.out.println("No product selected for deletion");
         }
@@ -161,34 +145,34 @@ public class ManageProductsController {
         InventoryProduct selectedProduct = productsTable.getSelectionModel().getSelectedItem();
         if (selectedProduct != null) {
             System.out.println("Set Restock Level for Product: " + selectedProduct.getProduct().getName());
-            // Open dialog to set restock level
+
+            // Create a dialog to input the restock level
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Set Restock Level");
+            dialog.setHeaderText("Enter the new restock level for " + selectedProduct.getProduct().getName());
+            dialog.setContentText("Restock Level:");
+
+            // Show dialog and wait for input
+            dialog.showAndWait().ifPresent(restockLevelInput -> {
+                try {
+                    int restockLevel = Integer.parseInt(restockLevelInput);  // Parse the input to an integer
+                    // Update restock level in the database using InventoryDAO
+                    boolean success = InventoryDAO.setRestockLevel(selectedProduct.getProduct().getId(), restockLevel);
+                    if (success) {
+                        // Refresh the inventory product list if the update was successful
+                        selectedProduct.setRestockLevel(restockLevel);  // Update in the table view
+                        productsTable.refresh();  // Refresh the table to reflect the changes
+                        System.out.println("Restock level updated successfully.");
+                    } else {
+                        System.out.println("Failed to update restock level.");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input. Please enter a valid integer.");
+                }
+            });
         } else {
             System.out.println("No product selected to set restock level");
         }
-    }
-
-    private List<InventoryProduct> fetchInventoryProductsFromDatabase() {
-        // Mock data for testing
-        Category categoryA = new Category(1, "Category A");
-        Category categoryB = new Category(2, "Category B");
-
-        Product product1 = new Product(1, "Product A", 100.0, "Brand A", null, categoryA, "Description A");
-        Product product2 = new Product(2, "Product B", 150.0, "Brand B", null, categoryB, "Description B");
-        Product product3 = new Product(3, "Product C", 200.0, "Brand A", null, categoryA, "Description C");
-
-        return List.of(
-                new InventoryProduct(product1, 50, 20, "2024-11-30"),
-                new InventoryProduct(product2, 100, 50, "2024-12-15"),
-                new InventoryProduct(product3, 30, 10, "2024-12-20")
-        );
-    }
-
-    private void showAlert(Alert.AlertType alertType, String title, String header, String content) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(header);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 
 }

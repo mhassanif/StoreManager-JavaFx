@@ -92,4 +92,28 @@ public class InventoryDAO {
         }
         return lowStockProducts;
     }
+    /**
+     * Sets the restock level for a given product in the inventory.
+     *
+     * @param productId The ID of the product
+     * @param restockLevel The new restock level to set
+     * @return boolean true if the update was successful, false otherwise
+     */
+    public static boolean setRestockLevel(int productId, int restockLevel) {
+        String updateQuery = "UPDATE Inventory SET restock_level = ? WHERE product_id = ?";
+
+        try (Connection connection = DBconnector.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
+
+            preparedStatement.setInt(1, restockLevel);
+            preparedStatement.setInt(2, productId);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+
+            return rowsAffected > 0;  // Return true if the update was successful
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;  // Return false in case of an error
+        }
+    }
 }

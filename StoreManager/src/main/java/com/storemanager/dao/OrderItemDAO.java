@@ -10,7 +10,28 @@ import java.util.List;
 
 public class OrderItemDAO {
 
-    private final ProductDAO productDAO = new ProductDAO();
+    // Method to get all OrderItems
+    public static List<OrderItem> getAllOrderItems() throws SQLException {
+        String sql = "SELECT * FROM ORDERITEM";
+        List<OrderItem> orderItems = new ArrayList<>();
+
+        try (Connection connection = DBconnector.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                int productId = rs.getInt("product_id");
+                Product product = ProductDAO.getProductById(productId);
+                int quantity = rs.getInt("quantity");
+                double priceAtPurchase = rs.getDouble("price");
+
+                OrderItem orderItem = new OrderItem(product, quantity, priceAtPurchase);
+                orderItems.add(orderItem);
+            }
+        }
+        return orderItems;
+    }
+
 
     // Retrieve OrderItems by Order ID
     public static List<OrderItem> getOrderItemsByOrderId(int orderId) throws SQLException {

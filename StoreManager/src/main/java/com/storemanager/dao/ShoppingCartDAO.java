@@ -14,6 +14,52 @@ import java.util.logging.Logger;
 public class ShoppingCartDAO {
     private static final Logger LOGGER = Logger.getLogger(ShoppingCartDAO.class.getName());
 
+    // Method to retrieve all shopping carts with their items
+    public List<ShoppingCart> getAllShoppingCarts() {
+        String cartSql = "SELECT DISTINCT cart_id, customer_id FROM SHOPPINGCART";
+        String itemsSql = "SELECT product_id, quantity FROM CARTITEM WHERE cart_id = ?";
+        List<ShoppingCart> shoppingCarts = new ArrayList<>();
+
+        try (Connection connection = DBconnector.getConnection();
+             PreparedStatement cartStmt = connection.prepareStatement(cartSql)) {
+
+            try (ResultSet cartRs = cartStmt.executeQuery()) {
+                while (cartRs.next()) {
+                    int cartId = cartRs.getInt("cart_id");
+                    int customerId = cartRs.getInt("customer_id");
+
+                    ShoppingCart shoppingCart = new ShoppingCart(cartId);
+
+                    // Retrieve items for this cart
+                    try (PreparedStatement itemsStmt = connection.prepareStatement(itemsSql)) {
+                        itemsStmt.setInt(1, cartId);
+                        try (ResultSet itemsRs = itemsStmt.executeQuery()) {
+                            while (itemsRs.next()) {
+                                int productId = itemsRs.getInt("product_id");
+                                int quantity = itemsRs.getInt("quantity");
+
+                                // Use ProductDAO to fetch product details
+                                Product product = ProductDAO.getProductById(productId);
+                                if (product != null) {
+                                    CartItem cartItem = new CartItem(product, quantity);
+                                    shoppingCart.addItem(cartItem);
+                                } else {
+                                    LOGGER.log(Level.WARNING, "Product with ID {0} not found", productId);
+                                }
+                            }
+                        }
+                    }
+
+                    shoppingCarts.add(shoppingCart);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error retrieving all shopping carts: {0}", e.getMessage());
+        }
+
+        return shoppingCarts;
+    }
+
     // Method to create a new shopping cart for a customer
     public int createShoppingCart(int customerId) {
         String sql = "INSERT INTO SHOPPINGCART (customer_id) VALUES (?)";

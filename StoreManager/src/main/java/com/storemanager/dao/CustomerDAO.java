@@ -8,15 +8,42 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CustomerDAO {
 
-    /**
-     * Fetches a Customer by their customer ID.
-     *
-     * @param customerId The customer ID.
-     * @return Customer object or null if not found.
-     */
+    public static List<Customer> getAllCustomers() {
+        List<Customer> customers = new ArrayList<>();
+
+        String query = "SELECT c.customer_id, u.user_id, u.name, u.email, u.password, u.role, u.address, u.phone " +
+                "FROM CUSTOMER c " +
+                "INNER JOIN USERS u ON c.user_id = u.user_id";
+
+        try (Connection connection = DBconnector.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                Customer customer = new Customer(
+                        resultSet.getInt("customer_id"),
+                        resultSet.getInt("user_id"),
+                        resultSet.getString("name"),
+                        resultSet.getString("email"),
+                        resultSet.getString("password"),
+                        resultSet.getString("address"),
+                        resultSet.getString("phone")
+                );
+                customers.add(customer);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return customers;
+    }
+
+
     public static Customer getCustomerById(int customerId) {
         String query = "SELECT c.customer_id, u.user_id, u.name, u.email, u.password, u.role, u.address, u.phone " +
                 "FROM CUSTOMER c " +

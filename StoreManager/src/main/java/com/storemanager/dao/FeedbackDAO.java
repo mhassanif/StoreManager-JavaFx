@@ -9,6 +9,28 @@ import com.storemanager.db.DBconnector;
 
 public class FeedbackDAO {
 
+    // Method to fetch all feedback of all customers
+    public static List<Feedback> getAllFeedback() {
+        List<Feedback> feedbackList = new ArrayList<>();
+        String query = "SELECT feedback_id, customer_id, comments FROM FEEDBACK";
+
+        try (Connection connection = DBconnector.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                int feedbackId = rs.getInt("feedback_id");
+                int customerId = rs.getInt("customer_id");
+                String comments = rs.getString("comments");
+                feedbackList.add(new Feedback(feedbackId, customerId, comments));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return feedbackList;
+    }
+
     // Fetch feedback by customer ID
     public static List<Feedback> getFeedbackByCustomerId(int customerId) {
         List<Feedback> feedbackList = new ArrayList<>();
