@@ -1,6 +1,7 @@
 package com.storemanager.controlers;
 
 import com.storemanager.communication.Feedback;
+import com.storemanager.dao.FeedbackDAO;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
@@ -27,10 +28,7 @@ public class StaffManageFeedbackController {
     private TableColumn<Feedback, String> commentsColumn;
 
     @FXML
-    private Button btnApproveFeedback;
-
-    @FXML
-    private Button btnRejectFeedback;
+    private Button btnDeleteFeedback;
 
     private List<Feedback> allFeedback; // To store all feedback for searching and filtering
 
@@ -50,43 +48,32 @@ public class StaffManageFeedbackController {
     }
 
     private void loadFeedback() {
-        // Replace with actual database logic. Mock data used here for testing.
-        allFeedback = fetchFeedbackFromDatabase();
+        // Fetch all feedback from the database using FeedbackDAO
+        allFeedback = FeedbackDAO.getFeedbackByCustomerId(0);  // Passing 0 to fetch all feedback, adjust as needed
     }
 
     @FXML
-    public void handleApproveFeedback() {
+    public void handleDeleteFeedback() {
+        // Get the selected feedback
         Feedback selectedFeedback = feedbackTable.getSelectionModel().getSelectedItem();
         if (selectedFeedback != null) {
-            System.out.println("Approving feedback: " + selectedFeedback.getComments());
-            // Database logic to mark feedback as approved
+            // Delete feedback from database
+            boolean isDeleted = FeedbackDAO.deleteFeedback(selectedFeedback.getId());
+            if (isDeleted) {
+                // Remove from table
+                allFeedback.remove(selectedFeedback);
+                feedbackTable.getItems().setAll(allFeedback);
+                showAlert("Success", "Feedback deleted successfully.");
+            } else {
+                showAlert("Error", "Failed to delete feedback.");
+            }
         } else {
-            showAlert("No Feedback Selected", "Please select a feedback to approve.");
+            showAlert("No Feedback Selected", "Please select a feedback to delete.");
         }
-    }
-
-    @FXML
-    public void handleRejectFeedback() {
-        Feedback selectedFeedback = feedbackTable.getSelectionModel().getSelectedItem();
-        if (selectedFeedback != null) {
-            System.out.println("Rejecting feedback: " + selectedFeedback.getComments());
-            // Database logic to mark feedback as rejected
-        } else {
-            showAlert("No Feedback Selected", "Please select a feedback to reject.");
-        }
-    }
-
-    private List<Feedback> fetchFeedbackFromDatabase() {
-        // Replace with actual database query logic
-        return List.of(
-                new Feedback(1, 101, "Great service, will come again!"),
-                new Feedback(2, 102, "Product quality could be better."),
-                new Feedback(3, 103, "Fast delivery, happy with the product.")
-        );
     }
 
     private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);

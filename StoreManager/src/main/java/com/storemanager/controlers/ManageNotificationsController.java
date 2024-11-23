@@ -1,6 +1,7 @@
 package com.storemanager.controlers;
 
 import com.storemanager.communication.Notification;
+import com.storemanager.dao.NotificationDAO;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
@@ -41,6 +42,8 @@ public class ManageNotificationsController {
 
     private List<Notification> allNotifications; // List of all notifications
 
+    private int currentUserId = 1; // Assume the current user ID is 1 for now
+
     @FXML
     public void initialize() {
         // Set up table columns
@@ -51,7 +54,7 @@ public class ManageNotificationsController {
                 cellData.getValue().getDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
         ));
 
-        // Load notifications
+        // Load notifications from the database
         loadNotifications();
 
         // Set the table data
@@ -59,11 +62,8 @@ public class ManageNotificationsController {
     }
 
     private void loadNotifications() {
-        // Mock data: Replace with actual database logic
-        allNotifications = new ArrayList<>();
-        allNotifications.add(new Notification(1, "New product added to inventory", LocalDateTime.now(), "Unread"));
-        allNotifications.add(new Notification(2, "Product restock required", LocalDateTime.now().minusDays(1), "Read"));
-        allNotifications.add(new Notification(3, "Order shipped successfully", LocalDateTime.now().minusHours(5), "Unread"));
+        // Use NotificationDAO to fetch notifications for the current user
+        allNotifications = NotificationDAO.getNotificationsForUser(currentUserId);
     }
 
     @FXML
@@ -79,8 +79,14 @@ public class ManageNotificationsController {
     public void handleMarkAsRead() {
         Notification selectedNotification = notificationsTable.getSelectionModel().getSelectedItem();
         if (selectedNotification != null) {
-            selectedNotification.markAsRead();
-            notificationsTable.refresh();
+            // Mark the notification as read in the database
+            boolean success = NotificationDAO.markNotificationAsRead(selectedNotification.getId(), currentUserId);
+            if (success) {
+                selectedNotification.setStatus("Read");
+                notificationsTable.refresh();
+            } else {
+                showAlert("Error", "Failed to mark notification as read.");
+            }
         } else {
             showAlert("No Notification Selected", "Please select a notification to mark as read.");
         }
@@ -90,8 +96,14 @@ public class ManageNotificationsController {
     public void handleDeleteNotification() {
         Notification selectedNotification = notificationsTable.getSelectionModel().getSelectedItem();
         if (selectedNotification != null) {
-            allNotifications.remove(selectedNotification);
-            notificationsTable.getItems().remove(selectedNotification);
+            // Delete the notification from the database
+            boolean success = NotificationDAO.deleteNotification(selectedNotification.getId());
+            if (success) {
+                allNotifications.remove(selectedNotification);
+                notificationsTable.getItems().remove(selectedNotification);
+            } else {
+                showAlert("Error", "Failed to delete notification.");
+            }
         } else {
             showAlert("No Notification Selected", "Please select a notification to delete.");
         }
