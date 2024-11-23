@@ -2,7 +2,7 @@ package com.storemanager.controlers;
 
 import com.storemanager.dao.InventoryDAO;
 import com.storemanager.dao.ProductDAO;
-import com.storemanager.dao.InventoryProductDAO;
+import com.storemanager.dao.InventoryDAO;
 import com.storemanager.model.items.InventoryProduct;
 import com.storemanager.model.items.Product;
 import com.storemanager.model.items.Category;
@@ -10,9 +10,14 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,15 +61,9 @@ public class ManageProductsController {
 
     private List<InventoryProduct> allInventoryProducts;
 
-    // DAOs
-    private ProductDAO productDAO;
-    private InventoryProductDAO inventoryProductDAO;
 
     @FXML
     public void initialize() {
-        // Initialize DAO instances
-        productDAO = new ProductDAO();
-        inventoryProductDAO = new InventoryProductDAO();
 
         // Initialize table columns
         productIdColumn.setCellValueFactory(cellData ->
@@ -122,8 +121,36 @@ public class ManageProductsController {
 
     @FXML
     public void handleAddProduct() {
-        // Logic for adding a product (could open a new form or modal)
-        System.out.println("Add Product clicked");
+        try {
+            // Load the FXML for the CreateProduct page
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/storemanager/CreateProduct.fxml"));
+            Parent createProductRoot = loader.load();
+
+            // Pass the current stage as a reference to allow navigation back
+            CreateProductController createProductController = loader.getController();
+            createProductController.setPreviousStage((Stage) btnAddProduct.getScene().getWindow());
+
+            // Set up a new stage for the CreateProduct page
+            Stage stage = new Stage();
+            stage.setTitle("Create New Product");
+            stage.setScene(new Scene(createProductRoot));
+            stage.show();
+
+            // Close the current ManageProducts stage (optional if you want only one window open at a time)
+            btnAddProduct.getScene().getWindow().hide();
+
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to load CreateProduct page.", e.getMessage());
+        }
+    }
+
+
+    private void showAlert(Alert.AlertType alertType, String title, String header, String content) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     @FXML

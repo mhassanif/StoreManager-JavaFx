@@ -22,7 +22,7 @@ public class LoginApplication extends Application {
         DBconnector.printAllUsernames();
 
         // Load the FXML for the main application UI
-        FXMLLoader fxmlLoader = new FXMLLoader(LoginApplication.class.getResource("ManageProducts.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(LoginApplication.class.getResource("Login.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 980.0, 620.0);//320x240
         stage.setTitle("Hello!");
         stage.setScene(scene);

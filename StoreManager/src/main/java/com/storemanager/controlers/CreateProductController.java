@@ -28,6 +28,7 @@ public class CreateProductController {
     @FXML private Button btnCancel;
 
     private Runnable cancelCallback; // Callback for cancel action
+    private Stage previousStage;
 
     @FXML
     private void initialize() {
@@ -100,10 +101,11 @@ public class CreateProductController {
 
     @FXML
     public void handleCancel() {
-        if (cancelCallback != null) {
-            cancelCallback.run();
+        // Close the CreateProduct window
+        if (previousStage != null) {
+            previousStage.show();  // Make sure the previous stage (ManageProducts) is visible again
+            ((Stage) btnCancel.getScene().getWindow()).close(); // Close the current stage (CreateProduct window)
         }
-        closeWindow();
     }
 
     private void closeWindow() {
@@ -122,4 +124,9 @@ public class CreateProductController {
         alert.setContentText(contentText);
         alert.showAndWait();
     }
+
+    public void setPreviousStage(Stage stage) {
+        this.previousStage = stage; // Store reference to the ManageProducts stage
+    }
+
 }
