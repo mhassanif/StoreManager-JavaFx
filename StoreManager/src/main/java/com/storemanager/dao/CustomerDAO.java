@@ -36,6 +36,7 @@ public class CustomerDAO {
                 if (resultSet.next()) {
                     return new Customer(
                             resultSet.getInt("customer_id"),
+                            resultSet.getInt("user_id"),
                             resultSet.getString("name"),
                             resultSet.getString("email"),
                             resultSet.getString("password"),
@@ -70,6 +71,7 @@ public class CustomerDAO {
                 if (resultSet.next()) {
                     return new Customer(
                             resultSet.getInt("customer_id"),
+                            resultSet.getInt("user_id"),
                             resultSet.getString("name"),
                             resultSet.getString("email"),
                             resultSet.getString("password"),

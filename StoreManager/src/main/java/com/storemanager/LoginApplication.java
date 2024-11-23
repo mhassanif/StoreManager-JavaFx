@@ -1,6 +1,8 @@
 package com.storemanager;
 
+import com.storemanager.dao.CustomerDAO;
 import com.storemanager.db.DBconnector;
+import com.storemanager.model.users.Customer;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -27,29 +29,17 @@ public class LoginApplication extends Application {
         stage.show();
     }
 
-//    public static void main(String[] args) {
-//        launch(); // Launch the JavaFX application
-//    }
-
     public static void main(String[] args) {
-//        // generic staff read
-//        StaffDAO staffDAO = new StaffDAO();
-//        int staffId = 1;
-//        User user = staffDAO.read(staffId);
-//        if (user != null) {
-//            System.out.println("User fetched successfully!");
-//            System.out.println("Name: " + user.getUsername());
-//            System.out.println("Email: " + user.getEmail());
-//            System.out.println("Position: " + user.getClass().getSimpleName());
-//        } else {
-//            System.out.println("No user found with the provided staffId.");
-//        }
+        launch(); // Launch the JavaFX application
+    }
+
+//    public static void main(String[] args) {
 //
 //
-//        // customer  read
+////        // customer  read
 //        CustomerDAO customerDAO = new CustomerDAO();
 //        int customerID = 2;
-//        Customer customer = customerDAO.read(customerID);
+//        Customer customer = customerDAO.getCustomerById(customerID);
 //        if (customer != null) {
 //            System.out.println("Customer fetched successfully!");
 //            System.out.println("Username: " + customer.getUsername());
@@ -61,8 +51,4 @@ public class LoginApplication extends Application {
 //            System.out.println("No customer found with the provided customerID.");
 //        }
 //    }
-
-
-
-}
 }

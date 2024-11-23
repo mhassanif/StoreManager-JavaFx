@@ -49,13 +49,13 @@ public class StaffDAO {
                 // If the user exists, create an instance of the appropriate staff type based on position
                 if (user != null) {
                     user = switch (position) {
-                        case "Admin" -> new Admin(user.getId(), user.getUsername(), user.getEmail(), user.getPassword(),
+                        case "Admin" -> new Admin(staffId, user.getId(), user.getUsername(), user.getEmail(), user.getPassword(),
                                 user.getAddress(), user.getPhoneNumber());
                         case "Manager" ->
-                                new Manager(user.getId(), user.getUsername(), user.getEmail(), user.getPassword(),
+                                new Manager(staffId,user.getId(), user.getUsername(), user.getEmail(), user.getPassword(),
                                         user.getAddress(), user.getPhoneNumber());
                         case "WarehouseStaff" ->
-                                new WarehouseStaff(user.getId(), user.getUsername(), user.getEmail(), user.getPassword(),
+                                new WarehouseStaff(staffId,user.getId(), user.getUsername(), user.getEmail(), user.getPassword(),
                                         user.getAddress(), user.getPhoneNumber());
                         default -> throw new IllegalArgumentException("Unknown position: " + position);
                     };
@@ -67,12 +67,7 @@ public class StaffDAO {
         return user;  // Return the User object (could be Admin, Manager, or WarehouseStaff)
     }
 
-    /**
-     * Creates a new Staff record.
-     *
-     * @param staff The Staff object to be created.
-     * @return true if the staff was successfully created, false otherwise.
-     */
+
     public boolean createStaff(User user, String position) {
         try {
             // Step 1: Use UserDAO to create the user
