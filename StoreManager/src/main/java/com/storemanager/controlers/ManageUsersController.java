@@ -3,14 +3,17 @@ package com.storemanager.controlers;
 import com.storemanager.dao.CustomerDAO;
 import com.storemanager.dao.StaffDAO;
 import com.storemanager.dao.UserDAO;
+import com.storemanager.model.users.Admin;
 import com.storemanager.model.users.User;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ManageUsersController {
@@ -84,11 +87,33 @@ public class ManageUsersController {
 
     @FXML
     private void handleDeleteUser(User user) {
-        if (user.getRole().equalsIgnoreCase("Admin") || user.getRole().equalsIgnoreCase("Manager")) {
+        String position = null;
+
+        if (!"Customer".equalsIgnoreCase(user.getRole())) {
+            // Fetch the position of the staff
+            position = StaffDAO.getStaffPositionByUserId(user.getId());
+        }
+
+        // Check if the user is an Admin or Manager based on the position
+        if ("Admin".equalsIgnoreCase(position) || "Manager".equalsIgnoreCase(position)) {
             showAlert("Delete Not Allowed", "Admin and Manager accounts cannot be deleted.");
             return;
         }
 
+        // Show a confirmation dialog to confirm the deletion
+        Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmationAlert.setTitle("Confirm Delete");
+        confirmationAlert.setHeaderText("Are you sure you want to delete this user?");
+        confirmationAlert.setContentText("This action cannot be undone.");
+
+        // Wait for user response
+        Optional<ButtonType> result = confirmationAlert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.CANCEL) {
+            // User chose to cancel the deletion
+            return;
+        }
+
+        // Proceed with the deletion
         boolean deleteSuccessful;
         if ("Customer".equalsIgnoreCase(user.getRole())) {
             deleteSuccessful = CustomerDAO.deleteCustomerByUserId(user.getId());
@@ -105,6 +130,8 @@ public class ManageUsersController {
             showAlert("Error", "Failed to delete the user.");
         }
     }
+
+
 
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
