@@ -2,6 +2,7 @@ package com.storemanager.dao;
 
 import com.storemanager.model.order.Order;
 import com.storemanager.model.order.OrderItem;
+import com.storemanager.model.order.Payment;
 import com.storemanager.model.users.Customer;
 import com.storemanager.db.DBconnector;
 
@@ -11,92 +12,138 @@ import java.util.List;
 
 public class OrderDAO {
 
-    // Static method to retrieve all orders
-    public static List<Order> getAllOrders() throws SQLException {
-        String sql = "SELECT * FROM ORDERTABLE";
-        List<Order> orders = new ArrayList<>();
+    // Method to fetch payment information for an order by order_id
+    public static Payment getPaymentByOrderId(int orderId) throws SQLException {
+        String sql = "SELECT payment_id, amount, status, date FROM PAYMENT WHERE order_id = ?";
+        try (Connection conn = DBconnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-        try (Connection connection = DBconnector.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, orderId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    // Payment object created and populated via setters
+                    Payment payment = new Payment();
+                    payment.setId(rs.getInt("payment_id"));
+                    payment.setAmount(rs.getDouble("amount"));
+                    //payment.setType(rs.getString("type"));
+                    payment.setStatus(rs.getString("status"));
+                    payment.setDate(rs.getString("date"));
+                    return payment;
+                }
+            }
+        }
+        return null; // Return null if no payment found
+    }
+
+    // Method to fetch all orders along with payment information
+    public static List<Order> getAllOrders() throws SQLException {
+        List<Order> orders = new ArrayList<>();
+        String sql = "SELECT o.order_id, o.customer_id, o.order_date, o.total_amount, o.status FROM ORDERTABLE o";
+
+        try (Connection conn = DBconnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                // Fetch order details
-                int orderId = rs.getInt("order_id");
-                int customerId = rs.getInt("customer_id");
-                Customer customer = CustomerDAO.getCustomerById(customerId); // Fetch Customer using CustomerDAO
-
-                // Initialize order object
-                Order order = new Order(customer, new ArrayList<>());
-                order.setOrderId(orderId);
-                order.setOrderDate(rs.getTimestamp("order_date").toLocalDateTime().toString());
+                // Order object created and populated via setters
+                Order order = new Order();
+                order.setOrderId(rs.getInt("order_id"));
+                order.setCustomer(CustomerDAO.getCustomerById(rs.getInt("customer_id"))); // Fetch customer details
+                order.setOrderDate(rs.getString("order_date"));
                 order.setTotalPrice(rs.getDouble("total_amount"));
                 order.setStatus(rs.getString("status"));
 
-                // Fetch and set order items
-                List<OrderItem> orderItems = OrderItemDAO.getOrderItemsByOrderId(orderId); // Fetch items using OrderItemDAO
-                order.setOrderItems(orderItems);
+                // Fetch payment details using the new method
+                Payment payment = getPaymentByOrderId(order.getOrderId());
+                order.setPayment(payment); // Set the payment for the order
 
-                // Recalculate total price if needed
-                order.setTotalPrice(OrderItemDAO.calculateTotalPrice(orderItems));
-
-                orders.add(order); // Add the order to the list
+                orders.add(order);
             }
         }
         return orders;
     }
 
-    // Static method to retrieve a specific order by its ID
+    // Method to fetch order by ID along with payment information
     public static Order getOrderById(int orderId) throws SQLException {
-        String orderSql = "SELECT * FROM ORDERTABLE WHERE order_id = ?";
-        Order order = null;
+        String sql = "SELECT o.customer_id, o.order_date, o.total_amount, o.status FROM ORDERTABLE o WHERE o.order_id = ?";
+        try (Connection conn = DBconnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-        try (Connection connection = DBconnector.getConnection()) {
-            // Fetch order details
-            try (PreparedStatement orderStmt = connection.prepareStatement(orderSql)) {
-                orderStmt.setInt(1, orderId);
-                try (ResultSet orderRs = orderStmt.executeQuery()) {
-                    if (orderRs.next()) {
-                        int customerId = orderRs.getInt("customer_id");
-                        Customer customer = CustomerDAO.getCustomerById(customerId);
-                        order = new Order(customer, new ArrayList<>());
-                        order.setOrderId(orderRs.getInt("order_id"));
-                        order.setOrderDate(orderRs.getTimestamp("order_date").toLocalDateTime().toString());
-                        order.setTotalPrice(orderRs.getDouble("total_amount"));
-                        order.setStatus(orderRs.getString("status"));
-                    }
-                }
-            }
-
-            // Fetch order items
-            if (order != null) {
-                List<OrderItem> orderItems = OrderItemDAO.getOrderItemsByOrderId(orderId);
-                order.setOrderItems(orderItems);
-                order.setTotalPrice(OrderItemDAO.calculateTotalPrice(orderItems)); // Recalculate total price if needed
-            }
-        }
-        return order;
-    }
-
-    // Static method to retrieve all orders for a specific customer
-    public static List<Order> getOrdersByCustomerId(int customerId) throws SQLException {
-        String sql = "SELECT * FROM ORDERTABLE WHERE customer_id = ?";
-        List<Order> orders = new ArrayList<>();
-
-        try (Connection connection = DBconnector.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, customerId);
-
+            stmt.setInt(1, orderId);
             try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    Order order = new Order(
-                            CustomerDAO.getCustomerById(rs.getInt("customer_id")), // Fetch Customer using CustomerDAO
-                            new ArrayList<>() // Initialize empty list for items
-                    );
-                    order.setOrderId(rs.getInt("order_id"));
-                    order.setOrderDate(rs.getTimestamp("order_date").toLocalDateTime().toString());
+                if (rs.next()) {
+                    // Order object created and populated via setters
+                    Order order = new Order();
+                    order.setOrderId(orderId);
+                    order.setCustomer(CustomerDAO.getCustomerById(rs.getInt("customer_id"))); // Fetch customer details
+                    order.setOrderDate(rs.getString("order_date"));
                     order.setTotalPrice(rs.getDouble("total_amount"));
                     order.setStatus(rs.getString("status"));
+
+                    // Fetch payment details using the new method
+                    Payment payment = getPaymentByOrderId(orderId);
+                    order.setPayment(payment); // Set the payment for the order
+
+                    return order;
+                }
+            }
+        }
+        return null; // Return null if order not found
+    }
+
+    // Method to fetch orders by customer ID along with payment information
+    public static List<Order> getOrdersByCustomerId(int customerId) throws SQLException {
+        List<Order> orders = new ArrayList<>();
+        String sql = "SELECT o.order_id, o.order_date, o.total_amount, o.status FROM ORDERTABLE o WHERE o.customer_id = ?";
+
+        try (Connection conn = DBconnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, customerId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    // Order object created and populated via setters
+                    Order order = new Order();
+                    order.setOrderId(rs.getInt("order_id"));
+                    order.setCustomer(CustomerDAO.getCustomerById(customerId)); // Fetch customer details
+                    order.setOrderDate(rs.getString("order_date"));
+                    order.setTotalPrice(rs.getDouble("total_amount"));
+                    order.setStatus(rs.getString("status"));
+
+                    // Fetch payment details using the new method
+                    Payment payment = getPaymentByOrderId(order.getOrderId());
+                    order.setPayment(payment); // Set the payment for the order
+
+                    orders.add(order);
+                }
+            }
+        }
+        return orders;
+    }
+
+    // Method to fetch all orders for a given status along with payment information
+    public static List<Order> getOrdersByStatus(String status) throws SQLException {
+        List<Order> orders = new ArrayList<>();
+        String sql = "SELECT o.order_id, o.customer_id, o.order_date, o.total_amount FROM ORDERTABLE o WHERE o.status = ?";
+
+        try (Connection conn = DBconnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, status);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    // Order object created and populated via setters
+                    Order order = new Order();
+                    order.setOrderId(rs.getInt("order_id"));
+                    order.setCustomer(CustomerDAO.getCustomerById(rs.getInt("customer_id"))); // Fetch customer details
+                    order.setOrderDate(rs.getString("order_date"));
+                    order.setTotalPrice(rs.getDouble("total_amount"));
+                    order.setStatus(rs.getString("status"));
+
+                    // Fetch payment details using the new method
+                    Payment payment = getPaymentByOrderId(order.getOrderId());
+                    order.setPayment(payment); // Set the payment for the order
+
                     orders.add(order);
                 }
             }
@@ -202,8 +249,6 @@ public class OrderDAO {
         }
     }
 
-
-    // Static method to delete an order by customer
     public static boolean deleteOrderByCustomer(int customerId) throws SQLException {
         String fetchOrdersSql = "SELECT order_id FROM ORDERTABLE WHERE customer_id = ?";
         String paymentSql = "DELETE FROM PAYMENT WHERE order_id = ?";
@@ -250,6 +295,4 @@ public class OrderDAO {
             throw e; // Rollback transaction in case of error
         }
     }
-
-
 }

@@ -1,55 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.cell.PropertyValueFactory?>
 
-<HBox xmlns:fx="http://javafx.com/fxml" fx:id="mainHBox" fx:controller="com.storemanager.controlers.ManageOrdersController" alignment="TOP_CENTER" spacing="20">
-    <!-- Main Content Section -->
-    <VBox fx:id="mainVBox" alignment="TOP_CENTER" spacing="20" style="-fx-padding: 20;">
-        <Label text="Manage Orders" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;" />
-        <Separator style="-fx-background-color: #2C3E50;" />
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
 
-        <!-- Table displaying orders -->
-        <TableView fx:id="ordersTable" prefWidth="600" prefHeight="400">
-            <TableColumn fx:id="orderIdColumn" text="Order ID" prefWidth="200">
-                <cellValueFactory>
-                    <PropertyValueFactory property="orderId"/>
-                </cellValueFactory>
-            </TableColumn>
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.storemanager.controlers.ManageOrdersController"
+            prefHeight="620.0" prefWidth="989.0" style="-fx-background-color: #ECF0F1;">
 
-            <TableColumn fx:id="customerUsernameColumn" text="Customer" prefWidth="200">
-                <cellValueFactory>
-                    <PropertyValueFactory property="customerUsername"/>
-                </cellValueFactory>
-            </TableColumn>
+    <!-- Main Content Area -->
+    <center>
+        <VBox fx:id="contentArea" alignment="CENTER" spacing="20" style="-fx-padding: 20; -fx-background-color: #FFFFFF;">
+            <Label text="Manage Orders" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;" />
 
-            <TableColumn fx:id="orderDateColumn" text="Order Date" prefWidth="200">
-                <cellValueFactory>
-                    <PropertyValueFactory property="orderDate"/>
-                </cellValueFactory>
-            </TableColumn>
+            <!-- Search and Filter Section -->
+            <HBox spacing="10" alignment="CENTER">
+                <TextField fx:id="searchField" promptText="Search by customer name" onKeyReleased="#handleSearch" />
+                <ComboBox fx:id="statusFilter" promptText="Filter by status" onAction="#handleFilterStatus" />
+            </HBox>
 
-            <TableColumn fx:id="orderStatusColumn" text="Status" prefWidth="200">
-                <cellValueFactory>
-                    <PropertyValueFactory property="status"/>
-                </cellValueFactory>
-            </TableColumn>
+            <!-- Table for Displaying Orders -->
+            <TableView fx:id="ordersTable" prefWidth="800" prefHeight="400">
+                <columns>
+                    <TableColumn fx:id="orderIdColumn" text="Order ID" prefWidth="100" />
+                    <TableColumn fx:id="customerIdColumn" text="Customer ID" prefWidth="150" />
+                    <TableColumn fx:id="customerNameColumn" text="Customer Name" prefWidth="150" />
+                    <TableColumn fx:id="paymentIdColumn" text="Payment ID" prefWidth="100" />
+                    <TableColumn fx:id="orderDateColumn" text="Order Date" prefWidth="150" />
+                    <TableColumn fx:id="totalAmountColumn" text="Total Amount" prefWidth="100" />
+                    <TableColumn fx:id="statusColumn" text="Status" prefWidth="100" />
+                </columns>
+            </TableView>
 
-            <TableColumn fx:id="totalPriceColumn" text="Total Price" prefWidth="200">
-                <cellValueFactory>
-                    <PropertyValueFactory property="totalPrice"/>
-                </cellValueFactory>
-            </TableColumn>
-        </TableView>
-
-        <!-- Button for deleting orders -->
-        <HBox spacing="20" alignment="CENTER">
-            <Button text="Delete Order" fx:id="btnDeleteOrder" onAction="#handleDeleteOrder" prefWidth="200" style="-fx-font-size: 14px; -fx-background-color: #E74C3C; -fx-text-fill: white;" />
-        </HBox>
-    </VBox>
-</HBox>
+            <!-- Buttons for Order Management -->
+            <HBox spacing="10" alignment="CENTER">
+                <Button fx:id="btnDeleteOrder" text="Delete Order" onAction="#handleDeleteOrder" />
+                <Button fx:id="btnUpdateOrderStatus" text="Update Order Status" onAction="#handleUpdateOrderStatus" />
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>

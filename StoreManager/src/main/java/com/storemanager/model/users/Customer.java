@@ -11,24 +11,27 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import com.storemanager.dao.CustomerDAO;
+
+import java.util.List;
+
 /**
  * Represents a customer in the system.
  * Inherits from the User class and provides functionality specific to the customer role.
  */
+
 public class Customer extends User {
 
-    private int customerId; // Unique ID for the customer in the database
-    private ShoppingCart shoppingCart; // Customer's shopping cart
-    private List<Order> orders;        // List of customer's past orders
+    private int customerId;
+    private ShoppingCart shoppingCart;
+    private List<Order> orders;
 
-    // Constructor
     public Customer(int customerId, int userId, String username, String email, String password, String address, String phoneNumber) {
-        super(userId, username, email, password, "Customer", address, phoneNumber); // Assigning the role as "Customer"
+        super(userId, username, email, password, "Customer", address, phoneNumber);
         this.customerId = customerId;
-        this.shoppingCart = initializeShoppingCart(customerId); // Initialize the shopping cart with cartId
+        this.shoppingCart = CustomerDAO.initializeShoppingCart(customerId); // Initialize shopping cart
     }
 
-    // Getters and Setters
     public int getCustomerId() {
         return customerId;
     }
@@ -39,6 +42,14 @@ public class Customer extends User {
 
     public void setShoppingCart(ShoppingCart shoppingCart) {
         this.shoppingCart = shoppingCart;
+    }
+
+    public void addToCart(CartItem cartItem) {
+        shoppingCart.addItem(cartItem);
+    }
+
+    public void removeFromCart(CartItem cartItem) {
+        shoppingCart.removeItem(cartItem);
     }
 
     public List<Order> getOrders() {
@@ -54,103 +65,50 @@ public class Customer extends User {
         System.out.println("Customer " + getUsername() + " has logged out.");
     }
 
-    public boolean updateCustomerInfo() {
-        try (Connection connection = DBconnector.getConnection()) {
-            String query = "UPDATE USERS SET address = ?, phone_number = ? WHERE id = ?";
-            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-                preparedStatement.setString(1, this.getAddress());
-                preparedStatement.setString(2, this.getPhoneNumber());
-                preparedStatement.setInt(3, getId()); // Use user ID here
-
-                int rowsAffected = preparedStatement.executeUpdate();
-                return rowsAffected > 0;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
     public void viewProfile() {
         System.out.println("Customer Profile:");
         System.out.println("Customer ID: " + customerId);
         System.out.println("Username: " + getUsername());
         System.out.println("Email: " + getEmail());
-        System.out.println("Address: " + this.getAddress());
-        System.out.println("Phone Number: " + this.getPhoneNumber());
+        System.out.println("Address: " + getAddress());
+        System.out.println("Phone Number: " + getPhoneNumber());
     }
 
-    public void addToCart(CartItem cartItem) {
-        shoppingCart.addItem(cartItem);
+    public boolean updateCustomerInfo() {
+        return CustomerDAO.updateCustomerInfo(this.getAddress(),this.getPhoneNumber(),this.customerId);
     }
 
-    public void removeFromCart(CartItem cartItem) {
-        shoppingCart.removeItem(cartItem);
+    public static Customer getCustomerById(int customerId) {
+        return CustomerDAO.getCustomerById(customerId);
     }
 
-    public Order placeOrder() {
-        if (shoppingCart.getItems().isEmpty()) {
-            System.out.println("Cannot place order. Shopping cart is empty.");
-            return null;
-        }
-
-        Order newOrder = shoppingCart.checkout(this);
-
-        if (newOrder != null) {
-            orders.add(newOrder);
-            return newOrder;
-        }
-
-        return null;
+    public static Customer getCustomerByUserId(int userId) {
+        return CustomerDAO.getCustomerByUserId(userId);
     }
 
-    @Override
-    public String toString() {
-        return "Customer{" +
-                "customerId=" + customerId +
-                ", username='" + getUsername() + '\'' +
-                ", email='" + getEmail() + '\'' +
-                ", address='" + getAddress() + '\'' +
-                ", phoneNumber='" + getPhoneNumber() + '\'' +
-                '}';
+    public static boolean createCustomer(Customer customer) {
+        return CustomerDAO.createCustomer(customer);
     }
 
-    /**
-     * Initializes the customer's shopping cart by retrieving or creating a cartId in the database.
-     *
-     * @param customerId The ID of the customer.
-     * @return A ShoppingCart object with a valid cartId.
-     */
-    private ShoppingCart initializeShoppingCart(int customerId) {
-        try (Connection connection = DBconnector.getConnection()) {
-            // Step 1: Check if a shopping cart already exists for the customer
-            String query = "SELECT cart_id FROM SHOPPINGCART WHERE customer_id = ?";
-            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-                preparedStatement.setInt(1, customerId);
-                try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                    if (resultSet.next()) {
-                        int cartId = resultSet.getInt("cart_id");
-                        return new ShoppingCart(cartId); // Return the cart with the retrieved ID
-                    } else {
-                        // Step 2: If no cart exists, create one for the customer
-                        String insertQuery = "INSERT INTO SHOPPINGCART (customer_id) VALUES (?)";
-                        try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                            insertStatement.setInt(1, customerId);
-                            insertStatement.executeUpdate();
-                            try (ResultSet generatedKeys = insertStatement.getGeneratedKeys()) {
-                                if (generatedKeys.next()) {
-                                    int newCartId = generatedKeys.getInt(1);
-                                    return new ShoppingCart(newCartId); // Return the cart with the new ID
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace(); // Log the exception for debugging
-        }
+    public static boolean createCustomer(int userId) {
+        return CustomerDAO.createCustomer(userId);
+    }
 
-        return null; // Return null if an error occurs
+    public static boolean updateCustomer(Customer customer) {
+        return CustomerDAO.updateCustomer(customer);
+    }
+
+    public static boolean deleteCustomerByUserId(int userId) {
+        return CustomerDAO.deleteCustomerByUserId(userId);
+    }
+
+    public static boolean deleteCustomer(int customerId) {
+        return CustomerDAO.deleteCustomer(customerId);
+    }
+
+    public static List<Customer> getAllCustomers() {
+        return CustomerDAO.getAllCustomers();
     }
 }
+
+

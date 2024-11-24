@@ -53,11 +53,39 @@ public class StaffDAO {
         return staffList; // Return the list of staff members
     }
 
-    public static boolean createStaff(User user, String position) {
-        if (!UserDAO.createUser(user)) {
+    // Fetch staff position by user_id
+    public static String getStaffPositionByUserId(int userId) {
+        String query = "SELECT position FROM STAFF WHERE user_id = ?";
+        try (Connection connection = DBconnector.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, userId);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getString("position");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null; // Return null if not found
+    }
+
+    public static boolean createStaff(int userId, String position) {
+        String sql = "INSERT INTO STAFF (user_id, position) VALUES (?, ?)";
+        try (Connection conn = DBconnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            stmt.setString(2, position);
+            int affectedRows = stmt.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
             return false;
         }
+    }
 
+    public static boolean createStaff(User user, String position) {
         String query = "INSERT INTO STAFF (user_id, position) VALUES (?, ?)";
 
         try (Connection conn = DBconnector.getConnection();
@@ -118,7 +146,7 @@ public class StaffDAO {
     }
 
     // Helper method to get staff_id by user_id
-    private static int getStaffIdByUserId(int userId) {
+    public static int getStaffIdByUserId(int userId) {
         String query = "SELECT staff_id FROM STAFF WHERE user_id = ?";
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {

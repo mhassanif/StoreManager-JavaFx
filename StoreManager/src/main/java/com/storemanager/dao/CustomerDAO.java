@@ -1,6 +1,7 @@
 package com.storemanager.dao;
 
 import com.storemanager.db.DBconnector;
+import com.storemanager.model.cart.ShoppingCart;
 import com.storemanager.model.users.Customer;
 import com.storemanager.model.users.User;
 
@@ -94,40 +95,95 @@ public class CustomerDAO {
     }
 
     public static boolean createCustomer(Customer customer) {
-        if (!UserDAO.createUser(customer)) {
-            return false;
-        }
-
         String query = "INSERT INTO CUSTOMER (user_id) VALUES (?)";
 
         try (Connection connection = DBconnector.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             preparedStatement.setInt(1, customer.getId());
-            return preparedStatement.executeUpdate() > 0;
+            if (preparedStatement.executeUpdate() > 0) {
+                try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        int customerId = generatedKeys.getInt(1);
+                        customer.setId(customerId);
+                        customer.setShoppingCart(initializeShoppingCart(customerId)); // Create and assign cart
+                        return true;
+                    }
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return false;
     }
 
+    public static boolean createCustomer(int userId) {
+        String query = "INSERT INTO CUSTOMER (user_id) VALUES (?)";
+
+        try (Connection connection = DBconnector.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+
+            preparedStatement.setInt(1, userId);
+            if (preparedStatement.executeUpdate() > 0) {
+                try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        int customerId = generatedKeys.getInt(1);
+                        initializeShoppingCart(customerId); // Create cart during customer creation
+                        return true;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static ShoppingCart initializeShoppingCart(int customerId) {
+        try (Connection connection = DBconnector.getConnection()) {
+            // Step 1: Check if a shopping cart already exists for the customer
+            String query = "SELECT cart_id FROM SHOPPINGCART WHERE customer_id = ?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setInt(1, customerId);
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        int cartId = resultSet.getInt("cart_id");
+                        return new ShoppingCart(cartId); // Return the cart with the retrieved ID
+                    } else {
+                        // Step 2: If no cart exists, create one for the customer
+                        String insertQuery = "INSERT INTO SHOPPINGCART (customer_id) VALUES (?)";
+                        try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                            insertStatement.setInt(1, customerId);
+                            insertStatement.executeUpdate();
+                            try (ResultSet generatedKeys = insertStatement.getGeneratedKeys()) {
+                                if (generatedKeys.next()) {
+                                    int newCartId = generatedKeys.getInt(1);
+                                    return new ShoppingCart(newCartId); // Return the cart with the new ID
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Log the exception for debugging
+        }
+
+        return null; // Return null if an error occurs
+    }
+
     public static boolean updateCustomer(Customer customer) {
         return UserDAO.updateUser(customer);
     }
 
-    // Delete customer by user_id
     public static boolean deleteCustomerByUserId(int userId) {
-        // First, get the customer_id using the user_id
         Customer customer = CustomerDAO.getCustomerByUserId(userId);
         if (customer == null) return false;
 
-        int customerId = customer.getId();
-
-        // Call the deleteCustomer method to handle the deletion
+        int customerId = customer.getCustomerId();
         return deleteCustomer(customerId);
     }
 
-    // Delete customer by customer_id
     public static boolean deleteCustomer(int customerId) {
         Customer customer = getCustomerById(customerId);
         if (customer == null) return false;
@@ -135,20 +191,17 @@ public class CustomerDAO {
         int userId = customer.getId();
 
         try {
-            // Delete related records using appropriate DAOs
             NotificationDAO.deleteNotificationsByUserId(userId);
             FeedbackDAO.deleteFeedbackByCustomer(customerId);
             ShoppingCartDAO.deleteShoppingCartByCustomer(customerId);
             OrderDAO.deleteOrderByCustomer(customerId);
 
-            // Delete customer record
             String query = "DELETE FROM CUSTOMER WHERE customer_id = ?";
             try (Connection connection = DBconnector.getConnection();
                  PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
                 preparedStatement.setInt(1, customerId);
                 if (preparedStatement.executeUpdate() > 0) {
-                    // Delete user record as well
                     return UserDAO.deleteUser(userId);
                 }
             }
@@ -158,4 +211,20 @@ public class CustomerDAO {
         return false;
     }
 
+    public static boolean updateCustomerInfo(String address, String phone, int id) {
+        try (Connection connection = DBconnector.getConnection()) {
+            String query = "UPDATE USERS SET address = ?, phone_number = ? WHERE id = ?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setString(1, address);
+                preparedStatement.setString(2, phone);
+                preparedStatement.setInt(3, id); // Use user ID here
+
+                int rowsAffected = preparedStatement.executeUpdate();
+                return rowsAffected > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

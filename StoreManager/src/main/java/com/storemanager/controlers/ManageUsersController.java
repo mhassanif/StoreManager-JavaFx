@@ -3,15 +3,15 @@ package com.storemanager.controlers;
 import com.storemanager.dao.CustomerDAO;
 import com.storemanager.dao.StaffDAO;
 import com.storemanager.dao.UserDAO;
-import com.storemanager.model.users.Customer;
-import com.storemanager.model.users.WarehouseStaff;
 import com.storemanager.model.users.User;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ManageUsersController {
 
@@ -32,6 +32,8 @@ public class ManageUsersController {
 
     @FXML
     private TextField searchField;
+
+    private List<User> allUsers = new ArrayList<>(); // Holds all users loaded from the database
 
     @FXML
     private void initialize() {
@@ -61,31 +63,47 @@ public class ManageUsersController {
     }
 
     private void loadUsers() {
-        List<User> users = UserDAO.getAllUsers();
-        userTable.getItems().setAll(users);
+        // Fetch all users from the database
+        allUsers = UserDAO.getAllUsers();
+        // Display all users in the table
+        userTable.getItems().setAll(allUsers);
     }
 
     @FXML
     private void handleSearch() {
-        String searchQuery = searchField.getText();
-        if (searchQuery.isEmpty()) {
-            loadUsers();
-        } else {
-            List<User> searchResults = UserDAO.searchUsers(searchQuery);
-            userTable.getItems().setAll(searchResults);
-        }
+        String searchQuery = searchField.getText().toLowerCase();
+        // Filter locally using the in-memory list
+        List<User> filteredUsers = allUsers.stream()
+                .filter(user -> user.getUsername().toLowerCase().contains(searchQuery) ||
+                        user.getEmail().toLowerCase().contains(searchQuery) ||
+                        user.getRole().toLowerCase().contains(searchQuery))
+                .collect(Collectors.toList());
+        // Update the table with the filtered results
+        userTable.getItems().setAll(filteredUsers);
     }
 
     @FXML
     private void handleDeleteUser(User user) {
-        if (user instanceof Customer) {
-            CustomerDAO.deleteCustomerByUserId(user.getId());
-        } else if (user instanceof WarehouseStaff) {
-            StaffDAO.deleteStaffByUserId(user.getId());
-        } else {
+        if (user.getRole().equalsIgnoreCase("Admin") || user.getRole().equalsIgnoreCase("Manager")) {
             showAlert("Delete Not Allowed", "Admin and Manager accounts cannot be deleted.");
+            return;
         }
-        loadUsers(); // Refresh table
+
+        boolean deleteSuccessful;
+        if ("Customer".equalsIgnoreCase(user.getRole())) {
+            deleteSuccessful = CustomerDAO.deleteCustomerByUserId(user.getId());
+        } else {
+            deleteSuccessful = StaffDAO.deleteStaffByUserId(user.getId());
+        }
+
+        if (deleteSuccessful) {
+            // Remove the user from the local list
+            allUsers.remove(user);
+            // Refresh the table to reflect the change
+            userTable.getItems().remove(user);
+        } else {
+            showAlert("Error", "Failed to delete the user.");
+        }
     }
 
     private void showAlert(String title, String message) {

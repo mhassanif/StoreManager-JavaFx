@@ -171,14 +171,36 @@ public class ManageProductsController {
     public void handleSetRestockLevel() {
         InventoryProduct selectedProduct = productsTable.getSelectionModel().getSelectedItem();
         if (selectedProduct != null) {
-            // Open dialog to set restock level or update via DAO
-            System.out.println("Set Restock Level for Product: " + selectedProduct.getProduct().getName());
-            // Example logic: update restock level in database
-            selectedProduct.setRestockLevel(50);  // Update restock level
-            InventoryDAO.setRestockLevel(selectedProduct.getProduct().getId(),selectedProduct.getRestockLevel());
-            productsTable.refresh();  // Refresh table to reflect changes
+            // Open dialog to ask for new restock level
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Set Restock Level");
+            dialog.setHeaderText("Enter the new restock level for " + selectedProduct.getProduct().getName());
+            dialog.setContentText("New Restock Level:");
+
+            // Wait for the user's input
+            dialog.showAndWait().ifPresent(input -> {
+                try {
+                    // Parse the input to an integer
+                    int newRestockLevel = Integer.parseInt(input);
+
+                    // Validate that the restock level is a positive number
+                    if (newRestockLevel < 0) {
+                        showAlert(Alert.AlertType.ERROR, "Invalid Input", "Restock level must be a positive number.", "");
+                    } else {
+                        // Update the inventory restock level using the DAO
+                        InventoryDAO.setRestockLevel(selectedProduct.getProduct().getId(), newRestockLevel);
+
+                        // Update the product object and refresh the table
+                        selectedProduct.setRestockLevel(newRestockLevel);
+                        productsTable.refresh();
+                    }
+                } catch (NumberFormatException e) {
+                    showAlert(Alert.AlertType.ERROR, "Invalid Input", "Please enter a valid number for the restock level.", "");
+                }
+            });
         } else {
             System.out.println("No product selected to set restock level");
         }
     }
+
 }

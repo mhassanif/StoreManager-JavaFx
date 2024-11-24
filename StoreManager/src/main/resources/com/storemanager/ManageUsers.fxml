@@ -17,7 +17,7 @@
             <Text text="Manage Users" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #34495E;"/>
 
             <!-- Search Field -->
-            <TextField fx:id="searchField" promptText="Search Users" onAction="#handleSearch" prefWidth="300"/>
+            <TextField fx:id="searchField" promptText="Search Users" onKeyReleased="#handleSearch" prefWidth="300"/>
 
             <!-- Table View for Users -->
             <TableView fx:id="userTable" prefHeight="400" prefWidth="600" style="-fx-background-color: #ffffff;">

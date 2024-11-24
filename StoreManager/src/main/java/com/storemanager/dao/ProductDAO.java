@@ -138,20 +138,58 @@ public class ProductDAO {
     }
 
     // Method to delete a product by its ID
-    public  static boolean deleteProduct(int productId) {
-        String query = "DELETE FROM PRODUCT WHERE product_id = ?";
+    public static boolean deleteProduct(int productId) {
+        // Step 1: Delete all related CartItem entries
+        String deleteCartItemQuery = "DELETE FROM CARTITEM WHERE product_id = ?";
         try (Connection conn = DBconnector.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
+             PreparedStatement pstmt = conn.prepareStatement(deleteCartItemQuery)) {
+
+            pstmt.setInt(1, productId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error deleting related cart items for product {0}: {1}", new Object[]{productId, e.getMessage()});
+            return false; // If deletion of cart items fails, stop further execution
+        }
+
+        // Step 2: Delete all related OrderItem entries
+        String deleteOrderItemQuery = "DELETE FROM ORDERITEM WHERE product_id = ?";
+        try (Connection conn = DBconnector.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(deleteOrderItemQuery)) {
+
+            pstmt.setInt(1, productId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error deleting related order items for product {0}: {1}", new Object[]{productId, e.getMessage()});
+            return false; // If deletion of order items fails, stop further execution
+        }
+
+        // Step 3: Delete all related Inventory entries (inventory depends on product)
+        String deleteInventoryQuery = "DELETE FROM INVENTORY WHERE product_id = ?";
+        try (Connection conn = DBconnector.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(deleteInventoryQuery)) {
+
+            pstmt.setInt(1, productId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error deleting related inventory for product {0}: {1}", new Object[]{productId, e.getMessage()});
+            return false; // If deletion of inventory entries fails, stop further execution
+        }
+
+        // Step 4: Delete the product itself
+        String deleteProductQuery = "DELETE FROM PRODUCT WHERE product_id = ?";
+        try (Connection conn = DBconnector.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(deleteProductQuery)) {
 
             pstmt.setInt(1, productId);
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0;
-
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error deleting product: {0}", e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error deleting product {0}: {1}", new Object[]{productId, e.getMessage()});
         }
         return false;
     }
+
+
 
     // Utility function to map a result set row to a Product object
     private  static  Product mapRowToProduct(ResultSet rs) throws SQLException {
