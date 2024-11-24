@@ -1,8 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
 
-<StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
-    <Label text="PLACEHOLDER: Update this file later." style="-fx-font-size: 16px; -fx-text-fill: gray;" />
-</StackPane>
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.storemanager.controlers.CustomerProfileController">
+    <!-- Top Section -->
+    <top>
+        <Label text="Your Profile" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-padding: 10;" alignment="CENTER" />
+    </top>
+
+    <!-- Center Section -->
+    <center>
+        <VBox spacing="15" style="-fx-padding: 20;" alignment="CENTER_LEFT">
+            <!-- Username (View Only) -->
+            <HBox spacing="10">
+                <Label text="Username:" style="-fx-font-weight: bold;" />
+                <Label fx:id="usernameLabel" style="-fx-background-color: #f0f0f0; -fx-padding: 5;" prefWidth="300" />
+            </HBox>
+
+            <!-- Email (View Only) -->
+            <HBox spacing="10">
+                <Label text="Email:" style="-fx-font-weight: bold;" />
+                <Label fx:id="emailLabel" style="-fx-background-color: #f0f0f0; -fx-padding: 5;" prefWidth="300" />
+            </HBox>
+
+            <!-- Address -->
+            <HBox spacing="10">
+                <Label text="Address:" style="-fx-font-weight: bold;" />
+                <TextField fx:id="addressField" promptText="Enter your address" />
+            </HBox>
+
+            <!-- Phone -->
+            <HBox spacing="10">
+                <Label text="Phone:" style="-fx-font-weight: bold;" />
+                <TextField fx:id="phoneField" promptText="Enter your phone number" />
+            </HBox>
+
+            <!-- Password -->
+            <HBox spacing="10">
+                <Label text="Password:" style="-fx-font-weight: bold;" />
+                <PasswordField fx:id="passwordField" promptText="Enter your new password" />
+            </HBox>
+        </VBox>
+    </center>
+
+    <!-- Bottom Section -->
+    <bottom>
+        <HBox spacing="20" alignment="CENTER" style="-fx-padding: 10;">
+            <Button text="Save Changes" onAction="#handleSaveChanges" />
+            <Button text="Cancel" onAction="#handleCancel" />
+        </HBox>
+    </bottom>
+</BorderPane>

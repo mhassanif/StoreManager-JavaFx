@@ -15,7 +15,7 @@ public class LoginApplication extends Application {
 
 
     public void start(Stage stage) throws IOException {
-        // Test the database connection
+        // Test the database connectionSop
         DBconnector.testConnection();
 
         // test reading from db
