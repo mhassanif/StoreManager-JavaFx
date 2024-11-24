@@ -3,6 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.*?>
+
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.storemanager.controlers.DashboardController" prefWidth="980.0" prefHeight="620.0">
     <!-- Left Sidebar -->
     <left>
@@ -13,8 +14,16 @@
             <Button text="Orders" fx:id="ordersButton" onAction="#showOrders" />
             <Button text="Notifications" fx:id="notificationsButton" onAction="#showNotifications" />
             <Button text="Profile" fx:id="profileButton" onAction="#showProfile" />
+            <Button text="Feedback" fx:id="feedbackButton" onAction="#showFeedback" />
         </VBox>
     </left>
+
+    <!-- Top Bar -->
+    <top>
+        <HBox alignment="CENTER_RIGHT" style="-fx-padding: 10; -fx-background-color: #2A2A2A;">
+            <Button text="Sign Out" onAction="#handleSignOut" style="-fx-background-color: red; -fx-text-fill: white;" />
+        </HBox>
+    </top>
 
     <!-- Dynamic Content Area -->
     <center>

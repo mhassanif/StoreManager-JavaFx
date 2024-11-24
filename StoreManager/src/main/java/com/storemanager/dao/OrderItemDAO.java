@@ -10,7 +10,7 @@ import java.util.List;
 
 public class OrderItemDAO {
 
-    private final ProductDAO productDAO = new ProductDAO();
+    private static final ProductDAO productDAO = new ProductDAO();
 
     // Retrieve OrderItems by Order ID
     public static List<OrderItem> getOrderItemsByOrderId(int orderId) throws SQLException {

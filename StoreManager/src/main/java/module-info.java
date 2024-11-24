@@ -8,4 +8,6 @@ module com.mhassanif.storemanager {
     exports com.storemanager;
     exports com.storemanager.controlers;
     opens com.storemanager.controlers to javafx.fxml;
+    opens com.storemanager.model.order to javafx.base;
+
 }

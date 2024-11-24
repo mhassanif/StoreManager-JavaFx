@@ -23,6 +23,15 @@ public class Order {
         this.status = "Pending"; // Default status when the order is created
         this.payment = null; // Payment will be added later
     }
+    public Order(Customer customer, List<OrderItem> orderItems, int orderId, String orderDate, double totalPrice, String status) {
+        this.customer = customer;
+        this.orderItems = orderItems;
+        this.orderId = orderId;
+        this.orderDate = orderDate;
+        this.totalPrice = totalPrice;
+        this.status = status;
+        this.payment = null; // Payment will be added later
+    }
 
     // Method to calculate the total price of the order
     private double calculateTotalPrice(List<OrderItem> items) {
@@ -67,7 +76,7 @@ public class Order {
     public String toString() {
         return "Order{" +
                 "orderId=" + orderId +
-                ", customer=" + customer.getUsername() +
+                ", customer=" + (customer != null ? customer.getUsername() : "null") +
                 ", orderDate='" + orderDate + '\'' +
                 ", totalPrice=" + totalPrice +
                 ", status='" + status + '\'' +
@@ -75,4 +84,6 @@ public class Order {
                 ", orderItems=" + orderItems +
                 '}';
     }
+
+
 }
