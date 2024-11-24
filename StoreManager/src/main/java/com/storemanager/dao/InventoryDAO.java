@@ -14,7 +14,7 @@ public class InventoryDAO {
     private static final Logger LOGGER = Logger.getLogger(InventoryDAO.class.getName());
 
     // Method to get all inventory products
-    public List<InventoryProduct> getAllInventory() {
+    public static List<InventoryProduct> getAllInventory() {
         String sql = "SELECT * FROM INVENTORY";
         List<InventoryProduct> inventoryList = new ArrayList<>();
 
@@ -127,29 +127,6 @@ public class InventoryDAO {
     }
 
     // Method to get all inventory products
-    public static List<InventoryProduct> getAllInventory() {
-        String sql = "SELECT * FROM INVENTORY";
-        List<InventoryProduct> allInventory = new ArrayList<>();
-
-        try (Connection connection = DBconnector.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet resultSet = statement.executeQuery()) {
-
-            while (resultSet.next()) {
-                int productId = resultSet.getInt("product_id");
-                Product product = ProductDAO.getProductById(productId); // Get product details
-                int stockQuantity = resultSet.getInt("stock_quantity");
-                int restockQuantity = resultSet.getInt("restock_quantity");
-                String restockDate = resultSet.getString("restock_date");
-
-                allInventory.add(new InventoryProduct(product, stockQuantity, restockQuantity, restockDate));
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error retrieving all inventory products: {0}", e.getMessage());
-        }
-        return allInventory;
-    }
-
     /**
      * Sets the restock level for a given product in the inventory.
      *
