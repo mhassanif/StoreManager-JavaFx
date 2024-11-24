@@ -12,6 +12,9 @@ import java.util.logging.Logger;
 public class CategoryDAO {
     private static final Logger LOGGER = Logger.getLogger(CategoryDAO.class.getName());
 
+
+
+
     // Method to create a new category
     public static int createCategory(Category category) {
         String sql = "INSERT INTO CATEGORY (name) VALUES (?)";
