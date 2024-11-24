@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml" fx:controller="com.storemanager.controlers.WarehouseNotificationController" prefWidth="1024" prefHeight="768">
+    <!-- Main Content Section -->
+    <center>
+        <VBox fx:id="mainVBox" alignment="TOP_CENTER" spacing="20" style="-fx-padding: 20;">
+            <Label text="Warehouse Notifications" style="-fx-font-size: 24px; -fx-padding: 10;" />
+
+            <TextField fx:id="searchField" promptText="Search notifications..." onKeyReleased="#handleSearch" prefWidth="800" />
+
+            <TableView fx:id="notificationsTable" prefWidth="800" prefHeight="400">
+                <columns>
+                    <TableColumn fx:id="notificationIdColumn" text="ID" prefWidth="50" />
+                    <TableColumn fx:id="messageColumn" text="Message" prefWidth="400" />
+                    <TableColumn fx:id="statusColumn" text="Status" prefWidth="100" />
+                    <TableColumn fx:id="dateColumn" text="Date" prefWidth="200" />
+                </columns>
+            </TableView>
+
+            <HBox alignment="CENTER" spacing="10">
+                <Button fx:id="btnMarkAsRead" text="Mark as Read" onAction="#handleMarkAsRead" prefWidth="200"
+                        style="-fx-font-size: 14px; -fx-background-color: #2ECC71; -fx-text-fill: white;" />
+                <Button fx:id="btnDeleteNotification" text="Delete Notification" onAction="#handleDeleteNotification" prefWidth="200"
+                        style="-fx-font-size: 14px; -fx-background-color: #E74C3C; -fx-text-fill: white;" />
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>

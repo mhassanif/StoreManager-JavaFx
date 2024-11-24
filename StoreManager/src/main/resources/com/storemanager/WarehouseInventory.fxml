@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.storemanager.controlers.WarehouseInventoryController">
+    <top>
+        <Label text="Inventory Management" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-padding: 10;" alignment="CENTER"/>
+    </top>
+    <center>
+        <TableView fx:id="inventoryTable" prefHeight="400">
+            <columns>
+                <TableColumn fx:id="productNameColumn" text="Product Name" prefWidth="150"/>
+                <TableColumn fx:id="priceColumn" text="Price" prefWidth="100"/>
+                <TableColumn fx:id="stockLevelColumn" text="Stock Level" prefWidth="100"/>
+                <TableColumn fx:id="restockLevelColumn" text="Restock Level" prefWidth="100"/>
+                <TableColumn fx:id="restockDateColumn" text="Restock Date" prefWidth="150"/>
+            </columns>
+        </TableView>
+    </center>
+</BorderPane>

@@ -112,7 +112,7 @@ public class LoginController {
                         loader = new FXMLLoader(getClass().getResource("/com/storemanager/ManagerDashboard.fxml"));
                         break;
                     case "warehouse staff":
-                        loader = new FXMLLoader(getClass().getResource("/com/storemanager/WarehouseStaffDashboard.fxml"));
+                        loader = new FXMLLoader(getClass().getResource("/com/storemanager/WarehouseDashboard.fxml"));
                         break;
                     default:
                         throw new IllegalArgumentException("Unknown role: " + role);
