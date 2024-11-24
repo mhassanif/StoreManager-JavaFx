@@ -86,7 +86,7 @@ public class CreateProductController {
             boolean success = ProductDAO.createProduct(newProduct);
             if (success) {
                 showAlert(Alert.AlertType.INFORMATION, "Success", "Product created successfully!");
-                closeWindow();
+                handleCancel();
             } else {
                 showAlert(Alert.AlertType.ERROR, "Error", "Failed to create product.");
             }
