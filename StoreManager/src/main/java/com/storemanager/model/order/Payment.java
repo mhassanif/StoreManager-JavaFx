@@ -23,6 +23,16 @@ public class Payment {
         this.order = order; // Associate the payment with the order
     }
 
+    public Payment() {
+        this.id = -1;
+        this.amount = -1.0;
+        this.type = "";
+        this.status = ""; // Default status when payment is created
+        this.date = LocalDate.now().toString();
+        this.paymentConfirmation = false; // Initially set to false
+        this.order = null; // Associate the payment with the order
+    }
+
 
     // Method to confirm payment
     public void confirmPayment() {

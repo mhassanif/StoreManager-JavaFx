@@ -1,99 +1,166 @@
 package com.storemanager.controlers;
 
-import com.storemanager.model.items.Category;
-import com.storemanager.model.items.Product;
+import com.storemanager.dao.OrderDAO;
 import com.storemanager.model.order.Order;
-import com.storemanager.model.order.OrderItem;
-import com.storemanager.model.users.Customer;
-import javafx.fxml.FXML;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.event.ActionEvent;
-
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ManageOrdersController {
 
-    @FXML private TableView<Order> ordersTable;
-    @FXML private TableColumn<Order, String> orderIdColumn;
-    @FXML private TableColumn<Order, String> customerUsernameColumn;
-    @FXML private TableColumn<Order, String> orderDateColumn;
-    @FXML private TableColumn<Order, String> orderStatusColumn;
-    @FXML private TableColumn<Order, Double> totalPriceColumn;
+    @FXML
+    private VBox contentArea;
 
     @FXML
-    private void initialize() {
-        // Set up the cell value factories for each column
-        orderIdColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(String.valueOf(cellData.getValue().getOrderId())) // Handle int as String
-        );
-        customerUsernameColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getCustomer().getUsername())
-        );
-        orderDateColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getOrderDate())
-        );
-        orderStatusColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getStatus())
-        );
-        totalPriceColumn.setCellValueFactory(cellData ->
-                new SimpleDoubleProperty(cellData.getValue().getTotalPrice()).asObject() // Bind the Double property
-        );
+    private TextField searchField;
 
-        // Load data into the table
+    @FXML
+    private ComboBox<String> statusFilter;
+
+    @FXML
+    private TableView<Order> ordersTable;
+
+    @FXML
+    private TableColumn<Order, Integer> orderIdColumn;
+
+    @FXML
+    private TableColumn<Order, Integer> customerIdColumn;
+
+    @FXML
+    private TableColumn<Order, String> customerNameColumn;
+
+    @FXML
+    private TableColumn<Order, Integer> paymentIdColumn;
+
+    @FXML
+    private TableColumn<Order, String> orderDateColumn;
+
+    @FXML
+    private TableColumn<Order, Double> totalAmountColumn;
+
+    @FXML
+    private TableColumn<Order, String> statusColumn;
+
+    @FXML
+    private Button btnDeleteOrder, btnUpdateOrderStatus;
+
+    private List<Order> allOrders;
+
+    @FXML
+    public void initialize() {
+        // Initialize table columns
+        orderIdColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getOrderId()).asObject());
+        customerIdColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getCustomer().getCustomerId()).asObject());
+        customerNameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCustomer().getUsername()));
+        paymentIdColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getPayment().getId()).asObject());
+        orderDateColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getOrderDate()));
+        totalAmountColumn.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getTotalPrice()).asObject());
+        statusColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getStatus()));
+
+        // Load orders from database
         loadOrders();
+
+        // Populate status filter dropdown
+        statusFilter.getItems().addAll("Pending", "Completed", "Cancelled");
     }
 
-    // Load orders into the TableView
     private void loadOrders() {
-        // Assuming you have a list of orders
-        List<Order> orders = fetchOrdersFromDatabase(); // Fetch orders dynamically
-        ordersTable.getItems().setAll(orders);
-    }
-
-    // Example method to fetch orders from a data source (e.g., a database)
-    private List<Order> fetchOrdersFromDatabase() {     // Testing with mock data
-        // Creating mock data for Category
-        Category category1 = new Category(1, "Electronics");
-        Category category2 = new Category(2, "Furniture");
-
-        // Creating mock data for Product, linking to Category
-        Product product1 = new Product(1, "Product A", 20.0, "Brand A", "imageA.jpg", category1, "Description of Product A");
-        Product product2 = new Product(2, "Product B", 50.0, "Brand B", "imageB.jpg", category2, "Description of Product B");
-        Product product3 = new Product(3, "Product C", 30.0, "Brand C", "imageC.jpg", category1, "Description of Product C");
-
-        // Creating mock data for OrderItem, linking to Product
-        OrderItem orderItem1 = new OrderItem(product1, 2, 20.0); // Order 1 Item
-        OrderItem orderItem2 = new OrderItem(product2, 1, 50.0); // Order 2 Item
-        OrderItem orderItem3 = new OrderItem(product3, 3, 30.0); // Order 3 Item
-
-        // Creating mock Customers
-        Customer customer1 = new Customer(1, 2, "John Doe", "john.doe@example.com", "123", "456", "789");
-        Customer customer2 = new Customer(3, 4, "Jane Smith", "jane.smith@example.com", "123", "456", "789");
-
-        // Creating Orders with Customer and OrderItem
-        Order order1 = new Order(customer1, List.of(orderItem1)); // Order 1
-        Order order2 = new Order(customer2, List.of(orderItem2)); // Order 2
-        Order order3 = new Order(customer1, List.of(orderItem3)); // Order 3
-
-        // Return the list of orders
-        return List.of(order1, order2, order3);
+        try {
+            // Fetch all orders along with payment details from the database
+            allOrders = OrderDAO.getAllOrders();
+            ordersTable.getItems().setAll(allOrders);
+        } catch (SQLException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to load orders.", e.getMessage());
+        }
     }
 
     @FXML
-    public void handleDeleteOrder(ActionEvent event) {
-        // Logic to delete an existing order
+    public void handleSearch() {
+        String searchTerm = searchField.getText().toLowerCase();
+        List<Order> filteredOrders = allOrders.stream()
+                .filter(order -> order.getCustomer().getUsername().toLowerCase().contains(searchTerm))
+                .collect(Collectors.toList());
+        ordersTable.getItems().setAll(filteredOrders);
+    }
+
+    @FXML
+    public void handleFilterStatus() {
+        String selectedStatus = statusFilter.getValue();
+        if (selectedStatus != null) {
+            List<Order> filteredByStatus = allOrders.stream()
+                    .filter(order -> order.getStatus().equals(selectedStatus))
+                    .collect(Collectors.toList());
+            ordersTable.getItems().setAll(filteredByStatus);
+        } else {
+            ordersTable.getItems().setAll(allOrders);
+        }
+    }
+
+    @FXML
+    public void handleDeleteOrder() {
         Order selectedOrder = ordersTable.getSelectionModel().getSelectedItem();
         if (selectedOrder != null) {
-            System.out.println("Deleting Order: " + selectedOrder.getOrderId());
-            ordersTable.getItems().remove(selectedOrder); // Remove from table
-            // Add logic to remove the order from the database if necessary
+            try {
+                // Delete the order from the database using the DAO
+                boolean success=OrderDAO.deleteOrder(selectedOrder.getOrderId());
+                allOrders.remove(selectedOrder);
+                ordersTable.getItems().setAll(allOrders);
+                System.out.println("Deleted Order: " + selectedOrder.getOrderId());
+            } catch (SQLException e) {
+                showAlert(Alert.AlertType.ERROR, "Error", "Failed to delete order.", e.getMessage());
+            }
         } else {
-            System.out.println("No order selected for deletion.");
+            System.out.println("No order selected for deletion");
         }
+    }
+
+    @FXML
+    public void handleUpdateOrderStatus() {
+        Order selectedOrder = ordersTable.getSelectionModel().getSelectedItem();
+        if (selectedOrder != null) {
+            // Create a list of possible statuses for the dropdown
+            List<String> statuses = new ArrayList<>();
+            statuses.add("Completed");
+            statuses.add("Pending");
+            statuses.add("Cancelled");
+
+            // Open dialog to ask for new order status with a dropdown
+            ChoiceDialog<String> dialog = new ChoiceDialog<>(selectedOrder.getStatus(), statuses);
+            dialog.setTitle("Update Order Status");
+            dialog.setHeaderText("Select the new status for Order ID: " + selectedOrder.getOrderId());
+            dialog.setContentText("New Status:");
+
+            // Wait for the user's input
+            dialog.showAndWait().ifPresent(selectedStatus -> {
+                try {
+                    // Update the order status in the database using the DAO
+                    OrderDAO.updateOrderStatus(selectedOrder.getOrderId(), selectedStatus);
+
+                    // Update the order object and refresh the table
+                    selectedOrder.setStatus(selectedStatus);
+                    ordersTable.refresh();
+                } catch (SQLException e) {
+                    showAlert(Alert.AlertType.ERROR, "Error", "Failed to update order status.", e.getMessage());
+                }
+            });
+        } else {
+            System.out.println("No order selected to update status");
+        }
+    }
+
+    private void showAlert(Alert.AlertType alertType, String title, String header, String content) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }

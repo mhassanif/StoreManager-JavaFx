@@ -75,4 +75,17 @@ public class FeedbackDAO {
         }
         return false;
     }
+
+    // Delete feedback entries for a specific customer
+    public static boolean deleteFeedbackByCustomer(int customerId) {
+        String query = "DELETE FROM FEEDBACK WHERE customer_id = ?";
+        try (PreparedStatement stmt = DBconnector.getConnection().prepareStatement(query)) {
+            stmt.setInt(1, customerId);
+            int result = stmt.executeUpdate();
+            return result > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

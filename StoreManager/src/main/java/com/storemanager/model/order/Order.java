@@ -33,6 +33,15 @@ public class Order {
         this.payment = null; // Payment will be added later
     }
 
+    public Order() {
+        this.customer = null;
+        this.orderItems = null;
+        this.orderDate = getCurrentDate(); // Get today's date
+        this.totalPrice = -1; // Calculate total price from order items
+        this.status = "Pending"; // Default status when the order is created
+        this.payment = null; // Payment will be added later
+    }
+
     // Method to calculate the total price of the order
     private double calculateTotalPrice(List<OrderItem> items) {
         double total = 0;

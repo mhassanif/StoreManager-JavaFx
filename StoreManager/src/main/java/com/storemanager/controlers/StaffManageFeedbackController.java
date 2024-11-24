@@ -49,7 +49,7 @@ public class StaffManageFeedbackController {
 
     private void loadFeedback() {
         // Fetch all feedback from the database using FeedbackDAO
-        allFeedback = FeedbackDAO.getFeedbackByCustomerId(0);  // Passing 0 to fetch all feedback, adjust as needed
+        allFeedback = FeedbackDAO.getAllFeedback();  // Passing 0 to fetch all feedback, adjust as needed
     }
 
     @FXML

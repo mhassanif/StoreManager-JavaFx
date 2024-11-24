@@ -1,5 +1,6 @@
 package com.storemanager.controlers;
 
+import com.storemanager.auth.CurrentUser;
 import com.storemanager.communication.Notification;
 import com.storemanager.dao.NotificationDAO;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -42,7 +43,6 @@ public class ManageNotificationsController {
 
     private List<Notification> allNotifications; // List of all notifications
 
-    private int currentUserId = 1; // Assume the current user ID is 1 for now
 
     @FXML
     public void initialize() {
@@ -63,7 +63,7 @@ public class ManageNotificationsController {
 
     private void loadNotifications() {
         // Use NotificationDAO to fetch notifications for the current user
-        allNotifications = NotificationDAO.getNotificationsForUser(currentUserId);
+        allNotifications = NotificationDAO.getNotificationsForUser(CurrentUser.getInstance().getUser().getId());
     }
 
     @FXML
@@ -80,7 +80,7 @@ public class ManageNotificationsController {
         Notification selectedNotification = notificationsTable.getSelectionModel().getSelectedItem();
         if (selectedNotification != null) {
             // Mark the notification as read in the database
-            boolean success = NotificationDAO.markNotificationAsRead(selectedNotification.getId(), currentUserId);
+            boolean success = NotificationDAO.markNotificationAsRead(selectedNotification.getId(), CurrentUser.getInstance().getUser().getId());
             if (success) {
                 selectedNotification.setStatus("Read");
                 notificationsTable.refresh();

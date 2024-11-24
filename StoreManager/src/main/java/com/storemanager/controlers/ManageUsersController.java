@@ -1,43 +1,48 @@
 package com.storemanager.controlers;
 
-import com.storemanager.model.users.Customer;
+import com.storemanager.dao.CustomerDAO;
+import com.storemanager.dao.StaffDAO;
+import com.storemanager.dao.UserDAO;
+import com.storemanager.model.users.User;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ManageUsersController {
 
     @FXML
-    private TableView<Customer> userTable;
+    private TableView<User> userTable;
 
     @FXML
-    private TableColumn<Customer, String> nameColumn;
+    private TableColumn<User, String> nameColumn;
 
     @FXML
-    private TableColumn<Customer, String> emailColumn;
+    private TableColumn<User, String> emailColumn;
 
     @FXML
-    private TableColumn<Customer, String> roleColumn;
+    private TableColumn<User, String> roleColumn;
 
     @FXML
-    private TableColumn<Customer, Void> actionColumn;
+    private TableColumn<User, Void> actionColumn;
 
     @FXML
     private TextField searchField;
 
-    private Customer selectedCustomer;
+    private List<User> allUsers = new ArrayList<>(); // Holds all users loaded from the database
 
     @FXML
     private void initialize() {
-        // Initialize the table columns
+        // Initialize table columns
         nameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getUsername()));
         emailColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getEmail()));
         roleColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getRole()));
 
-        // Add "Delete" button to the action column
+        // Add action buttons to the table
         actionColumn.setCellFactory(param -> new TableCell<>() {
             private final Button deleteButton = new Button("Delete");
 
@@ -48,41 +53,56 @@ public class ManageUsersController {
                     setGraphic(null);
                 } else {
                     setGraphic(new HBox(10, deleteButton));
-                    deleteButton.setOnAction(event -> handleDeleteCustomer());
+                    deleteButton.setOnAction(event -> handleDeleteUser(getTableView().getItems().get(getIndex())));
                 }
             }
         });
 
-        // Load customers into the table
-        loadCustomers();
+        // Load initial data
+        loadUsers();
     }
 
-    private void loadCustomers() {
-        // Mock some customers (replace with actual data retrieval later)
-        List<Customer> customers = List.of(
-                new Customer(1, 2, "John Doe", "john.doe@example.com", "password123", "123 Main St", "555-1234"),
-                new Customer(3, 4, "Jane Smith", "jane.smith@example.com", "password123", "456 Elm St", "555-5678")
-        );
-        userTable.getItems().setAll(customers);
+    private void loadUsers() {
+        // Fetch all users from the database
+        allUsers = UserDAO.getAllUsers();
+        // Display all users in the table
+        userTable.getItems().setAll(allUsers);
     }
 
     @FXML
     private void handleSearch() {
-        String searchQuery = searchField.getText();
-        // Search functionality (mocked for now)
-        List<Customer> searchResults = List.of(); // Replace with actual search logic
-        userTable.getItems().setAll(searchResults);
+        String searchQuery = searchField.getText().toLowerCase();
+        // Filter locally using the in-memory list
+        List<User> filteredUsers = allUsers.stream()
+                .filter(user -> user.getUsername().toLowerCase().contains(searchQuery) ||
+                        user.getEmail().toLowerCase().contains(searchQuery) ||
+                        user.getRole().toLowerCase().contains(searchQuery))
+                .collect(Collectors.toList());
+        // Update the table with the filtered results
+        userTable.getItems().setAll(filteredUsers);
     }
 
     @FXML
-    private void handleDeleteCustomer() {
-        selectedCustomer = userTable.getSelectionModel().getSelectedItem();
-        if (selectedCustomer != null) {
-            System.out.println("Delete Customer: " + selectedCustomer.getUsername());
-            // Delete customer logic here
-            loadCustomers(); // Refresh table after deletion
+    private void handleDeleteUser(User user) {
+        if (user.getRole().equalsIgnoreCase("Admin") || user.getRole().equalsIgnoreCase("Manager")) {
+            showAlert("Delete Not Allowed", "Admin and Manager accounts cannot be deleted.");
+            return;
+        }
+
+        boolean deleteSuccessful;
+        if ("Customer".equalsIgnoreCase(user.getRole())) {
+            deleteSuccessful = CustomerDAO.deleteCustomerByUserId(user.getId());
         } else {
-            showAlert("No Customer Selected", "Please select a customer to delete.");
+            deleteSuccessful = StaffDAO.deleteStaffByUserId(user.getId());
+        }
+
+        if (deleteSuccessful) {
+            // Remove the user from the local list
+            allUsers.remove(user);
+            // Refresh the table to reflect the change
+            userTable.getItems().remove(user);
+        } else {
+            showAlert("Error", "Failed to delete the user.");
         }
     }
 

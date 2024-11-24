@@ -2,15 +2,22 @@ package com.storemanager.controlers;
 
 import com.storemanager.dao.InventoryDAO;
 import com.storemanager.dao.ProductDAO;
+import com.storemanager.dao.InventoryDAO;
 import com.storemanager.model.items.InventoryProduct;
 import com.storemanager.model.items.Product;
+import com.storemanager.model.items.Category;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,8 +61,10 @@ public class ManageProductsController {
 
     private List<InventoryProduct> allInventoryProducts;
 
+
     @FXML
     public void initialize() {
+
         // Initialize table columns
         productIdColumn.setCellValueFactory(cellData ->
                 new SimpleIntegerProperty(cellData.getValue().getProduct().getId()).asObject());
@@ -72,11 +81,8 @@ public class ManageProductsController {
         restockDateColumn.setCellValueFactory(cellData ->
                 new SimpleStringProperty(cellData.getValue().getRestockDate()));
 
-        // Load products from the database
+        // Load products from database
         loadProducts();
-
-        // Populate table
-        productsTable.getItems().setAll(allInventoryProducts);
 
         // Populate brand filter dropdown
         brandFilter.getItems().addAll(allInventoryProducts.stream()
@@ -86,11 +92,9 @@ public class ManageProductsController {
     }
 
     private void loadProducts() {
-        // Fetch products and their inventory from the database
-        List<Product> products = ProductDAO.searchProducts(""); // Fetch all products
-        allInventoryProducts = products.stream()
-                .map(product -> new InventoryDAO().getInventoryByProductId(product.getId()))
-                .collect(Collectors.toList());
+        // Fetch inventory products from the database using the DAO
+        allInventoryProducts = InventoryDAO.getAllInventory();
+        productsTable.getItems().setAll(allInventoryProducts);
     }
 
     @FXML
@@ -117,24 +121,47 @@ public class ManageProductsController {
 
     @FXML
     public void handleAddProduct() {
-        System.out.println("Add Product clicked");
-        // Open a new form for adding a product
+        try {
+            // Load the FXML for the CreateProduct page
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/storemanager/CreateProduct.fxml"));
+            Parent createProductRoot = loader.load();
+
+            // Pass the current stage as a reference to allow navigation back
+            CreateProductController createProductController = loader.getController();
+            createProductController.setPreviousStage((Stage) btnAddProduct.getScene().getWindow());
+
+            // Set up a new stage for the CreateProduct page
+            Stage stage = new Stage();
+            stage.setTitle("Create New Product");
+            stage.setScene(new Scene(createProductRoot));
+            stage.show();
+
+            // Close the current ManageProducts stage (optional if you want only one window open at a time)
+            btnAddProduct.getScene().getWindow().hide();
+
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to load CreateProduct page.", e.getMessage());
+        }
+    }
+
+
+    private void showAlert(Alert.AlertType alertType, String title, String header, String content) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     @FXML
     public void handleDeleteProduct() {
         InventoryProduct selectedProduct = productsTable.getSelectionModel().getSelectedItem();
         if (selectedProduct != null) {
-            System.out.println("Delete Product: " + selectedProduct.getProduct().getName());
-            // Delete product from the database
-            boolean success = ProductDAO.deleteProduct(selectedProduct.getProduct().getId());
-            if (success) {
-                // Remove from table and refresh
-                allInventoryProducts.remove(selectedProduct);
-                productsTable.getItems().setAll(allInventoryProducts);
-            } else {
-                System.out.println("Failed to delete the product.");
-            }
+            // Delete from database using the DAO
+            ProductDAO.deleteProduct(selectedProduct.getProduct().getId());
+            allInventoryProducts.remove(selectedProduct);
+            productsTable.getItems().setAll(allInventoryProducts);
+            System.out.println("Deleted Product: " + selectedProduct.getProduct().getName());
         } else {
             System.out.println("No product selected for deletion");
         }
@@ -144,30 +171,31 @@ public class ManageProductsController {
     public void handleSetRestockLevel() {
         InventoryProduct selectedProduct = productsTable.getSelectionModel().getSelectedItem();
         if (selectedProduct != null) {
-            System.out.println("Set Restock Level for Product: " + selectedProduct.getProduct().getName());
-
-            // Create a dialog to input the restock level
+            // Open dialog to ask for new restock level
             TextInputDialog dialog = new TextInputDialog();
             dialog.setTitle("Set Restock Level");
             dialog.setHeaderText("Enter the new restock level for " + selectedProduct.getProduct().getName());
-            dialog.setContentText("Restock Level:");
+            dialog.setContentText("New Restock Level:");
 
-            // Show dialog and wait for input
-            dialog.showAndWait().ifPresent(restockLevelInput -> {
+            // Wait for the user's input
+            dialog.showAndWait().ifPresent(input -> {
                 try {
-                    int restockLevel = Integer.parseInt(restockLevelInput);  // Parse the input to an integer
-                    // Update restock level in the database using InventoryDAO
-                    boolean success = InventoryDAO.setRestockLevel(selectedProduct.getProduct().getId(), restockLevel);
-                    if (success) {
-                        // Refresh the inventory product list if the update was successful
-                        selectedProduct.setRestockLevel(restockLevel);  // Update in the table view
-                        productsTable.refresh();  // Refresh the table to reflect the changes
-                        System.out.println("Restock level updated successfully.");
+                    // Parse the input to an integer
+                    int newRestockLevel = Integer.parseInt(input);
+
+                    // Validate that the restock level is a positive number
+                    if (newRestockLevel < 0) {
+                        showAlert(Alert.AlertType.ERROR, "Invalid Input", "Restock level must be a positive number.", "");
                     } else {
-                        System.out.println("Failed to update restock level.");
+                        // Update the inventory restock level using the DAO
+                        InventoryDAO.setRestockLevel(selectedProduct.getProduct().getId(), newRestockLevel);
+
+                        // Update the product object and refresh the table
+                        selectedProduct.setRestockLevel(newRestockLevel);
+                        productsTable.refresh();
                     }
                 } catch (NumberFormatException e) {
-                    System.out.println("Invalid input. Please enter a valid integer.");
+                    showAlert(Alert.AlertType.ERROR, "Invalid Input", "Please enter a valid number for the restock level.", "");
                 }
             });
         } else {
