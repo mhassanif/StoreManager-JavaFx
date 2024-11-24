@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.storemanager.controlers.CustomerFeedbackController">
+    <top>
+        <Label text="Feedback" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-padding: 10;" alignment="CENTER" />
+    </top>
+
+    <center>
+        <VBox spacing="15" alignment="CENTER" style="-fx-padding: 20;">
+            <Label text="Your Comments:" />
+            <TextArea fx:id="commentsField" promptText="Enter your feedback here" prefHeight="200" prefWidth="400" />
+            <Button text="Submit Feedback" onAction="#handleSubmitFeedback" />
+        </VBox>
+    </center>
+</BorderPane>

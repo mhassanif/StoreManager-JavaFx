@@ -1,8 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
 
-<StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
-    <Label text="PLACEHOLDER: Update this file later." style="-fx-font-size: 16px; -fx-text-fill: gray;" />
-</StackPane>
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.storemanager.controlers.CustomerOrderController">
+    <!-- Top Section: Title -->
+    <top>
+        <Label text="Order History" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-padding: 10;" alignment="CENTER" />
+    </top>
+
+    <!-- Center Section: Table of Orders -->
+    <center>
+        <VBox spacing="10" style="-fx-padding: 10;">
+            <TableView fx:id="orderTable" prefHeight="500">
+                <columns>
+                    <TableColumn text="Order ID" fx:id="orderIdColumn" prefWidth="100" />
+                    <TableColumn text="Order Date" fx:id="orderDateColumn" prefWidth="150" />
+                    <TableColumn text="Total Price" fx:id="totalPriceColumn" prefWidth="120" />
+                    <TableColumn text="Status" fx:id="statusColumn" prefWidth="100" />
+                </columns>
+            </TableView>
+        </VBox>
+    </center>
+
+    <!-- Bottom Section: Back Button -->
+    <bottom>
+        <HBox alignment="CENTER" spacing="10" style="-fx-padding: 10;">
+            <Button text="Back to Dashboard" onAction="#handleBackToDashboard" />
+        </HBox>
+    </bottom>
+</BorderPane>
