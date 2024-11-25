@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.storemanager.controlers.WarehouseDashboardController" prefWidth="980.0" prefHeight="620.0">
+
+    <!-- Top Bar -->
+    <top>
+        <HBox alignment="TOP_RIGHT" style="-fx-background-color: #2A2A2A; -fx-padding: 10;">
+            <Button text="Sign Out" onAction="#handleSignOut"
+                    style="-fx-font-size: 14px; -fx-background-color: #E74C3C; -fx-text-fill: white;" />
+        </HBox>
+    </top>
+
+    <!-- Left Sidebar -->
+    <left>
+        <VBox spacing="15" alignment="TOP_LEFT" style="-fx-background-color: #2A2A2A; -fx-padding: 15;">
+            <Label text="Warehouse Staff" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" />
+            <Button text="Inventory" onAction="#showInventory" />
+            <Button text="Notifications" onAction="#showNotifications" />
+            <Button text="Profile" onAction="#showProfile" />
+        </VBox>
+    </left>
+
+    <!-- Dynamic Content Area -->
+    <center>
+        <StackPane fx:id="contentArea" style="-fx-background-color: #FFFFFF;">
+            <Label text="Welcome, Warehouse Staff!" style="-fx-font-size: 16px;" />
+        </StackPane>
+    </center>
+</BorderPane>

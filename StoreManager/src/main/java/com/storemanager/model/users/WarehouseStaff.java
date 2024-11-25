@@ -1,8 +1,12 @@
 package com.storemanager.model.users;
 
 import com.storemanager.db.DBconnector;
+import com.storemanager.model.items.InventoryProduct;
+import com.storemanager.model.items.Product;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents a Warehouse Staff user in the system.
@@ -27,27 +31,56 @@ public class WarehouseStaff extends User {
     /**
      * View the inventory list, including product name, quantity, and price.
      */
-    public void viewInventory() {
-        String query = "SELECT product_name, quantity, price FROM INVENTORY"; // Assuming the table is named INVENTORY
+    public List<InventoryProduct> viewInventory() {
+        List<InventoryProduct> inventoryList = new ArrayList<>();
+
+        // SQL query to fetch inventory and product details
+        String query = "SELECT " +
+                "    INVENTORY.product_id, " +
+                "    PRODUCT.name AS product_name, " +  // Adjust column name
+                "    PRODUCT.price, " +
+                "    INVENTORY.stock_quantity, " +
+                "    INVENTORY.restock_quantity, " +
+                "    INVENTORY.restock_date " +
+                "FROM INVENTORY " +
+                "JOIN PRODUCT ON INVENTORY.product_id = PRODUCT.product_id";
+
 
         try (Connection conn = DBconnector.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(query);
-             ResultSet resultSet = pstmt.executeQuery()) {
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
 
-            System.out.println("Inventory List:");
-            while (resultSet.next()) {
-                String productName = resultSet.getString("product_name");
-                int quantity = resultSet.getInt("quantity");
-                double price = resultSet.getDouble("price");
+            while (rs.next()) {
+                // Create the Product object
+                Product product = new Product(
+                        rs.getInt("product_id"),
+                        rs.getString("product_name"),
+                        rs.getDouble("price"),
+                        null, // Assuming brand is null for now
+                        null, // Assuming imageUrl is null for now
+                        null  // Assuming category is null for now
+                );
 
-                System.out.println("Product: " + productName + ", Quantity: " + quantity + ", Price: " + price);
+                // Create the InventoryProduct object
+                InventoryProduct inventoryProduct = new InventoryProduct(
+                        product,
+                        rs.getInt("stock_quantity"),
+                        rs.getInt("restock_quantity"),
+                        rs.getString("restock_date")
+                );
+
+                inventoryList.add(inventoryProduct); // Add to the inventory list
             }
 
         } catch (SQLException e) {
-            System.out.println("Error while retrieving inventory.");
             e.printStackTrace();
         }
+
+        return inventoryList;
     }
+
+
+
 
     /**
      * Update the inventory after an order is processed by decreasing the quantity.

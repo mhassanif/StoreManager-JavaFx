@@ -1,5 +1,5 @@
 package com.storemanager.model.items;
-
+import javafx.beans.property.*;
 public class InventoryProduct {
     private Product product;
     private int stockLevel;
@@ -22,7 +22,9 @@ public class InventoryProduct {
     public void setProduct(Product product) {
         this.product = product;
     }
-
+    public String getProductName() {
+        return product != null ? product.getName() : "Unknown";
+    }
     public int getStockLevel() {
         return stockLevel;
     }
@@ -46,7 +48,9 @@ public class InventoryProduct {
     public void setRestockDate(String restockDate) {
         this.restockDate = restockDate;
     }
-
+    public double getPrice() {
+        return product != null ? product.getPrice() : 0.0;
+    }
     // Utility methods
     public boolean needsRestock() {
         return stockLevel <= restockLevel;
