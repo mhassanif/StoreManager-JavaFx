@@ -1,5 +1,6 @@
 package com.storemanager.controlers;
 
+import com.storemanager.auth.CurrentUser;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -7,8 +8,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.stage.Stage;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 
@@ -17,13 +18,14 @@ public class DashboardController {
     @FXML
     private StackPane contentArea;
 
-    private String username;
-    private String password;
+    @FXML
+    public void initialize() {
+        // Ensure that a user is logged in
+        if (CurrentUser.getInstance().getUser() == null) {
+            throw new IllegalStateException("No user is currently logged in.");
+        }
 
-    public void setLoginCredentials(String username, String password) {
-        this.username = username;
-        this.password = password;
-        System.out.println("Credentials set in DashboardController: " + username);
+        System.out.println("Dashboard initialized for user: " + CurrentUser.getInstance().getUser().getUsername());
     }
 
     @FXML
@@ -38,7 +40,8 @@ public class DashboardController {
 
     @FXML
     private void showOrders() {
-        loadContent("/com/storemanager/CustomerOrder.fxml");
+        // Directly load the CustomerOrder.fxml and handle orders using CurrentUser
+        loadContentWithController("/com/storemanager/CustomerOrder.fxml", "CustomerOrderController");
     }
 
     @FXML
@@ -48,12 +51,14 @@ public class DashboardController {
 
     @FXML
     private void showProfile() {
-        loadContentWithCredentials("/com/storemanager/CustomerProfile.fxml");
+        // Load profile without passing credentials
+        loadContent("/com/storemanager/CustomerProfile.fxml");
     }
 
     @FXML
     private void showFeedback() {
-        loadContentWithCredentials("/com/storemanager/CustomerFeedback.fxml");
+        // Load feedback without passing credentials
+        loadContent("/com/storemanager/CustomerFeedback.fxml");
     }
 
     private void loadContent(String fxmlFile) {
@@ -68,21 +73,15 @@ public class DashboardController {
         }
     }
 
-    private void loadContentWithCredentials(String fxmlFile) {
+    private void loadContentWithController(String fxmlFile, String controllerType) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
             Node content = loader.load();
 
-            // Pass credentials to the corresponding controller
-            if (fxmlFile.equals("/com/storemanager/CustomerOrder.fxml")) {
+            // Handle specific controllers, like CustomerOrderController
+            if ("CustomerOrderController".equals(controllerType)) {
                 CustomerOrderController customerOrderController = loader.getController();
-                customerOrderController.setLoginCredentials(username, password);
-            } else if (fxmlFile.equals("/com/storemanager/CustomerProfile.fxml")) {
-                CustomerProfileController profileController = loader.getController();
-                profileController.setLoginCredentials(username, password);
-            } else if (fxmlFile.equals("/com/storemanager/CustomerFeedback.fxml")) {
-                CustomerFeedbackController feedbackController = loader.getController();
-                feedbackController.setLoginCredentials(username, password);
+                customerOrderController.loadOrderHistory(); // Uses CurrentUser
             }
 
             contentArea.getChildren().clear();
@@ -94,7 +93,6 @@ public class DashboardController {
         }
     }
 
-
     @FXML
     private void handleSignOut() {
         // Show confirmation dialog
@@ -105,7 +103,9 @@ public class DashboardController {
         alert.showAndWait().ifPresent(response -> {
             if (response.getText().equalsIgnoreCase("OK")) {
                 try {
-                    // Navigate to login page
+                    // Clear CurrentUser and navigate to login page
+                    CurrentUser.getInstance().clearUser();
+
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/storemanager/Login.fxml"));
                     Parent loginView = loader.load();
 

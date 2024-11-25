@@ -2,7 +2,6 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.storemanager.controlers.WarehouseInventoryController">
     <top>
         <Label text="Inventory Management" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-padding: 10;" alignment="CENTER"/>
@@ -18,4 +17,16 @@
             </columns>
         </TableView>
     </center>
+    <bottom>
+        <VBox spacing="10" style="-fx-padding: 10;">
+            <HBox spacing="10">
+                <Label text="Stock Level:"/>
+                <TextField fx:id="stockLevelField" promptText="Enter new stock level"/>
+                <Label text="Restock Level:"/>
+                <TextField fx:id="restockLevelField" promptText="Enter new restock level"/>
+                <Button text="Update" onAction="#handleRestockProduct"/>
+            </HBox>
+            <Label fx:id="statusMessage" style="-fx-text-fill: green;"/>
+        </VBox>
+    </bottom>
 </BorderPane>

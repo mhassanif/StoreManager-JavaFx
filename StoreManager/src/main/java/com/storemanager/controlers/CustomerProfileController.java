@@ -1,15 +1,16 @@
 package com.storemanager.controlers;
 
+import com.storemanager.auth.CurrentUser;
+import com.storemanager.model.users.User;
 import com.storemanager.db.DBconnector;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.sql.Connection;
@@ -33,53 +34,45 @@ public class CustomerProfileController {
     @FXML
     private PasswordField passwordField;
 
-    private String username; // Passed from DashboardController
-    private String password; // Passed from DashboardController
-
     /**
-     * Sets the login credentials and loads the user profile.
+     * Initializes the profile controller and loads the user's profile.
      */
-    public void setLoginCredentials(String username, String password) {
-        this.username = username;
-        this.password = password;
-        System.out.println("setLoginCredentials called in CustomerProfileController with username: " + username);
+    @FXML
+    public void initialize() {
         loadUserProfile();
     }
 
     /**
-     * Loads the user's profile details from the database.
+     * Loads the user's profile details from the database using CurrentUser.
      */
     private void loadUserProfile() {
-        String query = "SELECT * FROM USERS WHERE name = ? AND password = ?";
+        User currentUser = CurrentUser.getInstance().getUser();
+
+        if (currentUser == null) {
+            showAlert(Alert.AlertType.ERROR, "Error", "No user is currently logged in.");
+            return;
+        }
+
+        String query = "SELECT * FROM USERS WHERE user_id = ?";
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
-            statement.setString(1, username);
-            statement.setString(2, password);
+            statement.setInt(1, currentUser.getId());
 
-            System.out.println("Executing query to load profile: " + query);
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
-                // Debugging: Print fetched values
-                System.out.println("Fetched Username: " + resultSet.getString("name"));
-                System.out.println("Fetched Email: " + resultSet.getString("email"));
-                System.out.println("Fetched Address: " + resultSet.getString("address"));
-                System.out.println("Fetched Phone: " + resultSet.getString("phone"));
-
-                // Populate the labels and text fields
                 usernameLabel.setText(resultSet.getString("name"));
                 emailLabel.setText(resultSet.getString("email"));
                 addressField.setText(resultSet.getString("address"));
                 phoneField.setText(resultSet.getString("phone"));
                 passwordField.setText(resultSet.getString("password")); // Prepopulate the password
             } else {
-                System.err.println("User not found for the provided username and password.");
-                showAlert(AlertType.ERROR, "Error", "Unable to load user profile.");
+                showAlert(Alert.AlertType.ERROR, "Error", "Unable to load user profile.");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            showAlert(AlertType.ERROR, "Error", "An error occurred while loading the profile.");
+            showAlert(Alert.AlertType.ERROR, "Error", "An error occurred while loading the profile.");
         }
     }
 
@@ -88,30 +81,35 @@ public class CustomerProfileController {
      */
     @FXML
     private void handleSaveChanges() {
+        User currentUser = CurrentUser.getInstance().getUser();
+
+        if (currentUser == null) {
+            showAlert(Alert.AlertType.ERROR, "Error", "No user is currently logged in.");
+            return;
+        }
+
         String updatedAddress = addressField.getText();
         String updatedPhone = phoneField.getText();
         String updatedPassword = passwordField.getText();
 
-        String query = "UPDATE USERS SET address = ?, phone = ?, password = ? WHERE name = ? AND password = ?";
+        String query = "UPDATE USERS SET address = ?, phone = ?, password = ? WHERE user_id = ?";
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
             statement.setString(1, updatedAddress);
             statement.setString(2, updatedPhone);
             statement.setString(3, updatedPassword);
-            statement.setString(4, username);
-            statement.setString(5, password);
+            statement.setInt(4, currentUser.getId());
 
             int rowsAffected = statement.executeUpdate();
             if (rowsAffected > 0) {
-                showAlert(AlertType.INFORMATION, "Success", "Profile updated successfully.");
-                this.password = updatedPassword; // Update the current password for future requests
+                showAlert(Alert.AlertType.INFORMATION, "Success", "Profile updated successfully.");
             } else {
-                showAlert(AlertType.ERROR, "Error", "Failed to update profile.");
+                showAlert(Alert.AlertType.ERROR, "Error", "Failed to update profile.");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            showAlert(AlertType.ERROR, "Error", "An error occurred while updating profile.");
+            showAlert(Alert.AlertType.ERROR, "Error", "An error occurred while updating profile.");
         }
     }
 
@@ -124,21 +122,19 @@ public class CustomerProfileController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/storemanager/Dashboard.fxml"));
             Parent dashboardView = loader.load();
 
-            DashboardController dashboardController = loader.getController();
-            dashboardController.setLoginCredentials(username, password);
-
-            Stage stage = (Stage) usernameLabel.getScene().getWindow(); // Use usernameLabel
+            Stage stage = (Stage) usernameLabel.getScene().getWindow();
             stage.setScene(new Scene(dashboardView));
             stage.setTitle("Dashboard");
         } catch (Exception e) {
             e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to navigate back to Dashboard.");
         }
     }
 
     /**
      * Helper method to show an alert dialog.
      */
-    private void showAlert(AlertType alertType, String title, String content) {
+    private void showAlert(Alert.AlertType alertType, String title, String content) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);
         alert.setHeaderText(null);
