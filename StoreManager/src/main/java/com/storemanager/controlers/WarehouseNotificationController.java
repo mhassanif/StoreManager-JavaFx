@@ -33,13 +33,7 @@ public class WarehouseNotificationController {
     @FXML
     private TextField searchField;
 
-    private WarehouseStaff warehouseStaff;
     private List<Notification> allNotifications;
-
-    public void setWarehouseStaff(WarehouseStaff warehouseStaff) {
-        this.warehouseStaff = warehouseStaff;
-        loadNotifications();
-    }
 
     @FXML
     public void initialize() {
@@ -51,20 +45,13 @@ public class WarehouseNotificationController {
                 cellData.getValue().getDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
         ));
 
-        // Set default table data if warehouseStaff is already set
-        if (warehouseStaff != null) {
-            loadNotifications();
-        }
+        loadNotifications();
     }
 
     private void loadNotifications() {
-        if (warehouseStaff != null) {
-            // Fetch notifications for the current warehouse staff
-            allNotifications = NotificationDAO.getNotificationsForUser(warehouseStaff.getId());
-            notificationsTable.getItems().setAll(allNotifications);
-        } else {
-            System.err.println("WarehouseStaff object is null. Cannot load notifications.");
-        }
+        // Fetch notifications for the current warehouse staff
+        allNotifications = NotificationDAO.getNotificationsForUser(CurrentUser.getInstance().getUser().getId());
+        notificationsTable.getItems().setAll(allNotifications);
     }
 
     @FXML
@@ -80,7 +67,7 @@ public class WarehouseNotificationController {
     public void handleMarkAsRead() {
         Notification selectedNotification = notificationsTable.getSelectionModel().getSelectedItem();
         if (selectedNotification != null) {
-            boolean success = NotificationDAO.markNotificationAsRead(selectedNotification.getId(), warehouseStaff.getId());
+            boolean success = NotificationDAO.markNotificationAsRead(selectedNotification.getId(), CurrentUser.getInstance().getUser().getId());
             if (success) {
                 selectedNotification.setStatus("Read");
                 notificationsTable.refresh();
