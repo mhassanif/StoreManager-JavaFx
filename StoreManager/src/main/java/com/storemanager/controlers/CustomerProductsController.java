@@ -1,10 +1,11 @@
 package com.storemanager.controlers;
 
 import com.storemanager.auth.CurrentUser;
+import com.storemanager.dao.CategoryDAO;
+import com.storemanager.dao.ProductDAO;
 import com.storemanager.model.cart.CartItem;
-import com.storemanager.model.cart.ShoppingCart;
+import com.storemanager.model.items.Category;
 import com.storemanager.model.items.Product;
-import com.storemanager.db.DBconnector;
 import com.storemanager.model.users.Customer;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -12,16 +13,14 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
-import javafx.scene.control.Label;
+import javafx.util.StringConverter;
 
-import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class CustomerProductsController {
 
     @FXML
-    private ComboBox<String> categoryComboBox;
+    private ComboBox<Category> categoryComboBox; // Updated to hold Category objects
 
     @FXML
     private TilePane productGrid;
@@ -32,7 +31,7 @@ public class CustomerProductsController {
     @FXML
     private Button addAllToCartButton;
 
-    private Customer customer = (Customer) CurrentUser.getInstance().getUser();  // Get current customer
+    private Customer customer = (Customer) CurrentUser.getInstance().getUser(); // Get current customer
 
     // Initialize method to load categories and products
     public void initialize() {
@@ -41,47 +40,29 @@ public class CustomerProductsController {
         updateTotalAmount(); // Update total amount on startup
     }
 
-    // Load categories into the ComboBox
+    // Load categories into the ComboBox using CategoryDAO
     private void loadCategories() {
-        try (Connection connection = DBconnector.getConnection();
-             Statement statement = connection.createStatement()) {
+        List<Category> categories = CategoryDAO.getAllCategories();
+        categoryComboBox.getItems().add(null); // Add an empty option to allow unselection
+        categoryComboBox.getItems().addAll(categories);
 
-            ResultSet rs = statement.executeQuery("SELECT name FROM CATEGORY");
-            categoryComboBox.getItems().add(""); // Add an empty option to allow unselection
-            while (rs.next()) {
-                categoryComboBox.getItems().add(rs.getString("name"));
+        categoryComboBox.setConverter(new StringConverter<>() { // Show category names
+            @Override
+            public String toString(Category category) {
+                return category != null ? category.getName() : "All Categories";
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+
+            @Override
+            public Category fromString(String string) {
+                return categories.stream().filter(c -> c.getName().equals(string)).findFirst().orElse(null);
+            }
+        });
     }
 
-    // Load randomized products
+    // Load randomized products using ProductDAO
     private void loadRandomizedProducts() {
-        try (Connection connection = DBconnector.getConnection();
-             Statement statement = connection.createStatement()) {
-
-            ResultSet rs = statement.executeQuery("SELECT * FROM PRODUCT ORDER BY NEWID()");
-            List<Product> products = new ArrayList<>();
-
-            while (rs.next()) {
-                Product product = new Product(
-                        rs.getInt("product_id"),
-                        rs.getString("name"),
-                        rs.getDouble("price"),
-                        rs.getString("brand"),
-                        rs.getString("url"),
-                        null, // Category can be fetched later if needed
-                        rs.getString("description")
-                );
-                products.add(product);
-            }
-
-            displayProducts(products);
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        List<Product> products = ProductDAO.getAllProducts(); // DAO call to fetch all products
+        displayProducts(products);
     }
 
     // Display products in the grid
@@ -153,42 +134,18 @@ public class CustomerProductsController {
         totalAmountLabel.setText("Total Amount: $" + String.format("%.2f", total));
     }
 
-    // Filter products by category
+    // Filter products by category using ProductDAO
     @FXML
     private void filterByCategory() {
-        String selectedCategory = categoryComboBox.getValue();
+        Category selectedCategory = categoryComboBox.getValue();
 
-        if (selectedCategory == null || selectedCategory.isEmpty()) {
+        if (selectedCategory == null) {
             loadRandomizedProducts(); // Show all products if no category is selected
             return;
         }
 
-        try (Connection connection = DBconnector.getConnection();
-             PreparedStatement ps = connection.prepareStatement(
-                     "SELECT * FROM PRODUCT WHERE category_id = (SELECT category_id FROM CATEGORY WHERE name = ?)")) {
-
-            ps.setString(1, selectedCategory);
-            ResultSet rs = ps.executeQuery();
-            List<Product> products = new ArrayList<>();
-
-            while (rs.next()) {
-                Product product = new Product(
-                        rs.getInt("product_id"),
-                        rs.getString("name"),
-                        rs.getDouble("price"),
-                        rs.getString("brand"),
-                        rs.getString("url"),
-                        null,
-                        rs.getString("description")
-                );
-                products.add(product);
-            }
-
-            displayProducts(products);
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        List<Product> products = ProductDAO.getProductsByCategoryId(selectedCategory.getId()); // DAO method for filtering
+        displayProducts(products);
     }
 
     // Add all displayed products to the cart
