@@ -14,138 +14,170 @@ import java.util.logging.Logger;
 public class ShoppingCartDAO {
     private static final Logger LOGGER = Logger.getLogger(ShoppingCartDAO.class.getName());
 
-    // Method to retrieve all shopping carts with their items
-    public static List<ShoppingCart> getAllShoppingCarts() {
-        String cartSql = "SELECT DISTINCT cart_id, customer_id FROM SHOPPINGCART";
-        String itemsSql = "SELECT product_id, quantity FROM CARTITEM WHERE cart_id = ?";
-        List<ShoppingCart> shoppingCarts = new ArrayList<>();
+    // Method to synchronize shopping cart state with the database when adding an item
+    public static boolean addOrUpdateItem(int cartId, CartItem cartItem) {
+        // Check if the item already exists in the cart
+        String checkSql = "SELECT quantity FROM CARTITEM WHERE cart_id = ? AND product_id = ?";
+        String updateSql = "UPDATE CARTITEM SET quantity = ?, price = ? WHERE cart_id = ? AND product_id = ?";
+        String insertSql = "INSERT INTO CARTITEM (cart_id, product_id, quantity, price) VALUES (?, ?, ?, ?)";
 
-        try (Connection connection = DBconnector.getConnection();
-             PreparedStatement cartStmt = connection.prepareStatement(cartSql)) {
+        try (Connection connection = DBconnector.getConnection()) {
+            // Check if the product is already in the cart
+            try (PreparedStatement checkStmt = connection.prepareStatement(checkSql)) {
+                checkStmt.setInt(1, cartId);
+                checkStmt.setInt(2, cartItem.getProduct().getId());
+                try (ResultSet rs = checkStmt.executeQuery()) {
+                    if (rs.next()) {
+                        // Product exists, update the quantity
+                        int existingQuantity = rs.getInt("quantity");
+                        int newQuantity = existingQuantity + cartItem.getQuantity();
 
-            try (ResultSet cartRs = cartStmt.executeQuery()) {
-                while (cartRs.next()) {
-                    int cartId = cartRs.getInt("cart_id");
-                    int customerId = cartRs.getInt("customer_id");
-
-                    ShoppingCart shoppingCart = new ShoppingCart(cartId);
-
-                    // Retrieve items for this cart
-                    try (PreparedStatement itemsStmt = connection.prepareStatement(itemsSql)) {
-                        itemsStmt.setInt(1, cartId);
-                        try (ResultSet itemsRs = itemsStmt.executeQuery()) {
-                            while (itemsRs.next()) {
-                                int productId = itemsRs.getInt("product_id");
-                                int quantity = itemsRs.getInt("quantity");
-
-                                // Use ProductDAO to fetch product details
-                                Product product = ProductDAO.getProductById(productId);
-                                if (product != null) {
-                                    CartItem cartItem = new CartItem(product, quantity);
-                                    shoppingCart.addItem(cartItem);
-                                } else {
-                                    LOGGER.log(Level.WARNING, "Product with ID {0} not found", productId);
-                                }
-                            }
+                        try (PreparedStatement updateStmt = connection.prepareStatement(updateSql)) {
+                            updateStmt.setInt(1, newQuantity);
+                            updateStmt.setDouble(2, cartItem.calculateSubtotal());
+                            updateStmt.setInt(3, cartId);
+                            updateStmt.setInt(4, cartItem.getProduct().getId());
+                            return updateStmt.executeUpdate() > 0;
                         }
                     }
-
-                    shoppingCarts.add(shoppingCart);
                 }
             }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error retrieving all shopping carts: {0}", e.getMessage());
-        }
 
-        return shoppingCarts;
-    }
-
-    // Method to create a new shopping cart for a customer
-    public static int createShoppingCart(int customerId) {
-        String sql = "INSERT INTO SHOPPINGCART (customer_id) VALUES (?)";
-        try (Connection connection = DBconnector.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
-            statement.setInt(1, customerId);
-            statement.executeUpdate();
-
-            // Retrieve the generated cart_id
-            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    return generatedKeys.getInt(1); // Return cart_id
-                } else {
-                    throw new SQLException("Failed to create shopping cart, no ID obtained.");
-                }
+            // Product does not exist, insert it
+            try (PreparedStatement insertStmt = connection.prepareStatement(insertSql)) {
+                insertStmt.setInt(1, cartId);
+                insertStmt.setInt(2, cartItem.getProduct().getId());
+                insertStmt.setInt(3, cartItem.getQuantity());
+                insertStmt.setDouble(4, cartItem.calculateSubtotal());
+                return insertStmt.executeUpdate() > 0;
             }
+
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error creating shopping cart: {0}", e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error adding or updating item in cart: {0}", e.getMessage());
         }
-        return -1; // Return -1 if cart creation fails
+        return false;
     }
 
-    // Method to retrieve a shopping cart by its ID
-    public static ShoppingCart getShoppingCartById(int cartId) {
-        String sql = "SELECT cart_item_id, product_id, quantity FROM CARTITEM WHERE cart_id = ?";
-        ShoppingCart shoppingCart = new ShoppingCart(cartId);
+    // Method to remove an item from a shopping cart
+    public static boolean removeItem(int cartId, int productId) {
+        String sql = "DELETE FROM CARTITEM WHERE cart_id = ? AND product_id = ?";
 
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, cartId);
+            statement.setInt(2, productId);
+
+            return statement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error removing item from cart: {0}", e.getMessage());
+        }
+        return false;
+    }
+
+    // Method to retrieve all items in a shopping cart
+    public static List<CartItem> getItemsByCartId(int cartId) {
+        String sql = "SELECT product_id, quantity FROM CARTITEM WHERE cart_id = ?";
+        List<CartItem> items = new ArrayList<>();
+
+        try (Connection connection = DBconnector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, cartId);
+
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    // Fetch product details using ProductDAO
-                    Product product = ProductDAO.getProductById(resultSet.getInt("product_id"));
+                    int productId = resultSet.getInt("product_id");
+                    int quantity = resultSet.getInt("quantity");
 
+                    Product product = ProductDAO.getProductById(productId); // Fetch product details
                     if (product != null) {
-                        // Create CartItem and add it to the shopping cart
-                        CartItem cartItem = new CartItem(product, resultSet.getInt("quantity"));
-                        shoppingCart.addItem(cartItem);
+                        items.add(new CartItem(product, quantity));
                     } else {
-                        LOGGER.log(Level.WARNING, "Product with ID {0} not found", resultSet.getInt("product_id"));
+                        LOGGER.log(Level.WARNING, "Product with ID {0} not found", productId);
                     }
                 }
             }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error retrieving shopping cart: {0}", e.getMessage());
-        }
 
-        return shoppingCart;
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error retrieving cart items: {0}", e.getMessage());
+        }
+        return items;
     }
 
-    // Method to delete a shopping cart and its associated cart items for a specific customer
-    public static boolean deleteShoppingCartByCustomer(int customerId) {
-        String deleteCartItemsSql = "DELETE FROM CARTITEM WHERE cart_id IN (SELECT cart_id FROM SHOPPINGCART WHERE customer_id = ?)";
-        String deleteCartSql = "DELETE FROM SHOPPINGCART WHERE customer_id = ?";
+    // Method to clear all items from a shopping cart
+    public static boolean clearCart(int cartId) {
+        String sql = "DELETE FROM CARTITEM WHERE cart_id = ?";
+
+        try (Connection connection = DBconnector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, cartId);
+            return statement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error clearing cart: {0}", e.getMessage());
+        }
+        return false;
+    }
+
+    // Method to delete a shopping cart and its items
+    public static boolean deleteCart(int cartId) {
+        String deleteItemsSql = "DELETE FROM CARTITEM WHERE cart_id = ?";
+        String deleteCartSql = "DELETE FROM SHOPPINGCART WHERE cart_id = ?";
 
         try (Connection connection = DBconnector.getConnection()) {
             connection.setAutoCommit(false); // Begin transaction
 
-            // Step 1: Delete all cart items associated with the shopping cart
-            try (PreparedStatement cartItemsStmt = connection.prepareStatement(deleteCartItemsSql)) {
-                cartItemsStmt.setInt(1, customerId);
-                cartItemsStmt.executeUpdate();
+            try (PreparedStatement deleteItemsStmt = connection.prepareStatement(deleteItemsSql)) {
+                deleteItemsStmt.setInt(1, cartId);
+                deleteItemsStmt.executeUpdate();
             }
 
-            // Step 2: Delete the shopping cart
-            try (PreparedStatement cartStmt = connection.prepareStatement(deleteCartSql)) {
-                cartStmt.setInt(1, customerId);
-                cartStmt.executeUpdate();
+            try (PreparedStatement deleteCartStmt = connection.prepareStatement(deleteCartSql)) {
+                deleteCartStmt.setInt(1, cartId);
+                deleteCartStmt.executeUpdate();
             }
 
             connection.commit(); // Commit transaction
-            LOGGER.log(Level.INFO, "Deleted shopping cart and associated items for customer {0}", customerId);
             return true;
+
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error deleting shopping cart for customer {0}: {1}", new Object[]{customerId, e.getMessage()});
+            LOGGER.log(Level.SEVERE, "Error deleting cart: {0}", e.getMessage());
             try {
-                // Rollback transaction in case of error
                 DBconnector.getConnection().rollback();
             } catch (SQLException rollbackEx) {
                 LOGGER.log(Level.SEVERE, "Error rolling back transaction: {0}", rollbackEx.getMessage());
             }
         }
-
         return false;
     }
+
+    // Method to get a shopping cart by customer ID
+    public static ShoppingCart getShoppingCartByCustomerId(int customerId) {
+        String getCartIdSql = "SELECT cart_id FROM SHOPPINGCART WHERE customer_id = ?";
+        ShoppingCart shoppingCart = null;
+
+        try (Connection connection = DBconnector.getConnection();
+             PreparedStatement getCartIdStmt = connection.prepareStatement(getCartIdSql)) {
+
+            getCartIdStmt.setInt(1, customerId);
+
+            try (ResultSet rs = getCartIdStmt.executeQuery()) {
+                if (rs.next()) {
+                    int cartId = rs.getInt("cart_id");
+
+                    shoppingCart = new ShoppingCart(cartId);
+                }
+            }
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error retrieving shopping cart for customer ID {0}: {1}",
+                    new Object[]{customerId, e.getMessage()});
+        }
+
+        return shoppingCart;
+    }
+
 }

@@ -193,7 +193,7 @@ public class CustomerDAO {
         try {
             NotificationDAO.deleteNotificationsByUserId(userId);
             FeedbackDAO.deleteFeedbackByCustomer(customerId);
-            ShoppingCartDAO.deleteShoppingCartByCustomer(customerId);
+            ShoppingCartDAO.deleteCart(customer.getShoppingCart().getCartId());
             OrderDAO.deleteOrderByCustomer(customerId);
 
             String query = "DELETE FROM CUSTOMER WHERE customer_id = ?";
