@@ -68,7 +68,7 @@ public class CartController {
     private void loadCartItems() {
         shoppingCart.getItems().clear();
 
-        try (Connection connection = DBconnector.getConnection();
+/*        try (Connection connection = DBconnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(
                      "SELECT ci.quantity, ci.price, p.product_id, p.name, p.brand, p.description, p.url " +
                              "FROM CARTITEM ci " +
@@ -94,7 +94,8 @@ public class CartController {
 
         } catch (SQLException e) {
             e.printStackTrace();
-        }
+        }*/
+        shoppingCart.loadItems();
 
         ObservableList<CartItem> cartItems = FXCollections.observableArrayList(shoppingCart.getItems());
         cartTable.setItems(cartItems);
@@ -124,7 +125,7 @@ public class CartController {
                         updateCartItemInDB(item);
                         loadCartItems();
                     } else {
-                        removeCartItemFromDB(item);
+                        ShoppingCartDAO.removeItem(shoppingCart.getCartId(),item.getProduct().getId());
                         loadCartItems();
                     }
                 });
@@ -147,30 +148,19 @@ public class CartController {
      * Update cart item quantity in the database.
      */
     private void updateCartItemInDB(CartItem item) {
+
+        // Recalculate the total price for the cart item
+        double totalPrice = item.calculateSubtotal();
+
+        // Update the cart item in the database
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(
-                     "UPDATE CARTITEM SET quantity = ? WHERE cart_id = ? AND product_id = ?")) {
+                     "UPDATE CARTITEM SET quantity = ?, price = ? WHERE cart_id = ? AND product_id = ?")) {
 
             ps.setInt(1, item.getQuantity());
-            ps.setInt(2, shoppingCart.getCartId());
-            ps.setInt(3, item.getProduct().getId());
-            ps.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Remove cart item from the database.
-     */
-    private void removeCartItemFromDB(CartItem item) {
-        try (Connection connection = DBconnector.getConnection();
-             PreparedStatement ps = connection.prepareStatement(
-                     "DELETE FROM CARTITEM WHERE cart_id = ? AND product_id = ?")) {
-
-            ps.setInt(1, shoppingCart.getCartId());
-            ps.setInt(2, item.getProduct().getId());
+            ps.setDouble(2, totalPrice); // Update the total price in the database
+            ps.setInt(3, shoppingCart.getCartId());
+            ps.setInt(4, item.getProduct().getId());
             ps.executeUpdate();
 
         } catch (SQLException e) {

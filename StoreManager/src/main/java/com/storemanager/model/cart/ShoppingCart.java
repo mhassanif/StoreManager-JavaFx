@@ -17,7 +17,8 @@ public class ShoppingCart {
     // Constructor to initialize a shopping cart with a cartId and an empty list of items
     public ShoppingCart(int cartId) {
         this.cartId = cartId;
-        this.items = ShoppingCartDAO.getItemsByCartId(cartId);
+        this.items = new ArrayList<>(); // Initialize as empty list
+        loadItems(); // Load items from the database
     }
 
     // Getters and Setters for cartId
@@ -50,6 +51,11 @@ public class ShoppingCart {
 
         // Use DAO method to add or update the item in the database
         ShoppingCartDAO.addOrUpdateItem(cartId, item);
+    }
+
+    // New method to load items from the database without modifying the database
+    public void loadItems() {
+        items = ShoppingCartDAO.getItemsByCartId(cartId);
     }
 
     // Method to remove a CartItem from the cart and update the database
