@@ -1,5 +1,6 @@
 package com.storemanager.model.cart;
 
+import com.storemanager.dao.ShoppingCartDAO;
 import com.storemanager.model.items.Product;
 import com.storemanager.model.order.Order;
 import com.storemanager.model.order.OrderItem;
@@ -16,7 +17,7 @@ public class ShoppingCart {
     // Constructor to initialize a shopping cart with a cartId and an empty list of items
     public ShoppingCart(int cartId) {
         this.cartId = cartId;
-        this.items = new ArrayList<>();
+        this.items = ShoppingCartDAO.getItemsByCartId(cartId);
     }
 
     // Getters and Setters for cartId
@@ -28,32 +29,40 @@ public class ShoppingCart {
         this.cartId = cartId;
     }
 
-    // Method to add a CartItem to the shopping cart
+    // Method to add or update a CartItem in the shopping cart and synchronize with the database
     public void addItem(CartItem item) {
+        boolean itemExists = false;
+
         // Check if the item already exists in the cart (same product)
         for (CartItem cartItem : items) {
             if (cartItem.getProduct().getId() == item.getProduct().getId()) {
                 // If the product is already in the cart, update the quantity
                 cartItem.setQuantity(cartItem.getQuantity() + item.getQuantity());
-                return;
+                itemExists = true;
+                break;
             }
         }
-        // If not in the cart, add it
-        items.add(item);
+
+        if (!itemExists) {
+            // If not in the cart, add it to the list
+            items.add(item);
+        }
+
+        // Use DAO method to add or update the item in the database
+        ShoppingCartDAO.addOrUpdateItem(cartId, item);
     }
 
-    // Method to remove a CartItem from the cart
+    // Method to remove a CartItem from the cart and update the database
     public void removeItem(CartItem item) {
-        items.remove(item);
+        // Remove from the list
+        items.removeIf(cartItem -> cartItem.getProduct().getId() == item.getProduct().getId());
+        // Remove from the database
+        ShoppingCartDAO.removeItem(cartId, item.getProduct().getId());
     }
 
     // Method to get the total price of all items in the cart
     public double getTotalPrice() {
-        double total = 0;
-        for (CartItem item : items) {
-            total += item.getProduct().getPrice() * item.getQuantity();
-        }
-        return total;
+        return items.stream().mapToDouble(CartItem::calculateSubtotal).sum();
     }
 
     // Method to get the list of items in the cart
@@ -61,9 +70,10 @@ public class ShoppingCart {
         return items;
     }
 
-    // **Method to clear all items from the cart**
+    // Method to clear all items from the cart and the database
     public void clearCart() {
         items.clear();
+        ShoppingCartDAO.clearCart(cartId);
     }
 
     // Method to checkout and create an Order from the shopping cart
@@ -72,7 +82,6 @@ public class ShoppingCart {
 
         // Convert CartItems to OrderItems
         for (CartItem cartItem : items) {
-            // Convert each CartItem to OrderItem
             Product product = cartItem.getProduct();
             int quantity = cartItem.getQuantity();
             OrderItem orderItem = new OrderItem(product, quantity);
@@ -85,7 +94,6 @@ public class ShoppingCart {
         // Clear the cart after placing the order
         clearCart();
 
-        // Return the created order
         return order;
     }
 

@@ -1,10 +1,15 @@
 package com.storemanager.controlers;
 
+import com.storemanager.auth.CurrentUser;
+import com.storemanager.dao.ShoppingCartDAO;
 import com.storemanager.db.DBconnector;
 import com.storemanager.model.cart.CartItem;
 import com.storemanager.model.cart.ShoppingCart;
 import com.storemanager.model.items.Product;
+import com.storemanager.model.users.Customer; // Assuming you have a Customer model
+import com.storemanager.model.users.User; // Assuming you have a User model
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -30,16 +35,22 @@ public class CartController {
     @FXML private Label totalAmountLabel;
 
     private ShoppingCart shoppingCart;
+    private int currentUserId; // Holds the logged-in user ID
 
     @FXML
     public void initialize() {
-        // Initialize ShoppingCart
-        shoppingCart = new ShoppingCart(1); // Dynamic cart ID (fetch from session)
+        // Assuming we have a session manager or UserSession to get the current logged-in user
+        currentUserId = ((Customer)CurrentUser.getInstance().getUser()).getCustomerId(); // Fetch the logged-in user's ID
+
+        // Initialize ShoppingCart for the logged-in customer
+        //shoppingCart = ShoppingCartDAO.getShoppingCartByCustomerId(currentUserId); // Dynamically load the cart for the user
+        shoppingCart=((Customer)CurrentUser.getInstance().getUser()).getShoppingCart();
 
         // Set up table columns
         colProductName.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getProduct().getName()));
         colProductBrand.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getProduct().getBrand()));
-        colQuantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        //colQuantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        colQuantity.setCellValueFactory(data -> new SimpleIntegerProperty(data.getValue().getQuantity()).asObject());
         colPrice.setCellValueFactory(data -> new SimpleDoubleProperty(data.getValue().getProduct().getPrice()).asObject());
         colTotal.setCellValueFactory(data -> new SimpleDoubleProperty(data.getValue().calculateSubtotal()).asObject());
 
@@ -49,6 +60,7 @@ public class CartController {
         // Add action buttons for quantity adjustment
         addActionButtons();
     }
+
 
     /**
      * Load cart items from the database into the TableView.
@@ -170,17 +182,6 @@ public class CartController {
      * Clear all items from the cart.
      */
     public void clearCart() {
-        try (Connection connection = DBconnector.getConnection();
-             PreparedStatement ps = connection.prepareStatement(
-                     "DELETE FROM CARTITEM WHERE cart_id = ?")) {
-
-            ps.setInt(1, shoppingCart.getCartId());
-            ps.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
         shoppingCart.clearCart();
         loadCartItems();
     }

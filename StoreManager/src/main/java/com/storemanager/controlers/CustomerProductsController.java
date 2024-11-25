@@ -1,9 +1,11 @@
 package com.storemanager.controlers;
 
+import com.storemanager.auth.CurrentUser;
 import com.storemanager.model.cart.CartItem;
 import com.storemanager.model.cart.ShoppingCart;
 import com.storemanager.model.items.Product;
 import com.storemanager.db.DBconnector;
+import com.storemanager.model.users.Customer;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -30,7 +32,7 @@ public class CustomerProductsController {
     @FXML
     private Button addAllToCartButton;
 
-    private ShoppingCart activeCart = new ShoppingCart(1); // Example cart ID
+    private Customer customer = (Customer) CurrentUser.getInstance().getUser();  // Get current customer
 
     // Initialize method to load categories and products
     public void initialize() {
@@ -129,16 +131,16 @@ public class CustomerProductsController {
     // Handle adding/removing products from the cart
     private void handleCartButton(Product product, Spinner<Integer> quantitySpinner, Button cartButton) {
         int quantity = quantitySpinner.getValue();
-        boolean inCart = activeCart.getItems().stream()
+        boolean inCart = customer.getShoppingCart().getItems().stream()
                 .anyMatch(item -> item.getProduct().getId() == product.getId());
 
         if (inCart) {
             // Remove from cart
-            activeCart.removeItem(new CartItem(product, quantity));
+            customer.removeFromCart(new CartItem(product, quantity));
             cartButton.setText("Add to Cart");
         } else {
             // Add to cart
-            activeCart.addItem(new CartItem(product, quantity));
+            customer.addToCart(new CartItem(product, quantity));
             cartButton.setText("Remove from Cart");
         }
 
@@ -147,7 +149,7 @@ public class CustomerProductsController {
 
     // Update the total amount
     private void updateTotalAmount() {
-        double total = activeCart.getTotalPrice();
+        double total = customer.getShoppingCart().getTotalPrice();
         totalAmountLabel.setText("Total Amount: $" + String.format("%.2f", total));
     }
 
@@ -192,7 +194,7 @@ public class CustomerProductsController {
     // Add all displayed products to the cart
     @FXML
     private void addAllToCart() {
-        for (CartItem item : activeCart.getItems()) {
+        for (CartItem item : customer.getShoppingCart().getItems()) {
             System.out.println("Finalized item in cart: " + item.getProduct().getName() + " x" + item.getQuantity());
         }
         // Redirect to Cart.fxml (Checkout Page)
