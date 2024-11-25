@@ -4,31 +4,31 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.storemanager.controlers.DashboardController" prefWidth="980.0" prefHeight="620.0">
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.storemanager.controlers.DashboardController" prefWidth="980.0" prefHeight="620.0" style="-fx-background-color: #ECF0F1;">
     <!-- Left Sidebar -->
     <left>
-        <VBox spacing="15" alignment="TOP_LEFT" style="-fx-background-color: #2A2A2A; -fx-padding: 15;">
-            <Label text="Dashboard" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" />
-            <Button text="Products" fx:id="productsButton" onAction="#showProducts" />
-            <Button text="Cart" fx:id="cartButton" onAction="#showCart" />
-            <Button text="Orders" fx:id="ordersButton" onAction="#showOrders" />
-            <Button text="Notifications" fx:id="notificationsButton" onAction="#showNotifications" />
-            <Button text="Profile" fx:id="profileButton" onAction="#showProfile" />
-            <Button text="Feedback" fx:id="feedbackButton" onAction="#showFeedback" />
+        <VBox spacing="15" alignment="TOP_LEFT" style="-fx-background-color: #2C3E50; -fx-padding: 15;">
+            <Label text="Dashboard" style="-fx-text-fill: #FFFFFF; -fx-font-size: 20px; -fx-font-weight: bold;" />
+            <Button text="Products" fx:id="productsButton" onAction="#showProducts" prefWidth="200" style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-background-color: #34495E;" />
+            <Button text="Cart" fx:id="cartButton" onAction="#showCart" prefWidth="200" style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-background-color: #34495E;" />
+            <Button text="Orders" fx:id="ordersButton" onAction="#showOrders" prefWidth="200" style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-background-color: #34495E;" />
+            <Button text="Notifications" fx:id="notificationsButton" onAction="#showNotifications" prefWidth="200" style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-background-color: #34495E;" />
+            <Button text="Profile" fx:id="profileButton" onAction="#showProfile" prefWidth="200" style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-background-color: #34495E;" />
+            <Button text="Feedback" fx:id="feedbackButton" onAction="#showFeedback" prefWidth="200" style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-background-color: #34495E;" />
         </VBox>
     </left>
 
     <!-- Top Bar -->
     <top>
-        <HBox alignment="CENTER_RIGHT" style="-fx-padding: 10; -fx-background-color: #2A2A2A;">
-            <Button text="Sign Out" onAction="#handleSignOut" style="-fx-background-color: red; -fx-text-fill: white;" />
+        <HBox alignment="CENTER_RIGHT" style="-fx-padding: 10; -fx-background-color: #2C3E50;">
+            <Button text="Sign Out" onAction="#handleSignOut" style="-fx-background-color: #E74C3C; -fx-text-fill: #FFFFFF;" />
         </HBox>
     </top>
 
     <!-- Dynamic Content Area -->
     <center>
         <StackPane fx:id="contentArea" style="-fx-background-color: #FFFFFF;">
-            <Label text="Welcome to the Dashboard!" style="-fx-font-size: 16px; -fx-text-fill: black;" />
+            <Label text="Welcome to the Dashboard!" style="-fx-font-size: 16px; -fx-text-fill: #2C3E50;" />
         </StackPane>
     </center>
 </BorderPane>
