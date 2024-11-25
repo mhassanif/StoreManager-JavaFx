@@ -15,7 +15,7 @@
             <Separator style="-fx-background-color: white;" />
 
             <!-- Navigation Buttons -->
-            <Button text="Dashboard" fx:id="btnDashboard" onAction="#handleDashboard" prefWidth="200"
+            <Button text="Profile" fx:id="btnProfile" onAction="#handleProfile" prefWidth="200"
                     style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
             <Button text="Manage Orders" fx:id="btnManageOrders" onAction="#handleManageOrders" prefWidth="200"
                     style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
