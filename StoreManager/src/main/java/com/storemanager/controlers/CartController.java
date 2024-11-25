@@ -182,17 +182,6 @@ public class CartController {
      * Clear all items from the cart.
      */
     public void clearCart() {
-        try (Connection connection = DBconnector.getConnection();
-             PreparedStatement ps = connection.prepareStatement(
-                     "DELETE FROM CARTITEM WHERE cart_id = ?")) {
-
-            ps.setInt(1, shoppingCart.getCartId());
-            ps.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
         shoppingCart.clearCart();
         loadCartItems();
     }
