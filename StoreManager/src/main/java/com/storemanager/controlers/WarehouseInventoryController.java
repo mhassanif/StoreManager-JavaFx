@@ -1,5 +1,6 @@
 package com.storemanager.controlers;
 
+import com.storemanager.dao.InventoryDAO;
 import com.storemanager.model.items.InventoryProduct;
 import com.storemanager.model.users.WarehouseStaff;
 import javafx.collections.FXCollections;
@@ -31,19 +32,6 @@ public class WarehouseInventoryController {
     @FXML
     private TableColumn<InventoryProduct, String> restockDateColumn;
 
-    private WarehouseStaff warehouseStaff;
-
-    /**
-     * Set the WarehouseStaff instance for this controller.
-     *
-     * @param warehouseStaff The logged-in WarehouseStaff user.
-     */
-    public void setWarehouseStaff(WarehouseStaff warehouseStaff) {
-        this.warehouseStaff = warehouseStaff;
-        System.out.println("WarehouseInventoryController initialized for user: " + warehouseStaff.getUsername());
-        loadInventory(); // Load inventory once the WarehouseStaff is set
-    }
-
     @FXML
     public void initialize() {
         // Configure table columns
@@ -52,18 +40,14 @@ public class WarehouseInventoryController {
         stockLevelColumn.setCellValueFactory(new PropertyValueFactory<>("stockLevel"));
         restockLevelColumn.setCellValueFactory(new PropertyValueFactory<>("restockLevel"));
         restockDateColumn.setCellValueFactory(new PropertyValueFactory<>("restockDate"));
+
+        loadInventory();
     }
 
     private void loadInventory() {
-        if (warehouseStaff == null) {
-            System.err.println("WarehouseStaff is not set. Cannot load inventory.");
-            return;
-        }
-
-        System.out.println("Loading inventory for warehouse staff: " + warehouseStaff.getUsername());
 
         // Fetch inventory from the WarehouseStaff's method
-        List<InventoryProduct> inventory = warehouseStaff.viewInventory();
+        List<InventoryProduct> inventory = InventoryDAO.getAllInventory();
         ObservableList<InventoryProduct> inventoryData = FXCollections.observableArrayList(inventory);
 
         // Populate the table

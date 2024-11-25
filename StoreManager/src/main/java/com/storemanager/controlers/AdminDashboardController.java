@@ -11,11 +11,12 @@ import java.io.IOException;
 
 public class AdminDashboardController {
 
+    public Button btnProfile;
     @FXML
     private VBox contentArea;
 
     @FXML
-    private Button btnDashboard, btnManageUsers, btnManageOrders, btnManageProducts, btnManageNotifications, btnManageFeedback, btnLogout;
+    private Button btnManageUsers, btnManageOrders, btnManageProducts, btnManageNotifications, btnManageFeedback, btnLogout;
 
     private String currentView = "";
 
@@ -42,11 +43,11 @@ public class AdminDashboardController {
 
 
     @FXML
-    public void handleDashboard() {
-/*        if (!"AdminDashboardContent.fxml".equals(currentView)) {
-            loadContent("AdminDashboardContent.fxml"); // Example: Separate content file for Dashboard
-            currentView = "ManagerDashboard";
-        }*/
+    public void handleProfile() {
+        if (!"WarehouseProfile.fxml".equals(currentView)) {
+            loadContent("WarehouseProfile.fxml");
+            currentView = "WarehouseProfile";
+        }
     }
 
     @FXML

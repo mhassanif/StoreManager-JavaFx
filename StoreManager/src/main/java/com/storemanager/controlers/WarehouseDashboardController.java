@@ -29,17 +29,17 @@ public class WarehouseDashboardController {
 
     @FXML
     private void showInventory() {
-        loadContent("/com/storemanager/WarehouseInventory.fxml", "WarehouseInventoryController");
+        loadContent("/com/storemanager/WarehouseInventory.fxml");
     }
 
     @FXML
     private void showNotifications() {
-        loadContent("/com/storemanager/WarehouseNotifications.fxml", "WarehouseNotificationsController");
+        loadContent("/com/storemanager/WarehouseNotifications.fxml");
     }
 
     @FXML
     private void showProfile() {
-        loadContent("/com/storemanager/WarehouseProfile.fxml", "WarehouseProfileController");
+        loadContent("/com/storemanager/WarehouseProfile.fxml");
     }
 
     @FXML
@@ -58,26 +58,14 @@ public class WarehouseDashboardController {
         }
     }
 
-    private void loadContent(String fxmlFile, String controllerType) {
+    private void loadContent(String fxmlFile) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
             Node content = loader.load();
-
-            // Pass the warehouseStaff object to the appropriate controller
-            if (controllerType.equals("WarehouseInventoryController")) {
-                WarehouseInventoryController controller = loader.getController();
-                controller.setWarehouseStaff((WarehouseStaff) CurrentUser.getInstance().getUser());
-            } else if (controllerType.equals("WarehouseNotificationsController")) {
-                WarehouseNotificationController controller = loader.getController();
-                controller.setWarehouseStaff((WarehouseStaff) CurrentUser.getInstance().getUser());
-            } else if (controllerType.equals("WarehouseProfileController")) {
-                WarehouseProfileController controller = loader.getController();
-                controller.setWarehouseStaff((WarehouseStaff) CurrentUser.getInstance().getUser());
-            }
-
             contentArea.getChildren().clear();
             contentArea.getChildren().add(content);
         } catch (IOException e) {
+            System.err.println("Failed to load FXML: " + fxmlFile);
             e.printStackTrace();
         }
     }

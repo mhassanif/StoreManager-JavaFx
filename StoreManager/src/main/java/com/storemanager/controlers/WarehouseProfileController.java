@@ -1,5 +1,7 @@
 package com.storemanager.controlers;
 
+import com.storemanager.auth.CurrentUser;
+import com.storemanager.model.users.User;
 import com.storemanager.model.users.WarehouseStaff;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
@@ -28,27 +30,32 @@ public class WarehouseProfileController {
     @FXML
     private PasswordField confirmPasswordField;
 
-    private WarehouseStaff warehouseStaff;
+    private User user;
 
-    public void setWarehouseStaff(WarehouseStaff warehouseStaff) {
-        this.warehouseStaff = warehouseStaff;
+    @FXML
+    public void initialize(){
+        setWarehouseStaff();
+    }
 
-        if (warehouseStaff != null) {
-            usernameField.setText(warehouseStaff.getUsername());
-            emailField.setText(warehouseStaff.getEmail());
-            addressField.setText(warehouseStaff.getAddress());
-            phoneField.setText(warehouseStaff.getPhoneNumber());
+    public void setWarehouseStaff() {
+        this.user= CurrentUser.getInstance().getUser();
+
+        if (user != null) {
+            usernameField.setText(user.getUsername());
+            emailField.setText(user.getEmail());
+            addressField.setText(user.getAddress());
+            phoneField.setText(user.getPhoneNumber());
         } else {
-            System.err.println("WarehouseStaff object is null in WarehouseProfileController.");
+            System.err.println("User object is null in WarehouseProfileController.");
         }
     }
 
     @FXML
     private void handleUpdateProfile() {
-        if (warehouseStaff != null) {
-            warehouseStaff.setAddress(addressField.getText());
-            warehouseStaff.setPhoneNumber(phoneField.getText());
-            System.out.println("Profile updated for: " + warehouseStaff.getUsername());
+        if (user != null) {
+            user.setAddress(addressField.getText());
+            user.setPhoneNumber(phoneField.getText());
+            System.out.println("Profile updated for: " + user.getUsername());
         } else {
             System.err.println("Cannot update profile. WarehouseStaff object is null.");
         }
@@ -56,12 +63,12 @@ public class WarehouseProfileController {
 
     @FXML
     private void handleChangePassword() {
-        if (warehouseStaff != null) {
+        if (user != null) {
             String currentPassword = currentPasswordField.getText();
             String newPassword = newPasswordField.getText();
             String confirmPassword = confirmPasswordField.getText();
 
-            if (!warehouseStaff.getPassword().equals(currentPassword)) {
+            if (!user.getPassword().equals(currentPassword)) {
                 System.err.println("Current password is incorrect.");
                 return;
             }
@@ -76,8 +83,8 @@ public class WarehouseProfileController {
                 return;
             }
 
-            warehouseStaff.setPassword(newPassword);
-            System.out.println("Password updated successfully for: " + warehouseStaff.getUsername());
+            user.setPassword(newPassword);
+            System.out.println("Password updated successfully for: " + user.getUsername());
         } else {
             System.err.println("Cannot change password. WarehouseStaff object is null.");
         }

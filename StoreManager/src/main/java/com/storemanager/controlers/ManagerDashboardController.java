@@ -12,14 +12,13 @@ import java.io.IOException;
 
 public class ManagerDashboardController {
 
+    public Button btnProfile;
     @FXML
     private VBox sidebar;
 
     @FXML
     private VBox contentArea; // The main content area (right side) to load the FXMLs
 
-    @FXML
-    private Button btnDashboard;
     @FXML
     private Button btnManageOrders;
     @FXML
@@ -51,11 +50,11 @@ public class ManagerDashboardController {
     }
 
     @FXML
-    public void handleDashboard() {
-/*        if (!"ManagerDashboard".equals(currentView)) {
-            loadContent("ManagerDashboard.fxml");
-            currentView = "ManagerDashboard";
-        }*/
+    public void handleProfile() {
+        if (!"WarehouseProfile.fxml".equals(currentView)) {
+            loadContent("WarehouseProfile.fxml");
+            currentView = "WarehouseProfile";
+        }
     }
 
     @FXML
