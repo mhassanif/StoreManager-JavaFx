@@ -40,6 +40,8 @@ public class WarehouseInventoryController {
         stockLevelColumn.setCellValueFactory(new PropertyValueFactory<>("stockLevel"));
         restockLevelColumn.setCellValueFactory(new PropertyValueFactory<>("restockLevel"));
         restockDateColumn.setCellValueFactory(new PropertyValueFactory<>("restockDate"));
+
+        loadInventory();
     }
 
     private void loadInventory() {
