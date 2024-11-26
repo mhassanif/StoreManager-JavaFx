@@ -1,98 +1,127 @@
-USE StoreManagerDB;
--- Inserting Users (Customers and Staff)
-INSERT INTO USERS (name, email, password, role, address, phone)
-VALUES
-('James Walker', 'james.walker@tradetrack.com', 'password123', 'Admin', '45 Ridge Road, City', '1234509876'),  -- Admin
-('David Harris', 'david.harris@tradetrack.com', 'password456', 'Manager', '123 Maple Street, City', '2345610987'),  -- Manager
-('Michael Brown', 'michael.brown@tradetrack.com', 'password789', 'WarehouseStaff', '78 Oak Avenue, City', '3456721890'),  -- Warehouse Staff
-('Emily Johnson', 'emily.johnson@tradetrack.com', 'password321', 'Customer', '56 Birch Boulevard, City', '4567832109'),  -- Customer
-('Sophia Martinez', 'sophia.martinez@tradetrack.com', 'password654', 'Customer', '34 Cedar Lane, City', '5678943210');  -- Customer
+-- USERS Table
+INSERT INTO USERS (name, email, password, role, address, phone) VALUES
+('Shahmeer Ahmed', 'shahmeer.ahmed@gmail.com', 'password123', 'Staff', '123 Admin St, Karachi', '03001234567'),
+('Muhammad Danish', 'danish.manager@gmail.com', 'password123', 'Staff', '456 Manager Ave, Lahore', '03012345678'),
+('Hassan Imran', 'hassan.warehouse@gmail.com', 'password123', 'Staff', '789 Warehouse Rd, Islamabad', '03023456789'),
+('Ali Raza', 'ali.raza@gmail.com', 'password123', 'Customer', '101 Customer Blvd, Karachi', '03034567890'),
+('Sarah Khan', 'sarah.khan@gmail.com', 'password123', 'Customer', '202 Customer Lane, Lahore', '03045678901'),
+('Hamza Malik', 'hamza.malik@gmail.com', 'password123', 'Customer', '303 Malik St, Karachi', '03056789012'),
+('Ayesha Siddiqui', 'ayesha.siddiqui@gmail.com', 'password123', 'Customer', '404 Siddiqui Ave, Islamabad', '03067890123'),
+('Zain Ul Abideen', 'zain.abideen@gmail.com', 'password123', 'Customer', '505 Abideen Rd, Lahore', '03078901234'),
+('Fatima Noor', 'fatima.noor@gmail.com', 'password123', 'Customer', '606 Noor Blvd, Karachi', '03089012345'),
+('Usman Tariq', 'usman.tariq@gmail.com', 'password123', 'Customer', '707 Tariq Lane, Lahore', '03090123456'),
+('Mariam Ashraf', 'mariam.ashraf@gmail.com', 'password123', 'Customer', '808 Ashraf Rd, Islamabad', '03101234567'),
+('Bilal Ahmed', 'bilal.ahmed@gmail.com', 'password123', 'Customer', '909 Ahmed St, Karachi', '03112345678'),
+('Anam Sheikh', 'anam.sheikh@gmail.com', 'password123', 'Customer', '1010 Sheikh Blvd, Lahore', '03123456789'),
+('Imran Qureshi', 'imran.qureshi@gmail.com', 'password123', 'Customer', '1111 Qureshi Ave, Islamabad', '03134567890'),
+('Sana Zafar', 'sana.zafar@gmail.com', 'password123', 'Customer', '1212 Zafar Lane, Karachi', '03145678901');
 
--- Inserting Customers
-INSERT INTO CUSTOMER (user_id)
-VALUES
-(4), -- Emily Johnson
-(5); -- Sophia Martinez
+-- CUSTOMER Table
+INSERT INTO CUSTOMER (user_id, balance) VALUES
+(4, 100.00),
+(5, 200.00),
+(6, 150.00),
+(7, 250.00),
+(8, 300.00),
+(9, 350.00),
+(10, 400.00),
+(11, 450.00),
+(12, 500.00),
+(13, 550.00),
+(14, 600.00),
+(15, 650.00);
 
--- Inserting Shopping Carts
-INSERT INTO SHOPPINGCART (customer_id)
-VALUES
-(1), -- Emily Johnson's cart
-(2); -- Sophia Martinez's cart
+-- STAFF Table
+INSERT INTO STAFF (user_id, position) VALUES
+(1, 'Admin'),
+(2, 'Manager'),
+(3, 'Warehouse Staff');
 
--- Inserting Staff Members
-INSERT INTO STAFF (user_id, position)
-VALUES
-(1, 'Admin'), -- James Walker
-(2, 'Manager'), -- David Harris
-(3, 'Warehouse Staff'); -- Michael Brown
-
--- Inserting Categories for Products
-INSERT INTO CATEGORY (name)
-VALUES
+-- CATEGORY Table
+INSERT INTO CATEGORY (name) VALUES
 ('Electronics'),
 ('Clothing'),
-('Home Appliances');
+('Groceries'),
+('Books'),
+('Toys');
 
--- Inserting Products
-INSERT INTO PRODUCT (name, brand, description, price, category_id)
-VALUES
-('Smartphone', 'Samsung', 'Latest model smartphone with 5G', 799.99, 1), -- Electronics
-('Jeans', 'Outfitters', 'Classic blue denim jeans', 49.99, 2), -- Clothing
-('Blender', 'Philips', 'High-speed kitchen blender', 89.99, 3),
-('Laptop', 'Dell', '15-inch laptop with 16GB RAM and 512GB SSD', 999.99, 1), -- Electronics
-('T-shirt', 'Nike', 'Cotton T-shirt with modern design', 29.99, 2), -- Clothing
-('Microwave', 'LG', 'Compact microwave with multiple functions', 129.99, 3), -- Home Appliances
-('Headphones', 'Sony', 'Noise-cancelling wireless headphones', 199.99, 1), -- Electronics
-('Jacket', 'Adidas', 'Waterproof winter jacket', 129.99, 2), -- Clothing
-('Dishwasher', 'Bosch', 'Energy-efficient dishwasher', 599.99, 3), -- Home Appliances
-('Smartwatch', 'Apple', 'Water-resistant smartwatch with fitness tracking', 399.99, 1); -- Electronics
+-- PRODUCT Table
+INSERT INTO PRODUCT (name, brand, description, price, category_id, url) VALUES
+('Smartphone', 'Samsung', 'Latest smartphone with AMOLED display', 499.99, 1, 'http://example.com/smartphone'),
+('Laptop', 'Dell', 'High-performance laptop for work and play', 899.99, 1, 'http://example.com/laptop'),
+('T-Shirt', 'Nike', 'Comfortable cotton t-shirt', 29.99, 2, 'http://example.com/tshirt'),
+('Jeans', 'Levis', 'Classic blue jeans', 59.99, 2, 'http://example.com/jeans'),
+('Milk', 'Nestle', '1-liter milk pack', 2.99, 3, 'http://example.com/milk'),
+('Bread', 'Sunrise', 'Fresh whole grain bread', 1.99, 3, 'http://example.com/bread'),
+('Novel', 'Penguin', 'Best-selling fiction novel', 19.99, 4, 'http://example.com/novel'),
+('Action Figure', 'Hasbro', 'Popular superhero action figure', 24.99, 5, 'http://example.com/actionfigure'),
+('Puzzle', 'Ravensburger', '1000-piece jigsaw puzzle', 14.99, 5, 'http://example.com/puzzle');
 
--- Inserting Orders
-INSERT INTO ORDERTABLE (customer_id, total_amount, status)
-VALUES
-(4, 799.99, 'Completed'), -- Order for Emily Johnson
-(5, 49.99, 'Completed'); -- Order for Sophia Martinez
+-- SHOPPINGCART Table
+INSERT INTO SHOPPINGCART (customer_id) VALUES
+(4),
+(5),
+(6),
+(7),
+(8);
 
--- Inserting Payments (After Orders are created)
-INSERT INTO PAYMENT (order_id, amount, status)
-VALUES
-(1, 799.99, 'Completed'), -- Payment for Emily Johnson's order
-(2, 49.99, 'Completed'); -- Payment for Sophia Martinez's order
+-- CARTITEM Table
+INSERT INTO CARTITEM (cart_id, product_id, quantity, price) VALUES
+(1, 1, 1, 499.99),
+(2, 3, 2, 29.99),
+(3, 5, 1, 2.99),
+(4, 7, 1, 19.99),
+(5, 9, 2, 24.99);
 
--- Inserting Order Items
-INSERT INTO ORDERITEM (order_id, product_id, quantity, price)
-VALUES
-(1, 1, 1, 799.99), -- Emily Johnson buys 1 Smartphone
-(2, 2, 1, 49.99); -- Sophia Martinez buys 1 Jeans
+-- ORDERTABLE Table
+INSERT INTO ORDERTABLE (customer_id, total_amount, status) VALUES
+(4, 100.00, 'Completed'),
+(5, 200.00, 'Pending'),
+(6, 150.00, 'Cancelled'),
+(7, 300.00, 'Completed'),
+(8, 400.00, 'Completed');
 
--- Inserting Cart Items
-INSERT INTO CARTITEM (cart_id, product_id, quantity, price)
-VALUES
-(1, 1, 1, 799.99), -- Emily Johnson adds 1 Smartphone to cart
-(2, 2, 2, 49.99); -- Sophia Martinez adds 2 Jeans to cart
+-- PAYMENT Table
+INSERT INTO PAYMENT (order_id, amount, status) VALUES
+(1, 100.00, 'Completed'),
+(2, 200.00, 'Pending'),
+(3, 150.00, 'Failed'),
+(4, 300.00, 'Completed'),
+(5, 400.00, 'Completed');
 
--- Inserting Inventory Data
-INSERT INTO INVENTORY (product_id, stock_quantity, restock_quantity)
-VALUES
-(1, 150, 50), -- 150 smartphones in stock, 50 restocked
-(2, 200, 100), -- 200 jeans in stock, 100 restocked
-(3, 100, 30); -- 100 blenders in stock, 30 restocked
+-- ORDERITEM Table
+INSERT INTO ORDERITEM (order_id, product_id, quantity, price) VALUES
+(1, 1, 1, 499.99),
+(2, 3, 2, 29.99),
+(3, 5, 1, 2.99),
+(4, 7, 1, 19.99),
+(5, 9, 2, 24.99);
 
--- Inserting Feedback from Customers
-INSERT INTO FEEDBACK (customer_id, comments)
-VALUES
-(1, 'Great shopping experience!'), -- Feedback from Emily Johnson
-(2, 'Fast delivery, great product!'); -- Feedback from Sophia Martinez
+-- INVENTORY Table
+INSERT INTO INVENTORY (product_id, stock_quantity, restock_quantity, restock_date) VALUES
+(1, 50, 10, GETDATE()),
+(2, 30, 5, GETDATE()),
+(3, 100, 20, GETDATE()),
+(4, 75, 15, GETDATE()),
+(5, 200, 50, GETDATE()),
+(6, 150, 25, GETDATE()),
+(7, 60, 10, GETDATE()),
+(8, 40, 10, GETDATE()),
+(9, 90, 30, GETDATE());
 
--- Inserting Notifications
-INSERT INTO NOTIFICATION (message)
-VALUES
-('Welcome to TradeTrack!'); -- Welcome notification for all users
+-- FEEDBACK Table
+INSERT INTO FEEDBACK (customer_id, comments) VALUES
+(4, 'Great service!'),
+(5, 'Fast delivery!'),
+(6, 'Good quality products.'),
+(7, 'Highly recommend this store.'),
+(8, 'Very satisfied with the purchase.');
 
--- Inserting Notification Recipients
-INSERT INTO NOTIFICATION_RECIPIENT (notification_id, user_id, status)
-VALUES
-(1, 1, 'Unread'), (1, 2, 'Unread'), (1, 3, 'Unread'), (1, 4, 'Unread'), (1, 5, 'Unread');
+-- NOTIFICATION Table
+INSERT INTO NOTIFICATION (message) VALUES
+('Welcome to TradeTrack');
 
-
+-- NOTIFICATION_RECIPIENT Table
+INSERT INTO NOTIFICATION_RECIPIENT (notification_id, user_id) VALUES
+(1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9), (1, 10),
+(1, 11), (1, 12), (1, 13), (1, 14), (1, 15);
