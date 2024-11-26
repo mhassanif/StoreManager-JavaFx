@@ -5,36 +5,36 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.storemanager.controlers.ManageOrdersController"
-            prefHeight="620.0" prefWidth="989.0" style="-fx-background-color: #ECF0F1;">
+            prefHeight="620.0" prefWidth="989.0" styleClass="main-border-pane" stylesheets="@style.css">
 
     <!-- Main Content Area -->
     <center>
-        <VBox fx:id="contentArea" alignment="CENTER" spacing="20" style="-fx-padding: 20; -fx-background-color: #FFFFFF;">
-            <Label text="Manage Orders" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;" />
+        <VBox fx:id="contentArea" alignment="CENTER" spacing="20" styleClass="main-content">
+            <Label text="Manage Orders" styleClass="header-text" />
 
             <!-- Search and Filter Section -->
-            <HBox spacing="10" alignment="CENTER">
-                <TextField fx:id="searchField" promptText="Search by customer name" onKeyReleased="#handleSearch" />
-                <ComboBox fx:id="statusFilter" promptText="Filter by status" onAction="#handleFilterStatus" />
+            <HBox spacing="10" alignment="CENTER" styleClass="search-filter-section">
+                <TextField fx:id="searchField" promptText="Search by customer name" onKeyReleased="#handleSearch" styleClass="search-field" />
+                <ComboBox fx:id="statusFilter" promptText="Filter by status" onAction="#handleFilterStatus" styleClass="filter-combobox" />
             </HBox>
 
             <!-- Table for Displaying Orders -->
-            <TableView fx:id="ordersTable" prefWidth="800" prefHeight="400">
+            <TableView fx:id="ordersTable" prefWidth="800" prefHeight="400" styleClass="table-view">
                 <columns>
-                    <TableColumn fx:id="orderIdColumn" text="Order ID" prefWidth="100" />
-                    <TableColumn fx:id="customerIdColumn" text="Customer ID" prefWidth="150" />
-                    <TableColumn fx:id="customerNameColumn" text="Customer Name" prefWidth="150" />
-                    <TableColumn fx:id="paymentIdColumn" text="Payment ID" prefWidth="100" />
-                    <TableColumn fx:id="orderDateColumn" text="Order Date" prefWidth="150" />
-                    <TableColumn fx:id="totalAmountColumn" text="Total Amount" prefWidth="100" />
-                    <TableColumn fx:id="statusColumn" text="Status" prefWidth="100" />
+                    <TableColumn fx:id="orderIdColumn" text="Order ID" prefWidth="100"/>
+                    <TableColumn fx:id="customerIdColumn" text="Customer ID" prefWidth="150"/>
+                    <TableColumn fx:id="customerNameColumn" text="Customer Name" prefWidth="150"/>
+                    <TableColumn fx:id="paymentIdColumn" text="Payment ID" prefWidth="100"/>
+                    <TableColumn fx:id="orderDateColumn" text="Order Date" prefWidth="150"/>
+                    <TableColumn fx:id="totalAmountColumn" text="Total Amount" prefWidth="100"/>
+                    <TableColumn fx:id="statusColumn" text="Status" prefWidth="100"/>
                 </columns>
             </TableView>
 
             <!-- Buttons for Order Management -->
-            <HBox spacing="10" alignment="CENTER">
-                <Button fx:id="btnDeleteOrder" text="Delete Order" onAction="#handleDeleteOrder" />
-                <Button fx:id="btnUpdateOrderStatus" text="Update Order Status" onAction="#handleUpdateOrderStatus" />
+            <HBox spacing="10" alignment="CENTER" styleClass="button-container">
+                <Button fx:id="btnDeleteOrder" text="Delete Order" onAction="#handleDeleteOrder" styleClass="button-delete" />
+                <Button fx:id="btnUpdateOrderStatus" text="Update Order Status" onAction="#handleUpdateOrderStatus" styleClass="button-update-status" />
             </HBox>
         </VBox>
     </center>

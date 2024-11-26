@@ -10,33 +10,33 @@
 
     <!-- Left Sidebar -->
     <left>
-        <VBox alignment="TOP_CENTER" spacing="15" style="-fx-background-color: #2C3E50; -fx-padding: 20;">
+        <VBox alignment="TOP_CENTER" spacing="15" style="-fx-background-color: #2C3E50; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10, 0.5, 2, 2);">
             <!-- Logo -->
             <Label text="Admin Panel" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #FFFFFF;" />
             <Separator style="-fx-background-color: white;" />
 
             <!-- Navigation Buttons -->
             <Button text="Profile" fx:id="btnProfile" onAction="#handleProfile" prefWidth="200"
-                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
+                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E; -fx-background-radius: 5;" />
             <Button text="Manage Users" fx:id="btnManageUsers" onAction="#handleManageUsers" prefWidth="200"
-                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
+                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E; -fx-background-radius: 5;" />
             <Button text="Manage Orders" fx:id="btnManageOrders" onAction="#handleManageOrders" prefWidth="200"
-                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
+                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E; -fx-background-radius: 5;" />
             <Button text="Manage Products" fx:id="btnManageProducts" onAction="#handleManageProducts" prefWidth="200"
-                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
+                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E; -fx-background-radius: 5;" />
             <Button text="Manage Notifications" fx:id="btnManageNotifications" onAction="#handleManageNotifications" prefWidth="200"
-                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
+                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E; -fx-background-radius: 5;" />
             <Button text="Manage Feedback" fx:id="btnManageFeedback" onAction="#handleManageFeedback" prefWidth="200"
-                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E;" />
+                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #34495E; -fx-background-radius: 5;" />
 
             <!-- Logout Button -->
             <Button text="Logout" fx:id="btnLogout" onAction="#handleLogout" prefWidth="200"
-                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #E74C3C;" />
+                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-background-color: #E74C3C; -fx-background-radius: 5;" />
         </VBox>
     </left>
 
     <!-- Main Content Area -->
     <center>
-        <VBox fx:id="contentArea" style="-fx-padding: 20; -fx-background-color: #FFFFFF;" />
+        <VBox fx:id="contentArea" style="-fx-padding: 20; -fx-background-color: #F7F9F9; -fx-border-color: #D5D8DC; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10;" />
     </center>
 </BorderPane>

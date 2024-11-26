@@ -1,0 +1,195 @@
+/* General Application Styles */
+.root {
+    -fx-font-family: "Arial";
+    -fx-font-size: 14px;
+    -fx-background-color: #ECF0F1; /* Light background color */
+    -fx-text-fill: #2C3E50;  /* Dark text color */
+}
+
+/* Header Text Styles */
+.text-header, .header-text {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2C3E50;
+}
+
+/* Main Content Section */
+.main-content {
+    -fx-padding: 20;
+    -fx-spacing: 20;
+    -fx-background-color: #FFFFFF;
+}
+
+/* Button Styles - Inherits .root styles */
+.button {
+    -fx-background-color: #4CA1AF;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-background-radius: 5;
+    -fx-padding: 8 12;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #2C3E50;
+}
+
+/* Button Styles for Notifications */
+.button-mark-as-read, .button-delete, .button-update-status {
+    -fx-background-radius: 5;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 10px;
+}
+
+.button-mark-as-read {
+    -fx-background-color: #34495E;
+}
+
+.button-mark-as-read:hover {
+    -fx-background-color: #2C3E50;
+}
+
+.button-delete {
+    -fx-background-color: #E74C3C;
+}
+
+.button-delete:hover {
+    -fx-background-color: #C0392B;
+}
+
+.button-update-status {
+    -fx-background-color: #3498DB;
+}
+
+.button-update-status:hover {
+    -fx-background-color: #2980B9;
+}
+
+/* Input Field Styles - Inherits .root styles */
+.input-field, .search-field, .filter-combobox {
+    -fx-border-color: #D5D8DC;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 10;
+}
+
+.input-field:focused, .search-field:focused, .filter-combobox:focused {
+    -fx-border-color: #3498DB;
+    -fx-background-color: #FFFFFF;
+}
+
+/* Custom ComboBox style for smaller size */
+.filter-combobox {
+    -fx-pref-width: 180px; /* Reduce the width */
+    -fx-font-size: 12px;    /* Adjust font size */
+    -fx-padding: 5 10;      /* Adjust padding */
+}
+
+/* Table Styles */
+.table-view {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #D5D8DC;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0, 0, 0);
+}
+
+/* Header Styles */
+.column-header {
+    -fx-background-color: #34495E;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER;
+    -fx-padding: 5 10;
+    -fx-text-fill: white;
+}
+
+/* Row Styles */
+.table-row-cell {
+    -fx-background-color: transparent; /* Make sure rows are transparent initially */
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #EAF0F6; /* Light background for odd rows */
+}
+
+.table-row-cell:even {
+    -fx-background-color: #F7F7F7; /* Light background for even rows */
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #D6E9F5; /* Background on hover */
+}
+
+/* Selected Row Style */
+.table-row-cell:selected {
+    -fx-background-color: #3498DB; /* Selected row with blue background */
+    -fx-text-fill: white; /* White text for selected row */
+}
+
+
+/* Hyperlink Styles */
+.link {
+    -fx-text-fill: #0078d4;
+    -fx-font-size: 12px;
+}
+
+.link:hover {
+    -fx-text-fill: #3498DB;
+    -fx-underline: true;
+}
+
+/* Error Message Styles */
+.error-message {
+    -fx-font-size: 14px;
+    -fx-text-fill: #ff0000;
+}
+
+/* Profile Button Styles */
+.button-profile-update, .button-profile-change {
+    -fx-font-size: 14px;
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-border-radius: 5px;
+    -fx-padding: 10px 20px;
+}
+
+.button-profile-update:hover, .button-profile-change:hover {
+    -fx-background-color: #2980b9;
+}
+
+/* Login Page Specific Styles */
+.login-title {
+    -fx-font-size: 30px; /* Increased title size */
+    -fx-font-weight: bold;
+    -fx-text-fill: #2C3E50;
+}
+
+/* Form Container */
+.login-container {
+    -fx-background-color: #F7F9F9;
+    -fx-border-radius: 8px;
+    -fx-padding: 20px;
+    -fx-spacing: 20px;
+}
+
+/* Login Button Specific */
+.login-button {
+    -fx-background-color: #4CA1AF;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-background-radius: 5;
+    -fx-padding: 10px 20px;
+    -fx-cursor: hand;
+}
+
+.login-button:hover {
+    -fx-background-color: #2C3E50;
+}
+
+/* Styling for Error Message on Login */
+.error-message {
+    -fx-font-size: 14px;
+    -fx-text-fill: #ff0000;
+    -fx-alignment: center;
+}

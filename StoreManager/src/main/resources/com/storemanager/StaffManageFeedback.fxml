@@ -3,29 +3,24 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.storemanager.controlers.StaffManageFeedbackController"
-            prefWidth="1024" prefHeight="768">
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.storemanager.controlers.StaffManageFeedbackController" prefWidth="1024" prefHeight="768" stylesheets="@style.css">
 
     <center>
-        <VBox fx:id="mainVBox" alignment="TOP_CENTER" spacing="20" style="-fx-padding: 20;">
-            <Text text="Manage Feedback" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+        <VBox fx:id="mainVBox" alignment="TOP_CENTER" spacing="20" styleClass="form-container">
+            <Text text="Manage Feedback" styleClass="text-header" />
 
             <!-- Feedback List Table -->
-            <TableView fx:id="feedbackTable" prefWidth="800" prefHeight="400">
+            <TableView fx:id="feedbackTable" prefWidth="800" prefHeight="400" styleClass="table-view">
                 <columns>
-                    <TableColumn fx:id="feedbackIdColumn" text="Feedback ID" />
-                    <TableColumn fx:id="customerIdColumn" text="Customer ID" />
-                    <TableColumn fx:id="commentsColumn" text="Comments" />
+                    <TableColumn fx:id="feedbackIdColumn" text="Feedback ID" prefWidth="100" />
+                    <TableColumn fx:id="customerIdColumn" text="Customer ID" prefWidth="200" />
+                    <TableColumn fx:id="commentsColumn" text="Comments" prefWidth="500" />
                 </columns>
             </TableView>
 
             <!-- Buttons for Managing Feedback -->
             <HBox alignment="CENTER" spacing="10">
-                <!-- Delete Feedback Button -->
-                <Button fx:id="btnDeleteFeedback" text="Delete Feedback" onAction="#handleDeleteFeedback" prefWidth="200"
-                        style="-fx-font-size: 14px; -fx-background-color: #E74C3C; -fx-text-fill: white;" />
+                <Button fx:id="btnDeleteFeedback" text="Delete Feedback" onAction="#handleDeleteFeedback" prefWidth="200" styleClass="button-delete" />
             </HBox>
         </VBox>
     </center>

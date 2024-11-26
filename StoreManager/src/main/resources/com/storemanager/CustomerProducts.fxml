@@ -4,26 +4,26 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.storemanager.controlers.CustomerProductsController">
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.storemanager.controlers.CustomerProductsController" stylesheets="@style.css">
 
     <!-- Main container -->
-    <VBox spacing="10" alignment="TOP_CENTER" prefWidth="800" prefHeight="600">
+    <VBox spacing="10" alignment="TOP_CENTER" prefWidth="800" prefHeight="600" styleClass="main-container">
         <!-- Top section with category selection -->
-        <HBox spacing="10" alignment="CENTER">
-            <Label text="Categories:" />
-            <ComboBox fx:id="categoryComboBox" onAction="#filterByCategory" />
+        <HBox spacing="10" alignment="CENTER" styleClass="category-section">
+            <Label text="Categories:" styleClass="category-label"/>
+            <ComboBox fx:id="categoryComboBox" onAction="#filterByCategory" styleClass="category-combobox"/>
         </HBox>
 
         <!-- Product grid section -->
-        <ScrollPane fitToWidth="true" fitToHeight="true" vbarPolicy="ALWAYS" hbarPolicy="NEVER">
-            <TilePane fx:id="productGrid" hgap="10" vgap="10" prefColumns="3" alignment="CENTER">
+        <ScrollPane fitToWidth="true" fitToHeight="true" vbarPolicy="ALWAYS" hbarPolicy="NEVER" styleClass="product-scrollpane">
+            <TilePane fx:id="productGrid" hgap="10" vgap="10" prefColumns="3" alignment="CENTER" styleClass="product-grid">
                 <!-- Product items will be dynamically added here -->
             </TilePane>
         </ScrollPane>
 
         <!-- Bottom section for total amount -->
-        <HBox spacing="10" alignment="CENTER_RIGHT" prefHeight="50">
-            <Label fx:id="totalAmountLabel" text="Total Amount: $0.00" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+        <HBox spacing="10" alignment="CENTER_RIGHT" prefHeight="50" styleClass="total-amount-section">
+            <Label fx:id="totalAmountLabel" text="Total Amount: $0.00" styleClass="total-amount-label"/>
         </HBox>
     </VBox>
 </AnchorPane>
