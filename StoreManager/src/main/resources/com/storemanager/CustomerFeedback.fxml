@@ -3,16 +3,16 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.storemanager.controlers.CustomerFeedbackController">
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.storemanager.controlers.CustomerFeedbackController" stylesheets="@style.css">
     <top>
-        <Label text="Feedback" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-padding: 10;" alignment="CENTER" />
+        <Label text="Feedback" styleClass="text-header" alignment="CENTER" />
     </top>
 
     <center>
-        <VBox spacing="15" alignment="CENTER" style="-fx-padding: 20;">
+        <VBox spacing="15" alignment="CENTER" styleClass="form-container">
             <Label text="Your Comments:" />
-            <TextArea fx:id="commentsField" promptText="Enter your feedback here" prefHeight="200" prefWidth="400" />
-            <Button text="Submit Feedback" onAction="#handleSubmitFeedback" />
+            <TextArea fx:id="commentsField" promptText="Enter your feedback here" prefHeight="200" prefWidth="400" styleClass="text-field"/>
+            <Button text="Submit Feedback" onAction="#handleSubmitFeedback" styleClass="button" />
         </VBox>
     </center>
 </BorderPane>

@@ -7,20 +7,21 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.storemanager.controlers.ManageUsersController"
-            prefHeight="620.0" prefWidth="989.0" style="-fx-background-color: #ECF0F1;">
+            prefHeight="620.0" prefWidth="989.0" stylesheets="@style.css" styleClass="root">
 
     <!-- Main Content Area (Manage Users) -->
     <center>
         <!-- VBox for vertical alignment -->
-        <VBox alignment="TOP_CENTER" spacing="20" style="-fx-padding: 20;">
+        <VBox alignment="TOP_CENTER" spacing="20">
             <!-- Title -->
-            <Text text="Manage Users" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #34495E;"/>
+            <Text text="Manage Users" styleClass="text-header" />
 
             <!-- Search Field -->
-            <TextField fx:id="searchField" promptText="Search Users" onKeyReleased="#handleSearch" prefWidth="300"/>
+            <TextField fx:id="searchField" promptText="Search Users" onKeyReleased="#handleSearch" prefWidth="300"
+                       styleClass="text-field" />
 
             <!-- Table View for Users -->
-            <TableView fx:id="userTable" prefHeight="400" prefWidth="600" style="-fx-background-color: #ffffff;">
+            <TableView fx:id="userTable" prefHeight="400" prefWidth="600" styleClass="table-view">
                 <!-- Columns for Name, Email, Role, and Actions -->
                 <columns>
                     <TableColumn fx:id="nameColumn" text="Name" prefWidth="150" />

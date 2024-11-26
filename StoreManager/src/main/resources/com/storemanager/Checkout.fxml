@@ -3,19 +3,19 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox alignment="CENTER" spacing="20" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.storemanager.controlers.CheckoutController" prefWidth="980.0" prefHeight="620.0">
-    <Label text="Checkout" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+<VBox alignment="CENTER" spacing="20" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.storemanager.controlers.CheckoutController" prefWidth="980.0" prefHeight="620.0" stylesheets="@style.css">
+    <!-- Title -->
+    <Label text="Checkout" styleClass="text-header" />
 
     <!-- Order Details Table -->
-    <TableView fx:id="orderSummaryTable">
+    <TableView fx:id="orderSummaryTable" styleClass="table-view">
         <columns>
-            <TableColumn fx:id="colProductName" text="Product Name" />
-            <TableColumn fx:id="colQuantity" text="Quantity" />
-            <TableColumn fx:id="colPrice" text="Price" />
-            <TableColumn fx:id="colTotal" text="Total" />
+            <TableColumn fx:id="colProductName" text="Product Name" style="-fx-alignment: CENTER_LEFT;" />
+            <TableColumn fx:id="colQuantity" text="Quantity" style="-fx-alignment: CENTER;" />
+            <TableColumn fx:id="colPrice" text="Price" style="-fx-alignment: CENTER;" />
+            <TableColumn fx:id="colTotal" text="Total" style="-fx-alignment: CENTER;" />
         </columns>
     </TableView>
-
 
     <!-- Total Amount -->
     <Label fx:id="totalAmountLabel" text="Total Amount: $" style="-fx-font-size: 16px;" />
@@ -26,7 +26,7 @@
 
     <!-- Buttons -->
     <HBox spacing="20" alignment="CENTER">
-        <Button text="Go Back to Cart" onAction="#goBackToCart" style="-fx-background-color: #f0ad4e; -fx-text-fill: white;" />
-        <Button text="Confirm Order" onAction="#confirmOrder" style="-fx-background-color: #5cb85c; -fx-text-fill: white;" />
+        <Button text="Go Back to Cart" onAction="#goBackToCart" styleClass="button"/>
+        <Button text="Confirm Order" onAction="#confirmOrder" styleClass="button"/>
     </HBox>
 </VBox>

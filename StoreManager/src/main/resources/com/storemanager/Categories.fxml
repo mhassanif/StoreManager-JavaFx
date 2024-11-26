@@ -10,28 +10,28 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" spacing="15" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.storemanager.controlers.CategoriesController">
+<VBox alignment="TOP_CENTER" spacing="15" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.storemanager.controlers.CategoriesController" stylesheets="@style.css">
     <!-- Title -->
-    <Label text="Product Categories" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+    <Label text="Product Categories" styleClass="text-header"/>
 
     <!-- Category Selector -->
     <HBox spacing="10">
-        <Label text="Select Category:" style="-fx-font-size: 16px;" />
-        <ComboBox fx:id="categoryComboBox" onAction="#loadProducts" />
+        <Label text="Select Category:" style="-fx-font-size: 16px;"/>
+        <ComboBox fx:id="categoryComboBox" onAction="#loadProducts"/>
     </HBox>
 
     <!-- Product List Table -->
-    <TableView fx:id="productTable" prefWidth="750.0">
+    <TableView fx:id="productTable" prefWidth="750.0" styleClass="table-view">
         <columns>
-            <TableColumn fx:id="colProductName" text="Product Name" prefWidth="200.0" />
-            <TableColumn fx:id="colBrand" text="Brand" prefWidth="100.0" />
-            <TableColumn fx:id="colPrice" text="Price" prefWidth="100.0" />
-            <TableColumn fx:id="colActions" text="Actions" prefWidth="200.0" />
+            <TableColumn fx:id="colProductName" text="Product Name" prefWidth="200.0" style="-fx-alignment: CENTER_LEFT;"/>
+            <TableColumn fx:id="colBrand" text="Brand" prefWidth="100.0" style="-fx-alignment: CENTER;"/>
+            <TableColumn fx:id="colPrice" text="Price" prefWidth="100.0" style="-fx-alignment: CENTER;"/>
+            <TableColumn fx:id="colActions" text="Actions" prefWidth="200.0" style="-fx-alignment: CENTER;"/>
         </columns>
     </TableView>
 
     <!-- Action Buttons -->
     <HBox spacing="20" alignment="CENTER">
-        <Button text="Back to Dashboard" onAction="#goToDashboard" style="-fx-background-color: #5cb85c; -fx-text-fill: white;" />
+        <Button text="Back to Dashboard" onAction="#goToDashboard" styleClass="button"/>
     </HBox>
 </VBox>

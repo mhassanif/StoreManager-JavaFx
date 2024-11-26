@@ -1,26 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.storemanager.controlers.ManageProductsController"
-            prefHeight="620.0" prefWidth="989.0" style="-fx-background-color: #ECF0F1;">
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.storemanager.controlers.ManageProductsController" prefHeight="620.0" prefWidth="989.0" stylesheets="@style.css">
 
     <!-- Main Content Area -->
     <center>
-        <VBox fx:id="contentArea" alignment="CENTER" spacing="20" style="-fx-padding: 20; -fx-background-color: #FFFFFF;">
-            <Label text="Manage Products" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;" />
+        <VBox fx:id="contentArea" alignment="CENTER" spacing="20" styleClass="form-container">
+            <Label text="Manage Products" styleClass="text-header" />
 
             <!-- Search and Filter Section -->
-            <HBox spacing="10" alignment="CENTER">
-                <TextField fx:id="searchField" promptText="Search by product name" onKeyReleased="#handleSearch" />
-                <ComboBox fx:id="brandFilter" promptText="Filter by brand" onAction="#handleFilterBrand" />
-                <Button fx:id="btnAddProduct" text="Add Product" onAction="#handleAddProduct" />
+            <HBox spacing="10" alignment="CENTER" styleClass="search-filter-section">
+                <TextField fx:id="searchField" promptText="Search by product name" onKeyReleased="#handleSearch" prefWidth="800" styleClass="search-field" />
+                <ComboBox fx:id="brandFilter" promptText="Filter by brand" onAction="#handleFilterBrand" prefWidth="200" styleClass="filter-combobox" />
+                <Button fx:id="btnAddProduct" text="Add Product" onAction="#handleAddProduct" prefWidth="200" styleClass="button"/>
             </HBox>
 
             <!-- Table for Displaying Products -->
-            <TableView fx:id="productsTable" prefWidth="800" prefHeight="400">
+            <TableView fx:id="productsTable" prefWidth="800" prefHeight="400" styleClass="table-view">
                 <columns>
                     <TableColumn fx:id="productIdColumn" text="Product ID" prefWidth="100" />
                     <TableColumn fx:id="productNameColumn" text="Product Name" prefWidth="200" />
@@ -34,8 +32,8 @@
 
             <!-- Buttons for Product Management -->
             <HBox spacing="10" alignment="CENTER">
-                <Button fx:id="btnDeleteProduct" text="Delete Product" onAction="#handleDeleteProduct" />
-                <Button fx:id="btnSetRestockLevel" text="Set Restock Level" onAction="#handleSetRestockLevel" />
+                <Button fx:id="btnDeleteProduct" text="Delete Product" onAction="#handleDeleteProduct" prefWidth="200" styleClass="button-delete" />
+                <Button fx:id="btnSetRestockLevel" text="Set Restock Level" onAction="#handleSetRestockLevel" prefWidth="200" styleClass="button-update-status" />
             </HBox>
         </VBox>
     </center>

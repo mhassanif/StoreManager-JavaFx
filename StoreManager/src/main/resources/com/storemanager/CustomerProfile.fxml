@@ -4,52 +4,52 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.storemanager.controlers.CustomerProfileController">
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.storemanager.controlers.CustomerProfileController" stylesheets="@style.css">
     <!-- Top Section -->
     <top>
-        <Label text="Your Profile" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-padding: 10;" alignment="CENTER" />
+        <Label text="Your Profile" alignment="CENTER" styleClass="text-header"/>
     </top>
 
     <!-- Center Section -->
     <center>
-        <VBox spacing="15" style="-fx-padding: 20;" alignment="CENTER_LEFT">
+        <VBox spacing="25" styleClass="profile-container" alignment="CENTER">
             <!-- Username (View Only) -->
-            <HBox spacing="10">
-                <Label text="Username:" style="-fx-font-weight: bold;" />
-                <Label fx:id="usernameLabel" style="-fx-background-color: #f0f0f0; -fx-padding: 5;" prefWidth="300" />
+            <HBox spacing="20" styleClass="profile-section" alignment="CENTER">
+                <Label text="Username:" styleClass="profile-label" />
+                <Label fx:id="usernameLabel" styleClass="profile-field" prefWidth="300" />
             </HBox>
 
             <!-- Email (View Only) -->
-            <HBox spacing="10">
-                <Label text="Email:" style="-fx-font-weight: bold;" />
-                <Label fx:id="emailLabel" style="-fx-background-color: #f0f0f0; -fx-padding: 5;" prefWidth="300" />
+            <HBox spacing="20" styleClass="profile-section" alignment="CENTER">
+                <Label text="Email:" styleClass="profile-label" />
+                <Label fx:id="emailLabel" styleClass="profile-field" prefWidth="300" />
             </HBox>
 
             <!-- Address -->
-            <HBox spacing="10">
-                <Label text="Address:" style="-fx-font-weight: bold;" />
-                <TextField fx:id="addressField" promptText="Enter your address" />
+            <HBox spacing="20" styleClass="profile-section" alignment="CENTER">
+                <Label text="Address:" styleClass="profile-label" />
+                <TextField fx:id="addressField" promptText="Enter your address" styleClass="profile-input" />
             </HBox>
 
             <!-- Phone -->
-            <HBox spacing="10">
-                <Label text="Phone:" style="-fx-font-weight: bold;" />
-                <TextField fx:id="phoneField" promptText="Enter your phone number" />
+            <HBox spacing="20" styleClass="profile-section" alignment="CENTER">
+                <Label text="Phone:" styleClass="profile-label" />
+                <TextField fx:id="phoneField" promptText="Enter your phone number" styleClass="profile-input" />
             </HBox>
 
             <!-- Password -->
-            <HBox spacing="10">
-                <Label text="Password:" style="-fx-font-weight: bold;" />
-                <PasswordField fx:id="passwordField" promptText="Enter your new password" />
+            <HBox spacing="20" styleClass="profile-section" alignment="CENTER">
+                <Label text="Password:" styleClass="profile-label" />
+                <PasswordField fx:id="passwordField" promptText="Enter your new password" styleClass="profile-input" />
             </HBox>
         </VBox>
     </center>
 
     <!-- Bottom Section -->
     <bottom>
-        <HBox spacing="20" alignment="CENTER" style="-fx-padding: 10;">
-            <Button text="Save Changes" onAction="#handleSaveChanges" />
-            <Button text="Cancel" onAction="#handleCancel" />
+        <HBox spacing="30" alignment="CENTER" styleClass="profile-buttons">
+            <Button text="Save Changes" onAction="#handleSaveChanges" styleClass="save-button" />
+            <Button text="Cancel" onAction="#handleCancel" styleClass="cancel-button" />
         </HBox>
     </bottom>
 </BorderPane>
