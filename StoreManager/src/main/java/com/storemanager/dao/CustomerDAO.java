@@ -1,144 +1,200 @@
 package com.storemanager.dao;
 
 import com.storemanager.db.DBconnector;
-import com.storemanager.model.cart.ShoppingCart;
 import com.storemanager.model.users.Customer;
-import com.storemanager.model.users.User;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import com.storemanager.model.cart.ShoppingCart;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CustomerDAO {
 
-    public static List<Customer> getAllCustomers() {
-        List<Customer> customers = new ArrayList<>();
+    // Method to fetch the balance of a customer based on customerId
+    public static double fetchCustomerBalance(int customerId) {
+        double balance = 0.0;
 
-        String query = "SELECT c.customer_id, u.user_id, u.name, u.email, u.password, u.role, u.address, u.phone " +
-                "FROM CUSTOMER c " +
-                "INNER JOIN USERS u ON c.user_id = u.user_id";
+        String sql = "SELECT balance FROM CUSTOMER WHERE customer_id = ?";
 
-        try (Connection connection = DBconnector.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query);
-             ResultSet resultSet = preparedStatement.executeQuery()) {
+        try (Connection conn = DBconnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, customerId);
+            ResultSet rs = stmt.executeQuery();
 
-            while (resultSet.next()) {
-                customers.add(new Customer(
-                        resultSet.getInt("customer_id"),
-                        resultSet.getInt("user_id"),
-                        resultSet.getString("name"),
-                        resultSet.getString("email"),
-                        resultSet.getString("password"),
-                        resultSet.getString("address"),
-                        resultSet.getString("phone")
-                ));
+            if (rs.next()) {
+                balance = rs.getDouble("balance");
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return customers;
+        return balance;
     }
 
-    public static Customer getCustomerById(int customerId) {
-        String query = "SELECT c.customer_id, u.user_id, u.name, u.email, u.password, u.role, u.address, u.phone " +
-                "FROM CUSTOMER c " +
-                "INNER JOIN USERS u ON c.user_id = u.user_id " +
-                "WHERE c.customer_id = ?";
+    // Setter method to update the balance of a customer in the database
+    public static boolean setCustomerBalance(int customerId, double newBalance) {
+        String sql = "UPDATE CUSTOMER SET balance = ? WHERE customer_id = ?";
 
-        try (Connection connection = DBconnector.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        try (Connection conn = DBconnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDouble(1, newBalance);  // Set the new balance
+            stmt.setInt(2, customerId);     // Specify the customer to update
 
-            preparedStatement.setInt(1, customerId);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return new Customer(
-                            resultSet.getInt("customer_id"),
-                            resultSet.getInt("user_id"),
-                            resultSet.getString("name"),
-                            resultSet.getString("email"),
-                            resultSet.getString("password"),
-                            resultSet.getString("address"),
-                            resultSet.getString("phone")
-                    );
+            int rowsAffected = stmt.executeUpdate();
+
+            // If at least one row is affected, the update was successful
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    // Create a new customer
+    public static boolean createCustomer(Customer customer) {
+        String sql = "INSERT INTO USERS (user_id, username, email, password, role, address, phone) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String customerSql = "INSERT INTO CUSTOMER (user_id, balance) VALUES (?, ?)";
+
+        try (Connection conn = DBconnector.getConnection();
+             PreparedStatement userStmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+             PreparedStatement customerStmt = conn.prepareStatement(customerSql)) {
+
+            // Insert user data into USERS table
+            userStmt.setInt(1, customer.getId());
+            userStmt.setString(2, customer.getUsername());
+            userStmt.setString(3, customer.getEmail());
+            userStmt.setString(4, customer.getPassword());
+            userStmt.setString(5, "Customer");
+            userStmt.setString(6, customer.getAddress());
+            userStmt.setString(7, customer.getPhoneNumber());
+            int affectedRows = userStmt.executeUpdate();
+
+            if (affectedRows == 0) {
+                return false; // Inserting user failed
+            }
+
+            // Get the auto-generated user_id from the USERS table
+            try (ResultSet generatedKeys = userStmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    int userId = generatedKeys.getInt(1); // Get the generated user_id
+                    // Insert into the CUSTOMER table
+                    customerStmt.setInt(1, userId);
+                    customerStmt.setDouble(2, customer.getBalance());
+                    customerStmt.executeUpdate();
+                    return true;
                 }
             }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Create a customer using userId and balance
+    public static boolean createCustomer(int userId) {
+        String sql = "INSERT INTO CUSTOMER (user_id, balance) VALUES (?, ?)";
+
+        try (Connection conn = DBconnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, userId);
+            stmt.setDouble(2, 2000);
+            stmt.executeUpdate();
+            return true;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Get a customer by customerId
+    public static Customer getCustomerById(int customerId) {
+        String sql = "SELECT * FROM USERS u INNER JOIN CUSTOMER c ON u.user_id = c.user_id WHERE c.customer_id = ?";
+
+        try (Connection conn = DBconnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, customerId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                // Create User object from the result set
+                int userId = rs.getInt("user_id");
+                String username = rs.getString("name");
+                String email = rs.getString("email");
+                String password = rs.getString("password");
+                String address = rs.getString("address");
+                String phone = rs.getString("phone");
+                double balance = rs.getDouble("balance");
+
+                // Create Customer object
+                Customer customer = new Customer(customerId, userId, username, email, password, address, phone, balance);
+                return customer;
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
     }
 
+    // Get a customer by userId
     public static Customer getCustomerByUserId(int userId) {
-        String query = "SELECT * FROM CUSTOMER WHERE user_id = ?";
-        try (Connection connection = DBconnector.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        String sql = "SELECT * FROM USERS u INNER JOIN CUSTOMER c ON u.user_id = c.user_id WHERE u.user_id = ?";
 
-            preparedStatement.setInt(1, userId);
-            ResultSet resultSet = preparedStatement.executeQuery();
+        try (Connection conn = DBconnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            if (resultSet.next()) {
-                int customerId = resultSet.getInt("customer_id");
-                // Fetch user details
-                User user = UserDAO.getUserById(userId);
-                return new Customer(customerId, user.getId(), user.getUsername(), user.getEmail(),
-                        user.getPassword(), user.getAddress(), user.getPhoneNumber());
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                int customerId = rs.getInt("customer_id");
+                String username = rs.getString("name");
+                String email = rs.getString("email");
+                String password = rs.getString("password");
+                String address = rs.getString("address");
+                String phone = rs.getString("phone");
+                double balance = rs.getDouble("balance");
+
+                return new Customer(customerId, userId, username, email, password, address, phone, balance);
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null; // Return null if no customer found
+        return null;
     }
 
-    public static boolean createCustomer(Customer customer) {
-        String query = "INSERT INTO CUSTOMER (user_id) VALUES (?)";
+    // Update customer info (e.g., balance, address, phone)
+    public static boolean updateCustomerInfo(String address, String phoneNumber, int customerId, double balance) {
+        String sql = "UPDATE USERS u INNER JOIN CUSTOMER c ON u.user_id = c.user_id SET u.address = ?, u.phone = ?, c.balance = ? WHERE c.customer_id = ?";
 
-        try (Connection connection = DBconnector.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = DBconnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            preparedStatement.setInt(1, customer.getId());
-            if (preparedStatement.executeUpdate() > 0) {
-                try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        int customerId = generatedKeys.getInt(1);
-                        customer.setId(customerId);
-                        customer.setShoppingCart(initializeShoppingCart(customerId)); // Create and assign cart
-                        return true;
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
+            stmt.setString(1, address);
+            stmt.setString(2, phoneNumber);
+            stmt.setDouble(3, balance);
+            stmt.setInt(4, customerId);
+            int affectedRows = stmt.executeUpdate();
 
-    public static boolean createCustomer(int userId) {
-        String query = "INSERT INTO CUSTOMER (user_id) VALUES (?)";
+            return affectedRows > 0;
 
-        try (Connection connection = DBconnector.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
-
-            preparedStatement.setInt(1, userId);
-            if (preparedStatement.executeUpdate() > 0) {
-                try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        int customerId = generatedKeys.getInt(1);
-                        initializeShoppingCart(customerId); // Create cart during customer creation
-                        return true;
-                    }
-                }
-            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return false;
     }
 
+    // Update the customer (full customer update)
+    public static boolean updateCustomer(Customer customer) {
+        return updateCustomerInfo(customer.getAddress(), customer.getPhoneNumber(), customer.getCustomerId(), customer.getBalance());
+    }
+
+    // Delete customer by customerId
     public static ShoppingCart initializeShoppingCart(int customerId) {
         try (Connection connection = DBconnector.getConnection()) {
             // Step 1: Check if a shopping cart already exists for the customer
@@ -170,10 +226,6 @@ public class CustomerDAO {
         }
 
         return null; // Return null if an error occurs
-    }
-
-    public static boolean updateCustomer(Customer customer) {
-        return UserDAO.updateUser(customer);
     }
 
     public static boolean deleteCustomerByUserId(int userId) {
@@ -211,20 +263,35 @@ public class CustomerDAO {
         return false;
     }
 
-    public static boolean updateCustomerInfo(String address, String phone, int id) {
-        try (Connection connection = DBconnector.getConnection()) {
-            String query = "UPDATE USERS SET address = ?, phone_number = ? WHERE id = ?";
-            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-                preparedStatement.setString(1, address);
-                preparedStatement.setString(2, phone);
-                preparedStatement.setInt(3, id); // Use user ID here
 
-                int rowsAffected = preparedStatement.executeUpdate();
-                return rowsAffected > 0;
+    // Get all customers
+    public static List<Customer> getAllCustomers() {
+        String sql = "SELECT * FROM USERS u INNER JOIN CUSTOMER c ON u.user_id = c.user_id";
+
+        List<Customer> customers = new ArrayList<>();
+
+        try (Connection conn = DBconnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                int customerId = rs.getInt("customer_id");
+                int userId = rs.getInt("user_id");
+                String username = rs.getString("username");
+                String email = rs.getString("email");
+                String password = rs.getString("password");
+                String address = rs.getString("address");
+                String phone = rs.getString("phone");
+                double balance = rs.getDouble("balance");
+
+                Customer customer = new Customer(customerId, userId, username, email, password, address, phone, balance);
+                customers.add(customer);
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
+        return customers;
     }
 }

@@ -22,11 +22,12 @@
 
             <!-- Table View for Users -->
             <TableView fx:id="userTable" prefHeight="400" prefWidth="600" styleClass="table-view">
-                <!-- Columns for Name, Email, Role, and Actions -->
+                <!-- Columns for Name, Email, Role, User ID, Customer/Staff ID, and Actions -->
                 <columns>
                     <TableColumn fx:id="nameColumn" text="Name" prefWidth="150" />
                     <TableColumn fx:id="emailColumn" text="Email" prefWidth="200" />
                     <TableColumn fx:id="roleColumn" text="Role" prefWidth="100" />
+                    <TableColumn fx:id="userIdColumn" text="User ID" prefWidth="100" />
                     <TableColumn fx:id="actionColumn" text="Actions" prefWidth="150" />
                 </columns>
             </TableView>

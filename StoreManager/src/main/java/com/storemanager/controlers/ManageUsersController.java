@@ -1,16 +1,12 @@
 package com.storemanager.controlers;
 
-import com.storemanager.dao.CustomerDAO;
-import com.storemanager.dao.StaffDAO;
 import com.storemanager.dao.UserDAO;
-import com.storemanager.model.users.Admin;
 import com.storemanager.model.users.User;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +27,12 @@ public class ManageUsersController {
     private TableColumn<User, String> roleColumn;
 
     @FXML
+    private TableColumn<User, String> userIdColumn;
+
+    @FXML
+    private TableColumn<User, String> customerStaffIdColumn;
+
+    @FXML
     private TableColumn<User, Void> actionColumn;
 
     @FXML
@@ -43,8 +45,8 @@ public class ManageUsersController {
         // Initialize table columns
         nameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getUsername()));
         emailColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getEmail()));
-        roleColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getRole()));
-
+        roleColumn.setCellValueFactory(cellData -> new SimpleStringProperty(getRole(cellData.getValue())));
+        userIdColumn.setCellValueFactory(cellData -> new SimpleStringProperty(String.valueOf(cellData.getValue().getId())));
         // Add action buttons to the table
         actionColumn.setCellFactory(param -> new TableCell<>() {
             private final Button deleteButton = new Button("Delete");
@@ -72,6 +74,18 @@ public class ManageUsersController {
         userTable.getItems().setAll(allUsers);
     }
 
+    private String getRole(User user) {
+        // Check the user_id to determine the role
+        if (user.getId() == 1 && "Staff".equalsIgnoreCase(user.getRole())) {
+            return "Admin"; // user_id 1 is Admin
+        } else if (user.getId() == 2 && "Staff".equalsIgnoreCase(user.getRole())) {
+            return "Manager"; // user_id 2 is Manager
+        } else if ("Staff".equalsIgnoreCase(user.getRole())) {
+            return "WarehouseStaff"; // Other staff members
+        }
+        return "Customer"; // Default to Customer
+    }
+
     @FXML
     private void handleSearch() {
         String searchQuery = searchField.getText().toLowerCase();
@@ -79,7 +93,7 @@ public class ManageUsersController {
         List<User> filteredUsers = allUsers.stream()
                 .filter(user -> user.getUsername().toLowerCase().contains(searchQuery) ||
                         user.getEmail().toLowerCase().contains(searchQuery) ||
-                        user.getRole().toLowerCase().contains(searchQuery))
+                        getRole(user).toLowerCase().contains(searchQuery))
                 .collect(Collectors.toList());
         // Update the table with the filtered results
         userTable.getItems().setAll(filteredUsers);
@@ -87,15 +101,8 @@ public class ManageUsersController {
 
     @FXML
     private void handleDeleteUser(User user) {
-        String position = null;
-
-        if (!"Customer".equalsIgnoreCase(user.getRole())) {
-            // Fetch the position of the staff
-            position = StaffDAO.getStaffPositionByUserId(user.getId());
-        }
-
-        // Check if the user is an Admin or Manager based on the position
-        if ("Admin".equalsIgnoreCase(position) || "Manager".equalsIgnoreCase(position)) {
+        // Check if the user is an Admin or Manager, and prevent deletion
+        if ("Admin".equalsIgnoreCase(getRole(user)) || "Manager".equalsIgnoreCase(getRole(user))) {
             showAlert("Delete Not Allowed", "Admin and Manager accounts cannot be deleted.");
             return;
         }
@@ -113,13 +120,8 @@ public class ManageUsersController {
             return;
         }
 
-        // Proceed with the deletion
-        boolean deleteSuccessful;
-        if ("Customer".equalsIgnoreCase(user.getRole())) {
-            deleteSuccessful = CustomerDAO.deleteCustomerByUserId(user.getId());
-        } else {
-            deleteSuccessful = StaffDAO.deleteStaffByUserId(user.getId());
-        }
+        // Proceed with the deletion (call the appropriate DAO method)
+        boolean deleteSuccessful = UserDAO.deleteUser(user.getId());
 
         if (deleteSuccessful) {
             // Remove the user from the local list
@@ -130,8 +132,6 @@ public class ManageUsersController {
             showAlert("Error", "Failed to delete the user.");
         }
     }
-
-
 
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING);

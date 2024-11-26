@@ -92,7 +92,6 @@ public class AdminDashboardController {
 
     @FXML
     public void handleLogout() {
-        System.out.println("Logging out...");
         try {
             // Redirect to login screen by loading the Login FXML as the new root
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/storemanager/Login.fxml"));

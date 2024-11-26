@@ -130,15 +130,16 @@ public class UserDAO {
                 String phone = rs.getString("phone");
 
                 if ("customer".equalsIgnoreCase(role)) {
-                    // Query the CUSTOMER table to fetch customer_id based on the user_id
+                    // Query the CUSTOMER table to fetch customer_id and balance based on the user_id
                     String customerQuery = "SELECT * FROM CUSTOMER WHERE user_id = ?";
                     try (PreparedStatement customerStmt = conn.prepareStatement(customerQuery)) {
                         customerStmt.setInt(1, userId);
                         try (ResultSet customerRs = customerStmt.executeQuery()) {
                             if (customerRs.next()) {
                                 int customerId = customerRs.getInt("customer_id");
+                                double balance = customerRs.getDouble("balance");  // Get the balance
                                 // Create a Customer object with the relevant information
-                                users.add(new Customer(customerId, userId, username, email, password, address, phone));
+                                users.add(new Customer(customerId, userId, username, email, password, address, phone, balance));
                             }
                         }
                     }
