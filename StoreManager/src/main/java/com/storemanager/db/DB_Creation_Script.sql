@@ -1,130 +1,131 @@
 -- Create USERS Table
 CREATE TABLE USERS (
-    user_id INT IDENTITY(1,1) PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    role VARCHAR(50) NOT NULL, -- "Customer" or "Staff"
-    address TEXT,
-    phone VARCHAR(15),
+                       user_id INT IDENTITY(1,1) PRIMARY KEY,
+                       name VARCHAR(255) NOT NULL UNIQUE, -- Username is now unique
+                       email VARCHAR(255) UNIQUE NOT NULL,
+                       password VARCHAR(255) NOT NULL,
+                       role VARCHAR(50) NOT NULL, -- "Customer" or "Staff"
+                       address TEXT,
+                       phone VARCHAR(15)
 );
 
 --Modified Customer
 CREATE TABLE CUSTOMER (
-    customer_id INT IDENTITY(1,1) PRIMARY KEY,
-    user_id INT UNIQUE NOT NULL,  -- User ID should remain
-    FOREIGN KEY (user_id) REFERENCES USERS(user_id)
+                          customer_id INT IDENTITY(1,1) PRIMARY KEY,
+                          user_id INT UNIQUE NOT NULL,  -- User ID should remain
+                          balance DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+                          FOREIGN KEY (user_id) REFERENCES USERS(user_id)
 );
+
 
 -- SHOPPINGCART table (make sure customer_id references CUSTOMER)
 CREATE TABLE SHOPPINGCART (
-    cart_id INT IDENTITY(1,1) PRIMARY KEY,
-    customer_id INT NOT NULL,  -- Foreign Key pointing to CUSTOMER
-    FOREIGN KEY (customer_id) REFERENCES CUSTOMER(customer_id)
+                              cart_id INT IDENTITY(1,1) PRIMARY KEY,
+                              customer_id INT NOT NULL,  -- Foreign Key pointing to CUSTOMER
+                              FOREIGN KEY (customer_id) REFERENCES CUSTOMER(customer_id)
 );
 
 -- Create STAFF Table
 CREATE TABLE STAFF (
-    staff_id INT IDENTITY(1,1) PRIMARY KEY,
-    user_id INT UNIQUE NOT NULL,
-    position VARCHAR(50),
-    FOREIGN KEY (user_id) REFERENCES USERS(user_id)
+                       staff_id INT IDENTITY(1,1) PRIMARY KEY,
+                       user_id INT UNIQUE NOT NULL,
+                       position VARCHAR(50),
+                       FOREIGN KEY (user_id) REFERENCES USERS(user_id)
 );
 
 -- Create CATEGORY Table
 CREATE TABLE CATEGORY (
-    category_id INT IDENTITY(1,1) PRIMARY KEY,
-    name VARCHAR(255) NOT NULL
+                          category_id INT IDENTITY(1,1) PRIMARY KEY,
+                          name VARCHAR(255) NOT NULL
 );
 
 -- Create PRODUCT Table
 CREATE TABLE PRODUCT (
-    product_id INT IDENTITY(1,1) PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    brand VARCHAR(255) NOT NULL,
-    description TEXT,
-    price DECIMAL(10, 2) NOT NULL,
-    category_id INT,
-    url VARCHAR(500), -- Newly added field
-    FOREIGN KEY (category_id) REFERENCES CATEGORY(category_id)
+                         product_id INT IDENTITY(1,1) PRIMARY KEY,
+                         name VARCHAR(255) NOT NULL,
+                         brand VARCHAR(255) NOT NULL,
+                         description TEXT,
+                         price DECIMAL(10, 2) NOT NULL,
+                         category_id INT,
+                         url VARCHAR(500), -- Newly added field
+                         FOREIGN KEY (category_id) REFERENCES CATEGORY(category_id)
 );
 
 -- Create ORDERTABLE Table
 CREATE TABLE ORDERTABLE (
-    order_id INT IDENTITY(1,1) PRIMARY KEY,
-    customer_id INT NOT NULL, -- References CUSTOMER table
-    order_date DATETIME DEFAULT GETDATE(),
-    total_amount DECIMAL(10, 2),
-    status VARCHAR(50),
-    FOREIGN KEY (customer_id) REFERENCES CUSTOMER(user_id) -- Adjusted to match CUSTOMER's primary key
+                            order_id INT IDENTITY(1,1) PRIMARY KEY,
+                            customer_id INT NOT NULL, -- References CUSTOMER table
+                            order_date DATETIME DEFAULT GETDATE(),
+                            total_amount DECIMAL(10, 2),
+                            status VARCHAR(50),
+                            FOREIGN KEY (customer_id) REFERENCES CUSTOMER(customer_id)
 );
 
 
 -- Create PAYMENT Table
 CREATE TABLE PAYMENT (
-    payment_id INT IDENTITY(1,1) PRIMARY KEY,
-    order_id INT NOT NULL, -- References ORDERTABLE table
-    amount DECIMAL(10, 2) NOT NULL,
-    date DATETIME DEFAULT GETDATE(),
-    status VARCHAR(10) DEFAULT 'Pending', -- "Pending", "Completed", "Failed"
-    FOREIGN KEY (order_id) REFERENCES ORDERTABLE(order_id)
+                         payment_id INT IDENTITY(1,1) PRIMARY KEY,
+                         order_id INT NOT NULL, -- References ORDERTABLE table
+                         amount DECIMAL(10, 2) NOT NULL,
+                         date DATETIME DEFAULT GETDATE(),
+                         status VARCHAR(10) DEFAULT 'Pending', -- "Pending", "Completed", "Failed"
+                         FOREIGN KEY (order_id) REFERENCES ORDERTABLE(order_id)
 );
 
 -- Create ORDERLINEITEM Table
 CREATE TABLE ORDERITEM (
-    order_item_id INT IDENTITY(1,1) PRIMARY KEY,
-    order_id INT NOT NULL,
-    product_id INT NOT NULL,
-    quantity INT NOT NULL,
-    price DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (order_id) REFERENCES ORDERTABLE(order_id),
-    FOREIGN KEY (product_id) REFERENCES PRODUCT(product_id)
+                           order_item_id INT IDENTITY(1,1) PRIMARY KEY,
+                           order_id INT NOT NULL,
+                           product_id INT NOT NULL,
+                           quantity INT NOT NULL,
+                           price DECIMAL(10, 2) NOT NULL,
+                           FOREIGN KEY (order_id) REFERENCES ORDERTABLE(order_id),
+                           FOREIGN KEY (product_id) REFERENCES PRODUCT(product_id)
 );
 
 -- Create CARTLINEITEM Table
 CREATE TABLE CARTITEM (
-    cart_item_id INT IDENTITY(1,1) PRIMARY KEY,
-    cart_id INT NOT NULL,
-    product_id INT NOT NULL,
-    quantity INT NOT NULL,
-    price DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (cart_id) REFERENCES SHOPPINGCART(cart_id),
-    FOREIGN KEY (product_id) REFERENCES PRODUCT(product_id)
+                          cart_item_id INT IDENTITY(1,1) PRIMARY KEY,
+                          cart_id INT NOT NULL,
+                          product_id INT NOT NULL,
+                          quantity INT NOT NULL,
+                          price DECIMAL(10, 2) NOT NULL,
+                          FOREIGN KEY (cart_id) REFERENCES SHOPPINGCART(cart_id),
+                          FOREIGN KEY (product_id) REFERENCES PRODUCT(product_id)
 );
 
 -- Create INVENTORY Table
 CREATE TABLE INVENTORY (
-    inventory_id INT IDENTITY(1,1) PRIMARY KEY,
-    product_id INT NOT NULL,
-	stock_quantity INT NOT NULL,
-    restock_quantity INT NOT NULL,
-    restock_date DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (product_id) REFERENCES PRODUCT(product_id)
+                           inventory_id INT IDENTITY(1,1) PRIMARY KEY,
+                           product_id INT NOT NULL,
+                           stock_quantity INT NOT NULL,
+                           restock_quantity INT NOT NULL,
+                           restock_date DATETIME DEFAULT GETDATE(),
+                           FOREIGN KEY (product_id) REFERENCES PRODUCT(product_id)
 );
 
 -- Create FEEDBACK Table
 CREATE TABLE FEEDBACK (
-    feedback_id INT IDENTITY(1,1) PRIMARY KEY,
-    customer_id INT NOT NULL,
-    comments TEXT,
-    FOREIGN KEY (customer_id) REFERENCES CUSTOMER(customer_id)
+                          feedback_id INT IDENTITY(1,1) PRIMARY KEY,
+                          customer_id INT NOT NULL,
+                          comments TEXT,
+                          FOREIGN KEY (customer_id) REFERENCES CUSTOMER(customer_id)
 );
 
 -- Updated NOTIFICATION Table
 CREATE TABLE NOTIFICATION (
-    notification_id INT IDENTITY(1,1) PRIMARY KEY,
-    message TEXT NOT NULL,
-    date DATETIME DEFAULT GETDATE()
+                              notification_id INT IDENTITY(1,1) PRIMARY KEY,
+                              message TEXT NOT NULL,
+                              date DATETIME DEFAULT GETDATE()
 );
 
 
 -- Junction Table for Notification Recipients
 CREATE TABLE NOTIFICATION_RECIPIENT (
-    notification_id INT NOT NULL,
-    user_id INT NOT NULL,
-    status VARCHAR(10) DEFAULT 'Unread', -- "Unread" or "Read"
-    PRIMARY KEY (notification_id, user_id),
-    FOREIGN KEY (notification_id) REFERENCES NOTIFICATION(notification_id),
-    FOREIGN KEY (user_id) REFERENCES USERS(user_id)
+                                        notification_id INT NOT NULL,
+                                        user_id INT NOT NULL,
+                                        status VARCHAR(10) DEFAULT 'Unread', -- "Unread" or "Read"
+                                        PRIMARY KEY (notification_id, user_id),
+                                        FOREIGN KEY (notification_id) REFERENCES NOTIFICATION(notification_id),
+                                        FOREIGN KEY (user_id) REFERENCES USERS(user_id)
 );
-

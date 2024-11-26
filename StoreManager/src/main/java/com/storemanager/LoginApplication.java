@@ -19,7 +19,7 @@ public class LoginApplication extends Application {
         DBconnector.testConnection();
 
         // test reading from db
-        DBconnector.printAllUsernames();
+//        DBconnector.printAllUsernames();
 
         // Load the FXML for the main application UI
         FXMLLoader fxmlLoader = new FXMLLoader(LoginApplication.class.getResource("Login.fxml"));
