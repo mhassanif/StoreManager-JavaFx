@@ -61,7 +61,7 @@ public class DashboardController {
         loadContent("/com/storemanager/CustomerFeedback.fxml");
     }
 
-    private void loadContent(String fxmlFile) {
+    void loadContent(String fxmlFile) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
             Node content = loader.load();

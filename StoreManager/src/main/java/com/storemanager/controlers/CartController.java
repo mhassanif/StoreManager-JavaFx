@@ -14,9 +14,13 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -187,7 +191,44 @@ public class CartController {
      * Proceed to checkout (placeholder for checkout functionality).
      */
     public void proceedToCheckout() {
-        System.out.println("Proceeding to checkout...");
-        // Navigate to Checkout.fxml
+        double totalAmount = shoppingCart.getTotalPrice();
+        double walletBalance = getHardcodedWalletBalance(); // Use the hardcoded wallet balance
+
+        if (walletBalance >= totalAmount) {
+            // Navigate to the payment confirmation page
+            navigateToPaymentPage(totalAmount, shoppingCart);
+        } else {
+            // Show an error dialog for insufficient balance
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Insufficient Balance");
+            alert.setHeaderText("Insufficient Wallet Balance");
+            alert.setContentText("Your wallet balance is insufficient to complete this purchase. Please recharge your wallet.");
+            alert.showAndWait();
+        }
     }
+    private void navigateToPaymentPage(double totalAmount, ShoppingCart cart) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/storemanager/Checkout.fxml"));
+            Parent paymentView = loader.load();
+
+            // Pass data to the CheckoutController
+            CheckoutController checkoutController = loader.getController();
+            checkoutController.setCartDetails(cart);
+            checkoutController.setTotalAmount(totalAmount);
+
+            Stage stage = (Stage) cartTable.getScene().getWindow();
+            stage.setScene(new Scene(paymentView));
+            stage.setTitle("Checkout");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Returns a hardcoded wallet balance for testing purposes.
+     */
+    private double getHardcodedWalletBalance() {
+        return 5000.00; // Hardcoded wallet balance
+    }
+
 }
