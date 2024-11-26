@@ -38,7 +38,10 @@ public class OrderDAO {
     // Method to fetch all orders along with payment information
     public static List<Order> getAllOrders() throws SQLException {
         List<Order> orders = new ArrayList<>();
-        String sql = "SELECT o.order_id, o.customer_id, o.order_date, o.total_amount, o.status FROM ORDERTABLE o";
+        String sql = "SELECT o.order_id, o.customer_id, o.order_date, o.total_amount, o.status, " +
+                "p.payment_id, p.amount, p.status AS payment_status, p.date AS payment_date " +
+                "FROM ORDERTABLE o " +
+                "INNER JOIN PAYMENT p ON o.order_id = p.order_id";  // Using LEFT JOIN to get payment info if exists
 
         try (Connection conn = DBconnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -53,15 +56,22 @@ public class OrderDAO {
                 order.setTotalPrice(rs.getDouble("total_amount"));
                 order.setStatus(rs.getString("status"));
 
-                // Fetch payment details using the new method
-                Payment payment = getPaymentByOrderId(order.getOrderId());
-                order.setPayment(payment); // Set the payment for the order
+                // Fetch payment details directly from the result set
+                Payment payment = new Payment();
+                payment.setId(rs.getInt("payment_id"));
+                payment.setAmount(rs.getDouble("amount"));
+                payment.setStatus(rs.getString("payment_status"));
+                payment.setDate(rs.getString("payment_date"));
+
+                // Set the payment for the order
+                order.setPayment(payment);
 
                 orders.add(order);
             }
         }
         return orders;
     }
+
 
     // Method to fetch order by ID along with payment information
     public static Order getOrderById(int orderId) throws SQLException {

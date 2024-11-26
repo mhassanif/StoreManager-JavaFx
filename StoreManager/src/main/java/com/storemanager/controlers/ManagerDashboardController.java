@@ -26,8 +26,6 @@ public class ManagerDashboardController {
     @FXML
     private Button btnManageNotifications;
     @FXML
-    private Button btnManageFeedback;
-    @FXML
     private Button btnLogout;
 
     private String currentView = "";
@@ -82,16 +80,7 @@ public class ManagerDashboardController {
     }
 
     @FXML
-    public void handleManageFeedback() {
-        if (!"StaffManageFeedback".equals(currentView)) {
-            loadContent("StaffManageFeedback.fxml");
-            currentView = "StaffManageFeedback";
-        }
-    }
-
-    @FXML
     public void handleLogout() {
-        System.out.println("Logging out...");
         try {
             // Redirect to login screen by loading the Login FXML as the new root
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/storemanager/Login.fxml"));
