@@ -8,25 +8,26 @@
 
     <!-- Top Bar -->
     <top>
-        <HBox alignment="TOP_RIGHT" styleClass="top-bar">
-            <Button text="Sign Out" onAction="#handleSignOut" styleClass="button-sign-out" />
+        <HBox alignment="TOP_RIGHT" style="-fx-background-color: #2A2A2A; -fx-padding: 10;">
+            <Button text="Sign Out" onAction="#handleSignOut"
+                    style="-fx-font-size: 14px; -fx-background-color: #E74C3C; -fx-text-fill: white;" />
         </HBox>
     </top>
 
     <!-- Left Sidebar -->
     <left>
-        <VBox spacing="15" alignment="TOP_LEFT" styleClass="side-bar">
-            <Label text="Warehouse Staff" styleClass="label-sidebar-title" />
-            <Button text="Inventory" onAction="#showInventory" styleClass="button-sidebar" />
-            <Button text="Notifications" onAction="#showNotifications" styleClass="button-sidebar" />
-            <Button text="Profile" onAction="#showProfile" styleClass="button-sidebar" />
+        <VBox spacing="15" alignment="TOP_LEFT" style="-fx-background-color: #2A2A2A; -fx-padding: 15;">
+            <Label text="Warehouse Staff" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" />
+            <Button text="Inventory" onAction="#showInventory" />
+            <Button text="Notifications" onAction="#showNotifications" />
+            <Button text="Profile" onAction="#showProfile" />
         </VBox>
     </left>
 
     <!-- Dynamic Content Area -->
     <center>
-        <StackPane fx:id="contentArea" styleClass="content-area">
-            <Label text="Welcome, Warehouse Staff!" styleClass="label-welcome" />
+        <StackPane fx:id="contentArea" style="-fx-background-color: #FFFFFF;">
+            <Label text="Welcome, Warehouse Staff!" style="-fx-font-size: 16px;" />
         </StackPane>
     </center>
 </BorderPane>
