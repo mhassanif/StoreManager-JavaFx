@@ -94,7 +94,7 @@ public class OrderDAO {
     // Method to fetch orders by customer ID along with payment information
     public static List<Order> getOrdersByCustomerId(int customerId) throws SQLException {
         List<Order> orders = new ArrayList<>();
-        String sql = "SELECT o.order_id, o.order_date, o.total_amount, o.status FROM ORDERTABLE o WHERE o.customer_id = ?";
+        String sql = "SELECT * FROM ORDERTABLE WHERE customer_id = ?";
 
         try (Connection conn = DBconnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
