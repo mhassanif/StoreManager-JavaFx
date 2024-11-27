@@ -171,7 +171,7 @@ public class OrderDAO {
 
             // Insert into ORDERTABLE
             try (PreparedStatement orderStmt = connection.prepareStatement(orderSql, Statement.RETURN_GENERATED_KEYS)) {
-                orderStmt.setInt(1, order.getCustomer().getId());
+                orderStmt.setInt(1, order.getCustomer().getCustomerId());
                 orderStmt.setDouble(2, order.getTotalPrice());
                 orderStmt.setString(3, order.getStatus());
                 int affectedRows = orderStmt.executeUpdate();
