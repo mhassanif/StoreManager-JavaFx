@@ -1,5 +1,6 @@
 # StoreManager-JavaFx
-A Retail Management System developed for my SDA course using Spring. It supports both in-store and online sales with features for inventory management and POS operations, offering a seamless retail experience for businesses.
+TradeTrack is an integrated desktop-based application. TradeTrack merges eCommerce functionalities with inventory management to streamline retail operations for SaveMart. It covers key areas, including eCommerce management, inventory tracking, and analytics. 
+
 
 [PROJECT SCOPE](https://docs.google.com/document/d/1z5ElDZz7LbN9RkBCWqyHpdc8WMfhoWTePHPCq78gaFU/edit?usp=sharing)
 
