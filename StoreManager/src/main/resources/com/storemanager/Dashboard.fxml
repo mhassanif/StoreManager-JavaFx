@@ -4,31 +4,42 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.storemanager.controlers.DashboardController" prefWidth="980.0" prefHeight="620.0" style="-fx-background-color: #ECF0F1;">
-    <!-- Left Sidebar -->
-    <left>
-        <VBox spacing="15" alignment="TOP_LEFT" style="-fx-background-color: #2C3E50; -fx-padding: 15;">
-            <Label text="Dashboard" style="-fx-text-fill: #FFFFFF; -fx-font-size: 20px; -fx-font-weight: bold;" />
-            <Button text="Products" fx:id="productsButton" onAction="#showProducts" prefWidth="200" style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-background-color: #34495E;" />
-            <Button text="Cart" fx:id="cartButton" onAction="#showCart" prefWidth="200" style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-background-color: #34495E;" />
-            <Button text="Orders" fx:id="ordersButton" onAction="#showOrders" prefWidth="200" style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-background-color: #34495E;" />
-            <Button text="Notifications" fx:id="notificationsButton" onAction="#showNotifications" prefWidth="200" style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-background-color: #34495E;" />
-            <Button text="Profile" fx:id="profileButton" onAction="#showProfile" prefWidth="200" style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-background-color: #34495E;" />
-            <Button text="Feedback" fx:id="feedbackButton" onAction="#showFeedback" prefWidth="200" style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-background-color: #34495E;" />
-        </VBox>
-    </left>
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.storemanager.controlers.DashboardController" prefWidth="980.0" prefHeight="620.0" stylesheets="@dashboard.css" styleClass="root">
 
     <!-- Top Bar -->
     <top>
-        <HBox alignment="CENTER_RIGHT" style="-fx-padding: 10; -fx-background-color: #2C3E50;">
-            <Button text="Sign Out" onAction="#handleSignOut" style="-fx-background-color: #E74C3C; -fx-text-fill: #FFFFFF;" />
+        <HBox alignment="CENTER_RIGHT" style="-fx-background-color: #2C3E50; -fx-padding: 10;">
+            <Button text="Sign Out" onAction="#handleSignOut" styleClass="logout-button" />
         </HBox>
     </top>
 
-    <!-- Dynamic Content Area -->
+    <!-- Left Sidebar -->
+    <left>
+        <VBox spacing="15" alignment="TOP_CENTER" styleClass="sidebar">
+            <!-- Label for Customer Dashboard -->
+            <Label text="Customer Dashboard" styleClass="sidebar-label" />
+
+            <!-- Separator -->
+            <Separator styleClass="sidebar-separator" />
+
+            <!-- Navigation Buttons -->
+            <Button text="Products" fx:id="productsButton" onAction="#showProducts" styleClass="sidebar-button" />
+            <Button text="Cart" fx:id="cartButton" onAction="#showCart" styleClass="sidebar-button" />
+            <Button text="Orders" fx:id="ordersButton" onAction="#showOrders" styleClass="sidebar-button" />
+            <Button text="Notifications" fx:id="notificationsButton" onAction="#showNotifications" styleClass="sidebar-button" />
+            <Button text="Profile" fx:id="profileButton" onAction="#showProfile" styleClass="sidebar-button" />
+            <Button text="Feedback" fx:id="feedbackButton" onAction="#showFeedback" styleClass="sidebar-button" />
+
+            <!-- Spacer to push Logout button to the bottom -->
+            <Region VBox.vgrow="ALWAYS" />
+        </VBox>
+    </left>
+
+    <!-- Main Content Area -->
     <center>
-        <StackPane fx:id="contentArea" style="-fx-background-color: #FFFFFF;">
-            <Label text="Welcome to the Dashboard!" style="-fx-font-size: 16px; -fx-text-fill: #2C3E50;" />
+        <StackPane fx:id="contentArea">
+            <Label text="Welcome to the Customer Dashboard!" styleClass="text-header" />
         </StackPane>
     </center>
+
 </BorderPane>

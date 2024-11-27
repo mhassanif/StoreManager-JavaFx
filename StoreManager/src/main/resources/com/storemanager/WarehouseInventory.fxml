@@ -13,10 +13,10 @@
     <center>
         <TableView fx:id="inventoryTable" prefHeight="400" styleClass="table-view">
             <columns>
-                <TableColumn fx:id="productNameColumn" text="Product Name" prefWidth="150"/>
+                <TableColumn fx:id="productNameColumn" text="Product Name" prefWidth="200"/>
                 <TableColumn fx:id="priceColumn" text="Price" prefWidth="100"/>
                 <TableColumn fx:id="stockLevelColumn" text="Stock Level" prefWidth="100"/>
-                <TableColumn fx:id="restockLevelColumn" text="Restock Level" prefWidth="100"/>
+                <TableColumn fx:id="restockLevelColumn" text="Restock Level" prefWidth="150"/>
                 <TableColumn fx:id="restockDateColumn" text="Restock Date" prefWidth="150"/>
             </columns>
         </TableView>
@@ -26,11 +26,11 @@
     <bottom>
         <VBox spacing="10" style="-fx-padding: 10;">
             <HBox spacing="10">
-                <Label text="Stock Level:" styleClass="label-stock-restock"/>
-                <TextField fx:id="stockLevelField" promptText="Enter new stock level" styleClass="input-field"/>
-                <Label text="Restock Level:" styleClass="label-stock-restock"/>
-                <TextField fx:id="restockLevelField" promptText="Enter new restock level" styleClass="input-field"/>
-                <Button text="Update" onAction="#handleRestockProduct" styleClass="button-update"/>
+                <Label text="Stock Level:" styleClass="label-stock-restock" prefWidth="200"/>
+                <TextField fx:id="stockLevelField" promptText="Enter new stock level" styleClass="input-field" prefWidth="200"/>
+                <Label text="Restock Level:" styleClass="label-stock-restock" prefWidth="200"/>
+                <TextField fx:id="restockLevelField" promptText="Enter new restock level" styleClass="input-field" prefWidth="200"/>
+                <Button text="Update" onAction="#handleRestockProduct" styleClass="button-update" prefWidth="200"/>
             </HBox>
             <Label fx:id="statusMessage" styleClass="label-status"/>
         </VBox>
