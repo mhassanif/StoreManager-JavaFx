@@ -3,6 +3,7 @@ package com.storemanager.controlers;
 import com.storemanager.auth.CurrentUser;
 import com.storemanager.dao.OrderDAO;
 import com.storemanager.dao.CustomerDAO;
+import com.storemanager.dao.ShoppingCartDAO;
 import com.storemanager.db.DBconnector;
 import com.storemanager.model.cart.CartItem;
 import com.storemanager.model.cart.ShoppingCart;
@@ -82,6 +83,7 @@ public class CheckoutController {
             boolean balanceUpdated = deductWalletBalance(customer.getCustomerId(), totalAmount);
 
             if (balanceUpdated) {
+                ShoppingCartDAO.clearCart(((Customer)CurrentUser.getInstance().getUser()).getShoppingCart().getCartId());
                 saveOrder(customer.getCustomerId());
                 showSuccessDialog();
                 navigateToDashboard();
