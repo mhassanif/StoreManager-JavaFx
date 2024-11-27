@@ -18,6 +18,10 @@ TradeTrack is an integrated desktop-based application. TradeTrack merges eCommer
 
 [DELIVERABLE#4](https://docs.google.com/document/d/1kzpN3BP0F8CVbfs9zNb2Qpx1mfaCuAQz-NGVePSGB8U/edit?usp=sharing)
 
+[DETAILED DOCUMENTATION](https://docs.google.com/document/d/1nQ4ZFDPkTeb6NcJ1l5f-tok9yCS3-_UB/edit?usp=sharing&ouid=104121641467295610073&rtpof=true&sd=true)
+
+[PRESENTATION](https://docs.google.com/presentation/d/11zO-vK-PkMyaQgI6ITaRSNkrN9T5tWSH1eRJ7FmgIA4/edit?usp=sharing)
+
 
 
 
