@@ -50,7 +50,7 @@
     -fx-pref-width: 200; /* Ensures width consistency */
     -fx-pref-height: 25; /* Increased height for the button */
     -fx-font-size: 14px; /* Increased font size */
-    -fx-padding: 15 20; /* Padding to make the button larger */
+    -fx-padding: 10 20; /* Padding to make the button larger */
 }
 
 /* Hover effect for Logout Button */

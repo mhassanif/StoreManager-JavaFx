@@ -1,33 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Pos?>
 
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.storemanager.controlers.WarehouseDashboardController" prefWidth="980.0" prefHeight="620.0">
+            fx:controller="com.storemanager.controlers.WarehouseDashboardController"
+            prefWidth="980.0" prefHeight="620.0" stylesheets="@dashboard.css" styleClass="root">
 
     <!-- Top Bar -->
     <top>
-        <HBox alignment="TOP_RIGHT" style="-fx-background-color: #2A2A2A; -fx-padding: 10;">
-            <Button text="Sign Out" onAction="#handleSignOut"
-                    style="-fx-font-size: 14px; -fx-background-color: #E74C3C; -fx-text-fill: white;" />
+        <HBox alignment="TOP_RIGHT" style="-fx-background-color: #2C3E50; -fx-padding: 10;">
+            <Button text="Sign Out" onAction="#handleSignOut" styleClass="logout-button" />
         </HBox>
     </top>
 
     <!-- Left Sidebar -->
     <left>
-        <VBox spacing="15" alignment="TOP_LEFT" style="-fx-background-color: #2A2A2A; -fx-padding: 15;">
-            <Label text="Warehouse Staff" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" />
-            <Button text="Inventory" onAction="#showInventory" />
-            <Button text="Notifications" onAction="#showNotifications" />
-            <Button text="Profile" onAction="#showProfile" />
+        <VBox alignment="TOP_CENTER" spacing="15" styleClass="sidebar">
+            <!-- Label for Warehouse Staff -->
+            <Label text="Warehouse Staff" styleClass="sidebar-label" />
+
+            <!-- Separator -->
+            <Separator styleClass="sidebar-separator" />
+
+            <!-- Navigation Buttons -->
+            <Button text="Inventory" onAction="#showInventory" styleClass="sidebar-button" />
+            <Button text="Notifications" onAction="#showNotifications" styleClass="sidebar-button" />
+            <Button text="Profile" onAction="#showProfile" styleClass="sidebar-button" />
+
+            <!-- Spacer to push Logout button to the bottom -->
+            <Region VBox.vgrow="ALWAYS" />
+
         </VBox>
     </left>
 
-    <!-- Dynamic Content Area -->
+    <!-- Main Content Area -->
     <center>
-        <StackPane fx:id="contentArea" style="-fx-background-color: #FFFFFF;">
-            <Label text="Welcome, Warehouse Staff!" style="-fx-font-size: 16px;" />
+        <StackPane fx:id="contentArea">
+            <Label text="Welcome, Warehouse Staff!" styleClass="text-header" />
         </StackPane>
     </center>
 </BorderPane>

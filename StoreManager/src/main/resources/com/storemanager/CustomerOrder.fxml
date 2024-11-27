@@ -4,30 +4,39 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.storemanager.controlers.CustomerOrderController" stylesheets="@style.css">
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.storemanager.controlers.CustomerOrderController" stylesheets="@style.css">
+
     <!-- Top Section: Title -->
     <top>
-        <Label text="Order History" styleClass="title-label" alignment="CENTER" />
+        <VBox spacing="10" styleClass="header-container">
+            <Label text="Order History" styleClass="text-header" alignment="CENTER" />
+            <!-- Dropdown for filtering by Order Status -->
+            <HBox alignment="CENTER" spacing="10" styleClass="filter-container">
+                <Label text="Filter by Order Status:" styleClass="filter-label"/>
+                <ComboBox fx:id="statusFilterComboBox" promptText="Select Status" onAction="#filterOrdersByStatus"/>
+            </HBox>
+        </VBox>
     </top>
 
     <!-- Center Section: Table of Orders -->
     <center>
-        <VBox spacing="10" styleClass="content-container">
-            <TableView fx:id="orderTable" prefHeight="500" styleClass="table-view">
+        <VBox spacing="10" styleClass="content-container" VBox.vgrow="ALWAYS">
+            <TableView fx:id="orderTable" styleClass="table-view" VBox.vgrow="ALWAYS">
                 <columns>
+                    <!-- Existing Columns with Increased Width -->
                     <TableColumn text="Order ID" fx:id="orderIdColumn" prefWidth="100" />
-                    <TableColumn text="Order Date" fx:id="orderDateColumn" prefWidth="150" />
-                    <TableColumn text="Total Price" fx:id="totalPriceColumn" prefWidth="120" />
-                    <TableColumn text="Status" fx:id="statusColumn" prefWidth="100" />
+                    <TableColumn text="Order Date" fx:id="orderDateColumn" prefWidth="100" />
+                    <TableColumn text="Total Price" fx:id="totalPriceColumn" prefWidth="100" />
+
+                    <!-- Distinction between Order Status and Payment Status -->
+                    <TableColumn text="Order Status" fx:id="orderStatusColumn" prefWidth="150" />
+                    <TableColumn text="Payment Status" fx:id="paymentStatusColumn" prefWidth="150" />
+
+                    <!-- New Columns for Payment Details -->
+                    <TableColumn text="Payment Date" fx:id="paymentDateColumn" prefWidth="150" />
                 </columns>
             </TableView>
         </VBox>
     </center>
-
-    <!-- Bottom Section: Back Button -->
-    <bottom>
-        <HBox alignment="CENTER" spacing="10" styleClass="button-container">
-            <Button text="Back to Dashboard" onAction="#handleBackToDashboard" styleClass="button"/>
-        </HBox>
-    </bottom>
 </BorderPane>
