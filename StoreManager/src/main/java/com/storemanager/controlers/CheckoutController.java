@@ -2,6 +2,7 @@ package com.storemanager.controlers;
 
 import com.storemanager.auth.CurrentUser;
 import com.storemanager.dao.OrderDAO;
+import com.storemanager.dao.CustomerDAO;
 import com.storemanager.db.DBconnector;
 import com.storemanager.model.cart.CartItem;
 import com.storemanager.model.cart.ShoppingCart;
@@ -21,7 +22,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -31,7 +31,6 @@ import java.util.List;
 public class CheckoutController {
 
     @FXML private Label totalAmountLabel;
-    @FXML private TextArea deliveryAddressField;
     @FXML private Button confirmButton;
     @FXML private TableView<CartItem> orderSummaryTable;
     @FXML private TableColumn<CartItem, String> colProductName;
@@ -41,6 +40,7 @@ public class CheckoutController {
 
     private ShoppingCart cart;
     private double totalAmount;
+    private Customer customer;
 
     // Initialize the table columns
     @FXML
@@ -53,6 +53,9 @@ public class CheckoutController {
                 new SimpleDoubleProperty(data.getValue().getProduct().getPrice()).asObject());
         colTotal.setCellValueFactory(data ->
                 new SimpleDoubleProperty(data.getValue().calculateSubtotal()).asObject());
+
+        // Get the current customer
+        customer = (Customer) CurrentUser.getInstance().getUser();
     }
 
     public void setCartDetails(ShoppingCart cart) {
@@ -63,30 +66,50 @@ public class CheckoutController {
 
     public void setTotalAmount(double totalAmount) {
         this.totalAmount = totalAmount;
-        totalAmountLabel.setText("$" + String.format("%.2f", totalAmount));
+        totalAmountLabel.setText("Total Amount: $" + String.format("%.2f", totalAmount));
     }
 
     @FXML
     private void handleConfirmPayment() {
-        int userId = CurrentUser.getInstance().getUser().getId();
+        if (customer == null) {
+            showErrorDialog("Error", "User not logged in.");
+            return;
+        }
 
-        if (deductWalletBalance(userId, totalAmount)) {
-            saveOrder(userId);
-            showSuccessDialog();
-            navigateToDashboard();
+        double customerBalance = customer.getBalance();
+        if (customerBalance >= totalAmount) {
+            // Deduct the amount from customer's balance
+            boolean balanceUpdated = deductWalletBalance(customer.getCustomerId(), totalAmount);
+
+            if (balanceUpdated) {
+                saveOrder(customer.getCustomerId());
+                showSuccessDialog();
+                navigateToDashboard();
+            } else {
+                showErrorDialog("Payment Failed", "Unable to process payment. Please try again.");
+            }
         } else {
-            showErrorDialog("Payment Failed", "Insufficient wallet balance. Please recharge and try again.");
+            showInsufficientBalanceDialog();
         }
     }
 
-    private boolean deductWalletBalance(int userId, double amount) {
-        System.out.println("Deducting $" + amount + " from hardcoded wallet balance.");
-        return true; // Simulate successful wallet deduction
+    private boolean deductWalletBalance(int customerId, double amount) {
+        double newBalance = customer.getBalance() - amount;
+
+        // Update the balance in the database
+        boolean success = CustomerDAO.setCustomerBalance(customerId, newBalance);
+
+        if (success) {
+            // Update the balance in the customer object
+            customer.setBalance(newBalance);
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    private void saveOrder(int userId) {
+    private void saveOrder(int customerId) {
         try {
-            Customer customer = (Customer) CurrentUser.getInstance().getUser();
             List<OrderItem> orderItems = new ArrayList<>();
 
             for (CartItem item : cart.getItems()) {
@@ -99,7 +122,9 @@ public class CheckoutController {
             order.setStatus("Completed");
 
             OrderDAO.createOrder(order);
-            cart.clearCart();
+            // Do not clear the cart as per the requirement
+            // cart.clearCart();
+
             savePayment(order.getOrderId(), totalAmount);
 
         } catch (Exception e) {
@@ -136,6 +161,14 @@ public class CheckoutController {
         alert.showAndWait();
     }
 
+    private void showInsufficientBalanceDialog() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Insufficient Balance");
+        alert.setHeaderText(null);
+        alert.setContentText("Your balance is insufficient to complete this purchase. Please recharge your account and try again.");
+        alert.showAndWait();
+    }
+
     private void navigateToDashboard() {
         try {
             // Load Dashboard.fxml
@@ -150,7 +183,6 @@ public class CheckoutController {
             e.printStackTrace();
         }
     }
-
 
     @FXML
     private void goBackToCart() {
@@ -175,10 +207,8 @@ public class CheckoutController {
         }
     }
 
-
     @FXML
-    private void confirmOrder()
-    {
+    private void confirmOrder() {
         handleConfirmPayment();
     }
 }

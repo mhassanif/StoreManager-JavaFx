@@ -5,11 +5,12 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.cell.PropertyValueFactory?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" spacing="15" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.storemanager.controlers.CartController" stylesheets="@style.css">
+<VBox alignment="CENTER" spacing="15" prefHeight="600.0" prefWidth="800.0"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.storemanager.controlers.CartController" stylesheets="@style.css">
     <!-- Title -->
     <Label text="Your Shopping Cart" styleClass="text-header"/>
 
@@ -21,7 +22,7 @@
             <TableColumn fx:id="colQuantity" text="Quantity" prefWidth="100.0" style="-fx-alignment: CENTER;"/>
             <TableColumn fx:id="colPrice" text="Price" prefWidth="100.0" style="-fx-alignment: CENTER;"/>
             <TableColumn fx:id="colTotal" text="Total" prefWidth="150.0" style="-fx-alignment: CENTER;"/>
-            <TableColumn fx:id="colActions" text="Actions" prefWidth="200.0" style="-fx-alignment: CENTER;"/>
+            <TableColumn fx:id="colActions" text="Actions" prefWidth="150.0" style="-fx-alignment: CENTER;"/>
         </columns>
     </TableView>
 
@@ -34,6 +35,6 @@
     <!-- Action Buttons -->
     <HBox spacing="20" alignment="CENTER">
         <Button text="Clear Cart" onAction="#clearCart" styleClass="button"/>
-        <Button text="Proceed to Checkout" onAction="#proceedToCheckout" styleClass="button"/>
+        <Button fx:id="proceedToCheckoutButton" text="Proceed to Checkout" onAction="#proceedToCheckout" styleClass="button"/>
     </HBox>
 </VBox>

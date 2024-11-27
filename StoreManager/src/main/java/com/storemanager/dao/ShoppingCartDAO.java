@@ -179,5 +179,22 @@ public class ShoppingCartDAO {
 
         return shoppingCart;
     }
+    public static boolean updateCartItem(int cartId, int productId, int quantity, double totalPrice) {
+        String sql = "UPDATE CARTITEM SET quantity = ?, price = ? WHERE cart_id = ? AND product_id = ?";
+        try (Connection connection = DBconnector.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setInt(1, quantity);
+            ps.setDouble(2, totalPrice);
+            ps.setInt(3, cartId);
+            ps.setInt(4, productId);
+
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
 }
