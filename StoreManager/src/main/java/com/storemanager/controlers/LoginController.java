@@ -10,6 +10,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -17,7 +19,7 @@ import java.io.IOException;
 public class LoginController {
 
     @FXML
-    private TextField usernameField; // Updated to match FXML
+    private TextField usernameField;
 
     @FXML
     private PasswordField passwordField;
@@ -25,12 +27,30 @@ public class LoginController {
     @FXML
     private Label messageLabel;
 
+    @FXML
+    private ImageView logoImageView;
+
+    /**
+     * Initialize method called after all @FXML fields are injected.
+     */
+    @FXML
+    public void initialize() {
+        // Load the logo image programmatically
+        try {
+            Image logoImage = new Image(getClass().getResourceAsStream("/images/newLogo.png"));
+            logoImageView.setImage(logoImage);
+        } catch (Exception e) {
+            e.printStackTrace();
+            messageLabel.setText("Failed to load logo image.");
+        }
+    }
+
     /**
      * Handle the login action.
      */
     @FXML
     public void login() {
-        String username = usernameField.getText().trim(); // Use usernameField for email input
+        String username = usernameField.getText().trim();
         String password = passwordField.getText().trim();
 
         if (username.isEmpty() || password.isEmpty()) {
