@@ -1,55 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.storemanager.controlers.CustomerProfileController" stylesheets="@style.css">
-    <!-- Top Section -->
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.storemanager.controlers.CustomerProfileController" stylesheets="@style.css">
+
+    <!-- Top Header Section -->
     <top>
-        <Label text="Your Profile" alignment="CENTER" styleClass="text-header"/>
+        <Label text="My Profile" styleClass="text-header" alignment="CENTER"/>
     </top>
 
-    <!-- Center Section -->
+    <!-- Main Content Area -->
     <center>
-        <VBox spacing="25" styleClass="profile-container" alignment="CENTER">
-            <!-- Username (View Only) -->
-            <HBox spacing="20" styleClass="profile-section" alignment="CENTER">
-                <Label text="Username:" styleClass="profile-label" />
-                <Label fx:id="usernameLabel" styleClass="profile-field" prefWidth="300" />
-            </HBox>
+        <ScrollPane fitToWidth="true" styleClass="scroll-pane">
+            <VBox fx:id="mainVBox" spacing="20" alignment="TOP_CENTER" styleClass="form-container">
 
-            <!-- Email (View Only) -->
-            <HBox spacing="20" styleClass="profile-section" alignment="CENTER">
-                <Label text="Email:" styleClass="profile-label" />
-                <Label fx:id="emailLabel" styleClass="profile-field" prefWidth="300" />
-            </HBox>
+                <!-- Balance Display -->
+                <Label fx:id="balanceLabel" styleClass="balance-label"/>
 
-            <!-- Address -->
-            <HBox spacing="20" styleClass="profile-section" alignment="CENTER">
-                <Label text="Address:" styleClass="profile-label" />
-                <TextField fx:id="addressField" promptText="Enter your address" styleClass="profile-input" />
-            </HBox>
+                <!-- Personal Information Section -->
+                <Label text="Personal Information" styleClass="section-header"/>
+                <GridPane hgap="10" vgap="15" alignment="CENTER" styleClass="form-grid">
+                    <Label text="Username:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                    <TextField fx:id="usernameField" editable="false" GridPane.rowIndex="0" GridPane.columnIndex="1" styleClass="profile-input"/>
 
-            <!-- Phone -->
-            <HBox spacing="20" styleClass="profile-section" alignment="CENTER">
-                <Label text="Phone:" styleClass="profile-label" />
-                <TextField fx:id="phoneField" promptText="Enter your phone number" styleClass="profile-input" />
-            </HBox>
+                    <Label text="Email:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                    <TextField fx:id="emailField" editable="false" GridPane.rowIndex="1" GridPane.columnIndex="1" styleClass="profile-input"/>
 
-            <!-- Password -->
-            <HBox spacing="20" styleClass="profile-section" alignment="CENTER">
-                <Label text="Password:" styleClass="profile-label" />
-                <PasswordField fx:id="passwordField" promptText="Enter your new password" styleClass="profile-input" />
-            </HBox>
-        </VBox>
+                    <Label text="Address:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                    <TextField fx:id="addressField" GridPane.rowIndex="2" GridPane.columnIndex="1" styleClass="profile-input"/>
+
+                    <Label text="Phone Number:" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+                    <TextField fx:id="phoneField" GridPane.rowIndex="3" GridPane.columnIndex="1" styleClass="profile-input"/>
+                </GridPane>
+
+                <Separator styleClass="separator"/>
+
+                <!-- Change Password Section -->
+                <Label text="Change Password" styleClass="section-header"/>
+                <GridPane hgap="10" vgap="15" alignment="CENTER" styleClass="form-grid">
+                    <Label text="Current Password:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                    <PasswordField fx:id="currentPasswordField" GridPane.rowIndex="0" GridPane.columnIndex="1" styleClass="profile-input"/>
+
+                    <Label text="New Password:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                    <PasswordField fx:id="newPasswordField" GridPane.rowIndex="1" GridPane.columnIndex="1" styleClass="profile-input"/>
+
+                    <Label text="Confirm Password:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                    <PasswordField fx:id="confirmPasswordField" GridPane.rowIndex="2" GridPane.columnIndex="1" styleClass="profile-input"/>
+                </GridPane>
+
+                <Separator styleClass="separator"/>
+
+                <!-- Action Buttons -->
+                <HBox spacing="20" alignment="CENTER">
+                    <Button text="Update Profile" onAction="#handleUpdateProfile" styleClass="button"/>
+                    <Button text="Change Password" onAction="#handleChangePassword" styleClass="button"/>
+                    <Button text="Recharge" onAction="#handleRecharge" styleClass="button"/>
+                </HBox>
+            </VBox>
+        </ScrollPane>
     </center>
-
-    <!-- Bottom Section -->
-    <bottom>
-        <HBox spacing="30" alignment="CENTER" styleClass="profile-buttons">
-            <Button text="Save Changes" onAction="#handleSaveChanges" styleClass="save-button" />
-            <Button text="Cancel" onAction="#handleCancel" styleClass="cancel-button" />
-        </HBox>
-    </bottom>
 </BorderPane>
