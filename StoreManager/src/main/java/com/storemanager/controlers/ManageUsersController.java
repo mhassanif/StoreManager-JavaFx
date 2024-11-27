@@ -1,7 +1,11 @@
 package com.storemanager.controlers;
 
+import com.storemanager.dao.CustomerDAO;
+import com.storemanager.dao.StaffDAO;
 import com.storemanager.dao.UserDAO;
+import com.storemanager.model.users.Customer;
 import com.storemanager.model.users.User;
+import com.storemanager.model.users.WarehouseStaff;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -118,6 +122,13 @@ public class ManageUsersController {
         if (result.isPresent() && result.get() == ButtonType.CANCEL) {
             // User chose to cancel the deletion
             return;
+        }
+
+        if(user.getRole().equalsIgnoreCase("Customer")){
+            CustomerDAO.deleteCustomer(CustomerDAO.getCustomerByUserId(user.getId()).getCustomerId());
+        }
+        else{
+            StaffDAO.deleteStaff(StaffDAO.getStaffIdByUserId(user.getId()));
         }
 
         // Proceed with the deletion (call the appropriate DAO method)
