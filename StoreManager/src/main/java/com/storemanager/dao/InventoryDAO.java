@@ -5,6 +5,7 @@ import com.storemanager.model.items.InventoryProduct;
 import com.storemanager.model.items.Product;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -135,13 +136,19 @@ public class InventoryDAO {
      * @return boolean true if the update was successful, false otherwise
      */
     public static boolean setRestockLevel(int productId, int restockLevel) {
-        String updateQuery = "UPDATE Inventory SET restock_quantity = ? WHERE product_id = ?";
+        String updateQuery = "UPDATE Inventory SET restock_quantity = ?, restock_date = ? WHERE product_id = ?";
 
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
 
+            // Set the restock level
             preparedStatement.setInt(1, restockLevel);
-            preparedStatement.setInt(2, productId);
+
+            // Set the current timestamp for restock_date
+            preparedStatement.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
+
+            // Set the product ID
+            preparedStatement.setInt(3, productId);
 
             int rowsAffected = preparedStatement.executeUpdate();
 
