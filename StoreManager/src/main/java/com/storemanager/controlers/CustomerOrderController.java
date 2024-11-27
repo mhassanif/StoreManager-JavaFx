@@ -2,28 +2,26 @@ package com.storemanager.controlers;
 
 import com.storemanager.auth.CurrentUser;
 import com.storemanager.dao.OrderDAO;
-import com.storemanager.db.DBconnector;
 import com.storemanager.model.order.Order;
 import com.storemanager.model.users.Customer;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.stage.Stage;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CustomerOrderController {
+
+    @FXML
+    private VBox contentArea;
+
+    @FXML
+    private ComboBox<String> statusFilterComboBox;
 
     @FXML
     private TableView<Order> orderTable;
@@ -38,49 +36,65 @@ public class CustomerOrderController {
     private TableColumn<Order, Double> totalPriceColumn;
 
     @FXML
-    private TableColumn<Order, String> statusColumn;
+    private TableColumn<Order, String> orderStatusColumn;
+
+    @FXML
+    private TableColumn<Order, String> paymentStatusColumn;
+
+    @FXML
+    private TableColumn<Order, String> paymentDateColumn;
+
+    private List<Order> allOrders;
 
     @FXML
     public void initialize() {
-        orderIdColumn.setCellValueFactory(new PropertyValueFactory<>("orderId"));
-        orderDateColumn.setCellValueFactory(new PropertyValueFactory<>("orderDate"));
-        totalPriceColumn.setCellValueFactory(new PropertyValueFactory<>("totalPrice"));
-        statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+        // Initialize table columns
+        orderIdColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getOrderId()).asObject());
+        orderDateColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getOrderDate()));
+        totalPriceColumn.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getTotalPrice()).asObject());
+        orderStatusColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getStatus()));
+        paymentStatusColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPayment().getStatus()));
+        paymentDateColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPayment().getDate()));
 
-        // Automatically load orders for the logged-in user
+        // Load order history for the logged-in customer
         loadOrderHistory();
+
+        // Populate status filter dropdown
+        statusFilterComboBox.getItems().addAll("All", "Pending", "Completed", "Cancelled");
+        statusFilterComboBox.setValue("All");
+
+        // Add event listener for filtering
+        statusFilterComboBox.setOnAction(e -> filterOrdersByStatus());
     }
 
-    /**
-     * Fetches and displays the order history for the logged-in user.
-     */
     public void loadOrderHistory() {
         int customerId = ((Customer) CurrentUser.getInstance().getUser()).getCustomerId();
         try {
-            List<Order> orders = OrderDAO.getOrdersByCustomerId(customerId);
-
+            allOrders = OrderDAO.getOrdersByCustomerId(customerId);
+            orderTable.getItems().setAll(allOrders);
         } catch (SQLException e) {
-            System.err.println("Database error while retrieving orders: " + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to load orders.", e.getMessage());
         }
     }
-
 
     @FXML
-    private void handleBackToDashboard() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/storemanager/Dashboard.fxml"));
-            Parent dashboardView = loader.load();
-
-            // Debug: Confirm navigation
-            System.out.println("Navigating back to Dashboard...");
-
-            Stage stage = (Stage) orderTable.getScene().getWindow();
-            stage.setScene(new Scene(dashboardView));
-            stage.setTitle("Dashboard");
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Failed to navigate back to Dashboard: " + e.getMessage());
+    private void filterOrdersByStatus() {
+        String selectedStatus = statusFilterComboBox.getValue();
+        if ("All".equals(selectedStatus)) {
+            orderTable.getItems().setAll(allOrders);
+        } else {
+            List<Order> filteredOrders = allOrders.stream()
+                    .filter(order -> order.getStatus().equalsIgnoreCase(selectedStatus))
+                    .collect(Collectors.toList());
+            orderTable.getItems().setAll(filteredOrders);
         }
     }
-}
 
+    private void showAlert(Alert.AlertType alertType, String title, String header, String content) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+}
