@@ -1,54 +1,65 @@
-
--- Trigger for USERS Table: Automatically create role-based entries in CUSTOMER or STAFF
-CREATE TRIGGER trg_AfterInsert_USERS
-ON USERS
-AFTER INSERT
-AS
-BEGIN
-    -- Automatically add record to CUSTOMER if role is 'Customer'
-    INSERT INTO CUSTOMER (user_id)
-    SELECT user_id FROM inserted WHERE role = 'Customer';
-
-    -- Automatically add record to STAFF if role is 'Staff' --> usually added manually
-    --INSERT INTO STAFF (user_id, position)
-    --SELECT user_id, NULL FROM inserted WHERE role = 'Staff';
-END;
-GO
-
--- Trigger for CUSTOMER Table: Cascade delete related records
-CREATE TRIGGER trg_AfterDelete_CUSTOMER
+-- Trigger for CUSTOMER Table: Cascade delete related records before deleting CUSTOMER
+CREATE TRIGGER trg_BeforeDelete_CUSTOMER
 ON CUSTOMER
-AFTER DELETE
+INSTEAD OF DELETE
 AS
 BEGIN
-    -- Delete related SHOPPINGCART records
-    DELETE FROM SHOPPINGCART WHERE customer_id IN (SELECT customer_id FROM deleted);
-
-    -- Delete related ORDERTABLE records
-    DELETE FROM ORDERTABLE WHERE customer_id IN (SELECT customer_id FROM deleted);
+    -- Delete related NOTIFICATION_RECIPIENT and NOTIFICATION records
+    DELETE FROM NOTIFICATION_RECIPIENT WHERE user_id IN (SELECT user_id FROM CUSTOMER WHERE customer_id IN (SELECT customer_id FROM deleted));
 
     -- Delete related FEEDBACK records
     DELETE FROM FEEDBACK WHERE customer_id IN (SELECT customer_id FROM deleted);
 
-    -- Delete corresponding entry from USERS table as well if needed
+    -- Delete related SHOPPINGCART records (CARTITEM deletion is handled by its trigger)
+    DELETE FROM SHOPPINGCART WHERE customer_id IN (SELECT customer_id FROM deleted);
+
+    -- Delete related ORDERTABLE records (ORDERITEM deletion is handled by its trigger)
+    DELETE FROM ORDERTABLE WHERE customer_id IN (SELECT customer_id FROM deleted);
+
+    -- Now delete the CUSTOMER record
+    DELETE FROM CUSTOMER WHERE customer_id IN (SELECT customer_id FROM deleted);
 END;
 GO
 
 
--- Trigger for SHOPPINGCART Table: Delete related CARTITEM records
-CREATE TRIGGER trg_AfterDelete_SHOPPINGCART
+
+
+-- Trigger for SHOPPINGCART Table: Delete related CARTITEM records before deleting SHOPPINGCART
+CREATE TRIGGER trg_BeforeDelete_SHOPPINGCART
 ON SHOPPINGCART
-AFTER DELETE
+INSTEAD OF DELETE
 AS
 BEGIN
+    -- Delete related CARTITEM records
     DELETE FROM CARTITEM WHERE cart_id IN (SELECT cart_id FROM deleted);
+
+    -- Now delete from SHOPPINGCART
+    DELETE FROM SHOPPINGCART WHERE cart_id IN (SELECT cart_id FROM deleted);
 END;
 GO
 
--- Trigger for PRODUCT Table: Cascade delete and auto-create INVENTORY entries
-CREATE TRIGGER trg_AfterDelete_PRODUCT
+-- Trigger for ORDERTABLE Table: Delete related ORDERITEM records before deleting ORDERTABLE
+CREATE TRIGGER trg_BeforeDelete_ORDERTABLE
+ON ORDERTABLE
+INSTEAD OF DELETE
+AS
+BEGIN
+    -- Delete related ORDERITEM records
+    DELETE FROM ORDERITEM WHERE order_id IN (SELECT order_id FROM deleted);
+
+    -- Delete related PAYMENT records
+    DELETE FROM PAYMENT WHERE order_id IN (SELECT order_id FROM deleted);
+
+    -- Now delete from ORDERTABLE
+    DELETE FROM ORDERTABLE WHERE order_id IN (SELECT order_id FROM deleted);
+END;
+GO
+
+
+-- Trigger for PRODUCT Table: Cascade delete related records before deleting PRODUCT
+CREATE TRIGGER trg_BeforeDelete_PRODUCT
 ON PRODUCT
-AFTER DELETE
+INSTEAD OF DELETE
 AS
 BEGIN
     -- Delete related INVENTORY records
@@ -59,8 +70,12 @@ BEGIN
 
     -- Delete related ORDERITEM records
     DELETE FROM ORDERITEM WHERE product_id IN (SELECT product_id FROM deleted);
+
+    -- Now delete the PRODUCT record
+    DELETE FROM PRODUCT WHERE product_id IN (SELECT product_id FROM deleted);
 END;
 GO
+
 
 -- add entry for new product to the invetoty table
 CREATE TRIGGER trg_AfterInsert_PRODUCT
@@ -74,8 +89,7 @@ BEGIN
 END;
 GO
 
--- Updated Trigger for ORDERTABLE Table: Auto-create PAYMENT, notify Manager and Customer
-
+-- Trigger for ORDERTABLE Table: Auto-create PAYMENT, notify Manager and Customer
 CREATE TRIGGER trg_AfterInsert_ORDERTABLE
 ON ORDERTABLE
 AFTER INSERT
@@ -87,23 +101,20 @@ BEGIN
 
     -- Notify the Manager about the new order
     INSERT INTO NOTIFICATION (message)
-    SELECT 'New order placed: Order ID ' + CAST(order_id AS VARCHAR)
+    SELECT 'New order placed: Order ID ' + CAST(order_id AS VARCHAR(255))
     FROM inserted;
 
     -- Assign the notification to staff members with position 'Manager'
     INSERT INTO NOTIFICATION_RECIPIENT (notification_id, user_id)
     SELECT n.notification_id, s.user_id
     FROM NOTIFICATION n
-    CROSS JOIN STAFF s
-    WHERE n.notification_id NOT IN (
-        SELECT notification_id
-        FROM NOTIFICATION_RECIPIENT
-    )
-    AND s.position = 'Manager';
+    INNER JOIN STAFF s ON s.position = 'Manager'
+    INNER JOIN inserted i ON i.order_id = n.order_id
+    WHERE n.message = 'New order placed: Order ID ' + CAST(i.order_id AS VARCHAR(255));
 
     -- Notify the Customer about the order confirmation
     INSERT INTO NOTIFICATION (message)
-    SELECT 'Your order has been confirmed: Order ID ' + CAST(order_id AS VARCHAR)
+    SELECT 'Your order has been confirmed: Order ID ' + CAST(order_id AS VARCHAR(255))
     FROM inserted;
 
     -- Assign the notification to the customer who placed the order
@@ -111,27 +122,12 @@ BEGIN
     SELECT n.notification_id, u.user_id
     FROM NOTIFICATION n
     INNER JOIN USERS u ON u.user_id IN (SELECT user_id FROM inserted)
-    WHERE n.notification_id NOT IN (
-        SELECT notification_id
-        FROM NOTIFICATION_RECIPIENT
-    )
+    WHERE n.message = 'Your order has been confirmed: Order ID ' + CAST(i.order_id AS VARCHAR(255))
     AND u.role = 'Customer';
 END;
 GO
 
 
-CREATE TRIGGER trg_AfterDelete_ORDERTABLE
-ON ORDERTABLE
-AFTER DELETE
-AS
-BEGIN
-    -- Delete related ORDERITEM records
-    DELETE FROM ORDERITEM WHERE order_id IN (SELECT order_id FROM deleted);
-
-    -- Delete related PAYMENT records
-    DELETE FROM PAYMENT WHERE order_id IN (SELECT order_id FROM deleted);
-END;
-GO
 
 -- Trigger for PAYMENT Table: Update ORDERTABLE status
 CREATE TRIGGER trg_AfterUpdate_PAYMENT
@@ -146,7 +142,8 @@ BEGIN
 END;
 GO
 
--- Trigger for ORDERITEM Table: Update INVENTORY and send notification if stock is low
+
+-- Trigger for ORDERITEM Table: Update INVENTORY without sending notifications
 CREATE TRIGGER trg_AfterInsertOrUpdate_ORDERITEM
 ON ORDERITEM
 AFTER INSERT, UPDATE
@@ -157,40 +154,29 @@ BEGIN
     SET stock_quantity = stock_quantity - i.quantity
     FROM INVENTORY inv
     INNER JOIN inserted i ON inv.product_id = i.product_id;
-
-    -- Send notification if stock is low
-    INSERT INTO NOTIFICATION (message)
-    SELECT 'Restock needed for product: ' + CAST(product_id AS VARCHAR)
-    FROM INVENTORY
-    WHERE stock_quantity < restock_quantity;
 END;
 GO
 
-
-
--- Trigger for FEEDBACK Table: Notify admin/staff
--- Trigger to notify admin and manager when new feedback is added
-CREATE TRIGGER trg_AfterInsert_FEEDBACK
-ON FEEDBACK
-AFTER INSERT
+-- Trigger for INVENTORY Table: Notify if stock is low
+CREATE TRIGGER trg_AfterUpdate_INVENTORY
+ON INVENTORY
+AFTER UPDATE
 AS
 BEGIN
-    -- Insert a notification about the new feedback
+    -- Notify if stock is low for any product
     INSERT INTO NOTIFICATION (message)
-    SELECT 'New feedback from customer: ' + CAST(customer_id AS VARCHAR)
-    FROM inserted;
+    SELECT 'Restock needed for product: ' + CAST(product_id AS VARCHAR)
+    FROM inserted
+    WHERE stock_quantity < restock_quantity;
 
-    -- Assign the notification to staff members with positions 'Admin' and 'Manager'
+    -- Notify Managers and Warehouse Staff
     INSERT INTO NOTIFICATION_RECIPIENT (notification_id, user_id)
     SELECT n.notification_id, s.user_id
     FROM NOTIFICATION n
-    CROSS JOIN STAFF s
-    WHERE n.notification_id NOT IN (
-        SELECT notification_id
-        FROM NOTIFICATION_RECIPIENT
-    )
-    AND s.position IN ('Admin', 'Manager');
+    INNER JOIN STAFF s ON s.position IN ('Manager', 'Warehouse Staff')
+    WHERE n.notification_id IN (SELECT notification_id FROM inserted);
 END;
 GO
+
 
 

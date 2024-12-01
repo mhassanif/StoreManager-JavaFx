@@ -32,14 +32,14 @@ public class StaffDAO {
 
                 // If user exists, map to the appropriate staff type
                 if (user != null) {
-                    switch (position) {
-                        case "Admin" -> staffList.add(
+                    switch (position.toLowerCase()) {
+                        case "admin" -> staffList.add(
                                 new Admin(staffId, user.getId(), user.getUsername(), user.getEmail(),
                                         user.getPassword(), user.getAddress(), user.getPhoneNumber()));
-                        case "Manager" -> staffList.add(
+                        case "manager" -> staffList.add(
                                 new Manager(staffId, user.getId(), user.getUsername(), user.getEmail(),
                                         user.getPassword(), user.getAddress(), user.getPhoneNumber()));
-                        case "WarehouseStaff" -> staffList.add(
+                        case "warehouse staff" -> staffList.add(
                                 new WarehouseStaff(staffId, user.getId(), user.getUsername(), user.getEmail(),
                                         user.getPassword(), user.getAddress(), user.getPhoneNumber()));
                         default -> throw new IllegalArgumentException("Unknown position: " + position);
