@@ -131,7 +131,7 @@ BEGIN
         -- Match the notification_id with the relevant product notifications
         SELECT 1
         FROM inserted i
-        WHERE i.product_id = CAST(SUBSTRING(CAST(n.message AS VARCHAR(MAX)), 25, LEN(CAST(n.message AS VARCHAR(MAX)))) AS INT)
+        WHERE i.product_id = CAST(SUBSTRING(CAST(n.message AS VARCHAR(MAX)), 29, LEN(CAST(n.message AS VARCHAR(MAX)))) AS INT)
     )
     AND NOT EXISTS (
         -- Prevent duplicate user_id and notification_id combinations in NOTIFICATION_RECIPIENT
