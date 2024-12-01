@@ -89,59 +89,6 @@ BEGIN
 END;
 GO
 
--- Trigger for ORDERTABLE Table: Auto-create PAYMENT, notify Manager and Customer
-CREATE TRIGGER trg_AfterInsert_ORDERTABLE
-ON ORDERTABLE
-AFTER INSERT
-AS
-BEGIN
-    -- Automatically create a PAYMENT record for the new order
-    INSERT INTO PAYMENT (order_id, amount)
-    SELECT order_id, total_amount FROM inserted;
-
-    -- Notify the Manager about the new order
-    INSERT INTO NOTIFICATION (message)
-    SELECT 'New order placed: Order ID ' + CAST(order_id AS VARCHAR(255))
-    FROM inserted;
-
-    -- Assign the notification to staff members with position 'Manager'
-    INSERT INTO NOTIFICATION_RECIPIENT (notification_id, user_id)
-    SELECT n.notification_id, s.user_id
-    FROM NOTIFICATION n
-    INNER JOIN STAFF s ON s.position = 'Manager'
-    INNER JOIN inserted i ON i.order_id = n.order_id
-    WHERE n.message = 'New order placed: Order ID ' + CAST(i.order_id AS VARCHAR(255));
-
-    -- Notify the Customer about the order confirmation
-    INSERT INTO NOTIFICATION (message)
-    SELECT 'Your order has been confirmed: Order ID ' + CAST(order_id AS VARCHAR(255))
-    FROM inserted;
-
-    -- Assign the notification to the customer who placed the order
-    INSERT INTO NOTIFICATION_RECIPIENT (notification_id, user_id)
-    SELECT n.notification_id, u.user_id
-    FROM NOTIFICATION n
-    INNER JOIN USERS u ON u.user_id IN (SELECT user_id FROM inserted)
-    WHERE n.message = 'Your order has been confirmed: Order ID ' + CAST(i.order_id AS VARCHAR(255))
-    AND u.role = 'Customer';
-END;
-GO
-
-
-
--- Trigger for PAYMENT Table: Update ORDERTABLE status
-CREATE TRIGGER trg_AfterUpdate_PAYMENT
-ON PAYMENT
-AFTER UPDATE
-AS
-BEGIN
-    -- Update the status of the corresponding order if payment is completed
-    UPDATE ORDERTABLE
-    SET status = 'Completed'
-    WHERE order_id IN (SELECT order_id FROM inserted WHERE status = 'Completed');
-END;
-GO
-
 
 -- Trigger for ORDERITEM Table: Update INVENTORY without sending notifications
 CREATE TRIGGER trg_AfterInsertOrUpdate_ORDERITEM
@@ -163,20 +110,53 @@ ON INVENTORY
 AFTER UPDATE
 AS
 BEGIN
-    -- Notify if stock is low for any product
+    -- Insert a notification if stock is low for any product
     INSERT INTO NOTIFICATION (message)
     SELECT 'Restock needed for product: ' + CAST(product_id AS VARCHAR)
     FROM inserted
-    WHERE stock_quantity < restock_quantity;
+    WHERE stock_quantity < restock_quantity
+    AND NOT EXISTS (
+        -- Avoid inserting the same notification if it's already present
+        SELECT 1
+        FROM NOTIFICATION n
+        WHERE CAST(n.message AS VARCHAR(MAX)) = 'Restock needed for product: ' + CAST(inserted.product_id AS VARCHAR)
+    );
 
-    -- Notify Managers and Warehouse Staff
+    -- Insert into NOTIFICATION_RECIPIENT table, avoiding duplicate entries
     INSERT INTO NOTIFICATION_RECIPIENT (notification_id, user_id)
     SELECT n.notification_id, s.user_id
     FROM NOTIFICATION n
     INNER JOIN STAFF s ON s.position IN ('Manager', 'Warehouse Staff')
-    WHERE n.notification_id IN (SELECT notification_id FROM inserted);
+    WHERE EXISTS (
+        -- Match the notification_id with the relevant product notifications
+        SELECT 1
+        FROM inserted i
+        WHERE i.product_id = CAST(SUBSTRING(CAST(n.message AS VARCHAR(MAX)), 25, LEN(CAST(n.message AS VARCHAR(MAX)))) AS INT)
+    )
+    AND NOT EXISTS (
+        -- Prevent duplicate user_id and notification_id combinations in NOTIFICATION_RECIPIENT
+        SELECT 1
+        FROM NOTIFICATION_RECIPIENT nr
+        WHERE nr.notification_id = n.notification_id
+        AND nr.user_id = s.user_id
+    );
 END;
 GO
 
 
 
+
+
+
+DECLARE @sql NVARCHAR(MAX) = '';
+
+-- Generate DROP TRIGGER statements for all triggers in the current database
+SELECT @sql = @sql + 'DROP TRIGGER IF EXISTS ' + QUOTENAME(name) + ';' + CHAR(13)
+FROM sys.triggers
+WHERE parent_id = OBJECT_ID('dbo.ORDERTABLE') OR parent_id = OBJECT_ID('dbo.PRODUCT')
+   OR parent_id = OBJECT_ID('dbo.CUSTOMER') OR parent_id = OBJECT_ID('dbo.SHOPPINGCART')
+   OR parent_id = OBJECT_ID('dbo.ORDERITEM') OR parent_id = OBJECT_ID('dbo.INVENTORY')
+   OR parent_id = OBJECT_ID('dbo.PAYMENT');
+
+-- Execute the dynamic SQL to drop the triggers
+EXEC sp_executesql @sql;

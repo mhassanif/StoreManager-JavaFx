@@ -125,3 +125,26 @@ INSERT INTO NOTIFICATION (message) VALUES
 INSERT INTO NOTIFICATION_RECIPIENT (notification_id, user_id) VALUES
 (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9), (1, 10),
 (1, 11), (1, 12), (1, 13), (1, 14), (1, 15);
+
+-- Adding low stock notifications to the NOTIFICATION Table
+INSERT INTO NOTIFICATION (message) VALUES
+('Restock needed for product: 2'),
+('Restock needed for product: 5'),
+('Restock needed for product: 6');
+
+INSERT INTO NOTIFICATION_RECIPIENT (notification_id, user_id, status) VALUES
+(2, 1, 'Unread'),
+(2, 2, 'Unread'),
+(2, 3, 'Unread');
+
+-- Notification 3: Low stock for Laptop
+INSERT INTO NOTIFICATION_RECIPIENT (notification_id, user_id, status) VALUES
+(3, 1, 'Unread'),
+(3, 2, 'Unread'),
+(3, 3, 'Unread');
+
+-- Notification 4: Low stock for Action Figure
+INSERT INTO NOTIFICATION_RECIPIENT (notification_id, user_id, status) VALUES
+(4, 1, 'Unread'),
+(4, 2, 'Unread'),
+(4, 3, 'Unread');

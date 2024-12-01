@@ -121,7 +121,7 @@ public class CheckoutController {
 
             Order order = new Order(customer, orderItems);
             order.setTotalPrice(totalAmount);
-            order.setStatus("Completed");
+            order.setStatus("Pending");
 
             OrderDAO.createOrder(order);
             // Do not clear the cart as per the requirement
@@ -136,7 +136,7 @@ public class CheckoutController {
     }
 
     private void savePayment(int orderId, double amount) {
-        String paymentQuery = "INSERT INTO PAYMENT (order_id, amount, date, status) VALUES (?, ?, GETDATE(), 'Completed')";
+        String paymentQuery = "INSERT INTO PAYMENT (order_id, amount, date, status) VALUES (?, ?, GETDATE(), 'Pending')";
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(paymentQuery)) {
             ps.setInt(1, orderId);
