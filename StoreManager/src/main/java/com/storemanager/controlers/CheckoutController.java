@@ -136,7 +136,7 @@ public class CheckoutController {
     }
 
     private void savePayment(int orderId, double amount) {
-        String paymentQuery = "INSERT INTO PAYMENT (order_id, amount, date, status) VALUES (?, ?, GETDATE(), 'Pending')";
+        String paymentQuery = "INSERT INTO PAYMENT (order_id, amount, date, status) VALUES (?, ?, GETDATE(), 'Completed')";
         try (Connection connection = DBconnector.getConnection();
              PreparedStatement ps = connection.prepareStatement(paymentQuery)) {
             ps.setInt(1, orderId);
