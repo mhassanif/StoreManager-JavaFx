@@ -121,7 +121,7 @@ public class CheckoutController {
 
             Order order = new Order(customer, orderItems);
             order.setTotalPrice(totalAmount);
-            order.setStatus("Completed");
+            order.setStatus("Pending");
 
             OrderDAO.createOrder(order);
             // Do not clear the cart as per the requirement
