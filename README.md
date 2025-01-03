@@ -1,29 +1,244 @@
-# StoreManager-JavaFx
-TradeTrack is an integrated desktop-based application. TradeTrack merges eCommerce functionalities with inventory management to streamline retail operations for SaveMart. It covers key areas, including eCommerce management, inventory tracking, and analytics. 
+﻿# TradeTrack
+
+**by**
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.002.png)
+
+## Software Requirements Specification
+
+### Table of Contents
+
+#### Introduction
+1. Purpose
+1. Product Scope
+1. Title
+1. Objectives
+1. Problem Statement
+#### Overall Description
+1. Product Perspective
+1. Product Functions
+1. List of Use Cases
+1. Use Case Diagram
+#### Other Nonfunctional Requirements
+1. Performance Requirements
+1. Safety Requirements
+1. Security Requirements
+1. Software Quality Attributes
+1. Business Rules 
+1. Operating Environment
+1. User Interfaces
+#### Domain Model
+#### System Sequence Diagram
+#### Sequence Diagrams
+#### Class Diagram
+#### Component Diagram
+#### Package Diagram
+#### Deployment Diagram
+
+************************************
+
+## Introduction
+
+### 1. **Purpose**
+
+*The software requirements document describes TradeTrack, an integrated desktop-based application. TradeTrack merges eCommerce functionalities with inventory management to streamline retail operations for SaveMart. It covers key areas, including eCommerce management, inventory tracking, and analytics. This SRS outlines the entire system.*
+
+### 2. **Product Scope**
+
+*TradeTrack is designed for Metro Cash and Carry’s retail operations. It combines eCommerce and inventory management to reduce manual errors, automate processes, and facilitate real-time synchronization of data. The system will address current inefficiencies in retail by:*
+
+- *Managing online sales and payments.*
+- *Tracking inventory and automating reordering.*
+- *Generating reports for strategic decision-making.*
+
+### 3. **Title**
+
+<a name="_page3_x64.80_y409.58"></a>*TradeTrack: An Integrated eCommerce and Inventory Management System for Retail Operations*
+
+### 4. **Objectives**
+
+*Streamline operations by merging eCommerce and inventory systems.*
+
+*Provide real-time inventory updates and automate stock adjustments.*
+
+*Enhance customer satisfaction through accurate order tracking and timely fulfillment. Offer analytics for informed decision-making.*
+
+*Create a scalable and user-friendly solution with robust security measures.*
+
+### 5. **Problem Statement**
+
+*Retail businesses face inefficiencies due to disconnected eCommerce and inventory systems:*
+
+*Manual Errors: Prone to data discrepancies.*
+
+*Operational Inefficiencies: Redundant data entry increases workload.*
+
+*Customer Dissatisfaction: Delays in order processing and stock inaccuracies.*
+
+*TradeTrack solves these issues by integrating eCommerce and inventory management into a cohesive system.*
+
+## **Overall Description**
+### 1. **Product Perspective**
+
+*TradeTrack is a new, self-contained system addressing gaps in existing solutions by providing:*
+
+*Integrated inventory and sales tracking.*
+
+*Automation of key operations like reordering and reporting.*
+
+*Diagram: Displays system components, subsystems (eCommerce, inventory management), and interfaces.*
+
+### 2. **Product Functions**
+
+*Manage online customer orders and payments. Track and reorder inventory automatically.*
+
+*Generate analytics for sales, inventory, and finances.*
+
+### 3. **List of Use Cases**
+1. **View Product Catalog**
+1. **Place Order**
+1. **Track Order Status**
+1. **View Order History**
+1. **Notify Low Stock Levels**
+1. **Set Restock Levels**
+1. **Restock Inventory**
+1. **Manage Users**
+1. **Manage Products**
+1. **Send Order Confirmation**
+1. **View Inventory Status**
+1. **Manage Customer Feedback**
+1. **Manage Orders**
 
 
-[PROJECT SCOPE](https://docs.google.com/document/d/1z5ElDZz7LbN9RkBCWqyHpdc8WMfhoWTePHPCq78gaFU/edit?usp=sharing)
+### 5. **Use Case Diagram**
 
-[USECASE-DIAGRAM](https://drive.google.com/file/d/10-PDATXtgbPqcOy0TYtoF2K0IClebA4c/view?usp=sharing)
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.004.jpeg)
 
-[FULLY DRESSES USECASES](https://docs.google.com/document/d/1iEGZ_M8FCJL7CDgoZM3_mKZwYF-gxmzrXRYIzuYwb_8/edit?usp=sharing)
+## **Other Nonfunctional Requirements**
+### 1. **Performance Requirements**
 
-[DOMAIN MODEL](https://drive.google.com/file/d/1frQA9VhNlRuulaa5_T5N_DYxtFGY5akK/view?usp=sharing)
+*Real-time updates for inventory and order statuses.*
 
-[UML DIAGRAM](https://drive.google.com/file/d/1cutA6XR3TN4LJs8WPEX8XZfPz3Sf98UZ/view?usp=sharing)
+*Handle up to 10,000 concurrent user requests without degradation.*
 
-[SYSTEM SEQUENCE](https://drive.google.com/file/d/1NBoYfohJ-6oq0dzyxQrNiLSROiO4Tz64/view?usp=sharing)
+### 2. **Safety Requirements**
 
-[ACTION SEQUENCES](https://drive.google.com/file/d/1zPvXNP-vhaDg80woSlj1yO6YsRoxPh7U/view?usp=sharing)
+*Prevent data loss during system crashes via periodic backups. Ensure regulatory compliance with data protection standards.*
 
-[DELIVERABLE#4](https://docs.google.com/document/d/1kzpN3BP0F8CVbfs9zNb2Qpx1mfaCuAQz-NGVePSGB8U/edit?usp=sharing)
+### 3. **Security Requirements**
 
-[DETAILED DOCUMENTATION](https://docs.google.com/document/d/1nQ4ZFDPkTeb6NcJ1l5f-tok9yCS3-_UB/edit?usp=sharing&ouid=104121641467295610073&rtpof=true&sd=true)
+*Encrypted communication for sensitive data.*
 
-[PRESENTATION](https://docs.google.com/presentation/d/11zO-vK-PkMyaQgI6ITaRSNkrN9T5tWSH1eRJ7FmgIA4/edit?usp=sharing)
+*Role-based access control for Store Managers and Customers.*
 
+### 4. **Software Quality Attributes**
 
+*Adaptability: Compatible with future extensions. Reliability: Ensure 99.9% uptime.*
 
+*Usability: Intuitive interfaces for non-technical users.*
 
+### 5. **Business Rules**
 
+*Only Store Managers can approve refunds. Warehouse Staff manages restocking processes.*
 
+### 6. **Operating Environment**
+
+*Hardware: Windows/Linux desktops with a minimum of 8GB RAM. Software: Java-based application using SQL Server for the database.*
+
+### 7. **User Interfaces**
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.005.jpeg)
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.006.jpeg)
+
+**Admin:**
+
+The admin interface provides comprehensive control over the system, enabling the management of user accounts, permissions, and overall system configurations. Admins can oversee inventory, monitor sales analytics, and generate reports. Additionally, they can resolve escalations from other roles and maintain system security.
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.007.jpeg)
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.008.jpeg)
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.009.jpeg)
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.010.jpeg)
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.011.jpeg)
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.012.jpeg)
+
+**WarehouseStaff:**
+
+The warehouse staff interface focuses on inventory management and order fulfillment. Staff can view incoming and outgoing stock, update inventory levels, and track stock movements. The interface also supports scanning products for faster processing and provides alerts for low stock or discrepancies during audits.
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.013.jpeg)
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.014.jpeg)
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.015.jpeg)
+
+**Customer:**
+
+The customer interface is designed for shopping convenience, allowing users to browse products, add items to their cart, and complete secure checkouts. Customers can track their orders, view past purchases, and manage their profile details. The interface also provides personalized recommendations and promotional offers.
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.016.jpeg)
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.017.jpeg)
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.018.jpeg)
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.019.jpeg)
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.020.jpeg)
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.021.jpeg)
+
+4. **Domain Model**
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.022.jpeg)
+
+5. **System Sequence Diagram**
+
+   ![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.023.jpeg)
+
+6. **Sequence Diagram**
+
+**Manage Orders :**
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.024.jpeg)
+
+**Manage Feedback:**
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.025.jpeg)
+
+**Restock Inventory:**
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.026.jpeg)
+
+**Notify Low Stock:**
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.027.jpeg)
+
+**Manage Products:**
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.028.jpeg)
+
+**View Products:**
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.029.jpeg)
+
+7. **Class Diagram**
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.030.png)
+
+8. **Component Diagram**
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.031.jpeg)
+
+9. **Package Diagram**
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.032.jpeg)
+
+10. **Deployment Diagram**
+
+![](utils/Aspose.Words.b670a146-df69-445c-b7eb-f867da166c2a.033.jpeg)
